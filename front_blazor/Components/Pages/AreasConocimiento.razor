@@ -1,0 +1,277 @@
+@page "/areas-conocimiento"
+@rendermode InteractiveServer
+@inject ServicioAreaConocimiento Servicio
+@inject IJSRuntime JS
+
+@*
+    LA PANTALLA DE `area_conocimiento`
+    Tiene dirección propia —/areas-conocimiento—, siguiendo el mismo patrón de
+    /aliados: dos botones de guardar (ficha completa vs. solo lo que cambió),
+    y un aviso en pantalla —nunca una página de excepción— si algo falla.
+*@
+
+<PageTitle>Áreas de conocimiento</PageTitle>
+
+<div class="encabezado">
+    <div>
+        <h1>Áreas de conocimiento</h1>
+        <p class="nota">
+            El catálogo jerárquico de áreas de conocimiento (gran área, área y disciplina) que clasifica los programas académicos.
+        </p>
+    </div>
+    @if (!mostrandoFormulario)
+    {
+        <button class="boton primario" @onclick="Agregar">Agregar</button>
+    }
+</div>
+
+@foreach (var error in errores)
+{
+    <p class="aviso error">@error</p>
+}
+@if (!string.IsNullOrEmpty(exito))
+{
+    <p class="aviso exito">@exito</p>
+}
+
+@if (mostrandoFormulario)
+{
+    <div class="tarjeta-formulario">
+        <h2>@(editando ? "Editar el área de conocimiento" : "Agregar el área de conocimiento")</h2>
+
+        <label>
+            Código
+            <input type="text" maxlength="6" @bind="campoId" disabled="@editando" />
+            <span class="ayuda">El código del catálogo (hasta 6 caracteres). No se podrá cambiar después.</span>
+        </label>
+
+        <label>
+            Gran área
+            <input type="text" maxlength="60" @bind="campoGranArea" />
+        </label>
+
+        <label>
+            Área
+            <input type="text" maxlength="60" @bind="campoArea" />
+        </label>
+
+        <label>
+            Disciplina
+            <input type="text" maxlength="150" @bind="campoDisciplina" />
+        </label>
+
+        <div class="pareja">
+            @if (editando)
+            {
+                <button class="boton primario" @onclick="GuardarCompleta" disabled="@guardando">
+                    Guardar la ficha completa
+                </button>
+                <button class="boton" @onclick="GuardarLoQueCambio" disabled="@guardando">
+                    Guardar solo lo que cambié
+                </button>
+            }
+            else
+            {
+                <button class="boton primario" @onclick="Crear" disabled="@guardando">
+                    Agregar
+                </button>
+            }
+            <button class="boton" @onclick="Cancelar" disabled="@guardando">Cancelar</button>
+        </div>
+
+        @if (editando)
+        {
+            <span class="ayuda">
+                «La ficha completa» exige que todos los datos obligatorios estén
+                diligenciados. «Solo lo que cambié» guarda lo que usted escribió
+                y deja lo demás como estaba.
+            </span>
+        }
+    </div>
+}
+
+@if (cargando)
+{
+    <p class="nota">Cargando…</p>
+}
+else if (filas.Count > 0)
+{
+    <div class="tabla-scroll">
+        <table>
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Gran área</th>
+                    <th>Área</th>
+                    <th>Disciplina</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var fila in filas)
+                {
+                    <tr>
+                        <td><code>@fila.Id</code></td>
+                        <td>@fila.GranArea</td>
+                        <td>@fila.Area</td>
+                        <td>@fila.Disciplina</td>
+                        <td>
+                            <div class="acciones">
+                                <button class="boton" @onclick="() => Editar(fila)">Editar</button>
+                                <button class="boton peligro" @onclick="() => Retirar(fila)">Retirar</button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <p class="nota">@filas.Count ficha(s).</p>
+}
+else
+{
+    <p class="vacio">
+        Todavía no hay áreas de conocimiento. Use «Agregar» para crear la primera.
+    </p>
+}
+
+@code {
+    private List<AreaConocimiento> filas = new();
+    private List<string> errores = new();
+    private string exito = string.Empty;
+
+    private bool cargando = true;
+    private bool guardando;
+    private bool mostrandoFormulario;
+    private bool editando;
+
+    private string campoId = string.Empty;
+    private string campoGranArea = string.Empty;
+    private string campoArea = string.Empty;
+    private string campoDisciplina = string.Empty;
+
+    protected override async Task OnInitializedAsync() => await Cargar();
+
+    private async Task Cargar()
+    {
+        cargando = true;
+        var r = await Servicio.Listar();
+        cargando = false;
+
+        errores = r.Errores;
+        filas = r.Ok ? r.Datos! : new();
+    }
+
+    private void Agregar()
+    {
+        Limpiar();
+        editando = false;
+        mostrandoFormulario = true;
+    }
+
+    private void Editar(AreaConocimiento fila)
+    {
+        campoId = fila.Id;
+        campoGranArea = fila.GranArea;
+        campoArea = fila.Area;
+        campoDisciplina = fila.Disciplina;
+        editando = true;
+        mostrandoFormulario = true;
+        errores = new();
+        exito = string.Empty;
+    }
+
+    private void Cancelar()
+    {
+        mostrandoFormulario = false;
+        Limpiar();
+    }
+
+    private void Limpiar()
+    {
+        campoId = string.Empty;
+        campoGranArea = string.Empty;
+        campoArea = string.Empty;
+        campoDisciplina = string.Empty;
+        errores = new();
+        exito = string.Empty;
+    }
+
+    private async Task Crear()
+    {
+        guardando = true;
+        var r = await Servicio.Crear(new AreaConocimiento
+        {
+            Id = campoId,
+            GranArea = campoGranArea.Trim(),
+            Area = campoArea.Trim(),
+            Disciplina = campoDisciplina.Trim()
+        });
+        guardando = false;
+
+        await TrasGuardar(r, $"Se agregó el registro {campoId}.");
+    }
+
+    private async Task GuardarCompleta()
+    {
+        guardando = true;
+        var r = await Servicio.Reemplazar(campoId, new AreaConocimiento
+        {
+            GranArea = campoGranArea.Trim(),
+            Area = campoArea.Trim(),
+            Disciplina = campoDisciplina.Trim()
+        });
+        guardando = false;
+
+        await TrasGuardar(r, $"Se guardó el registro {campoId}.");
+    }
+
+    private async Task GuardarLoQueCambio()
+    {
+        guardando = true;
+        var r = await Servicio.Actualizar(
+            campoId,
+            campoGranArea,
+            campoArea,
+            campoDisciplina);
+        guardando = false;
+
+        await TrasGuardar(r, $"Se guardó el registro {campoId}.");
+    }
+
+    private async Task TrasGuardar(Resultado<bool> r, string mensaje)
+    {
+        if (r.Ok)
+        {
+            mostrandoFormulario = false;
+            exito = mensaje;
+            errores = new();
+            await Cargar();
+        }
+        else
+        {
+            errores = r.Errores;
+            exito = string.Empty;
+        }
+    }
+
+    private async Task Retirar(AreaConocimiento fila)
+    {
+        var seguro = await JS.InvokeAsync<bool>(
+            "confirm", $"¿Retirar {fila.Id} del uso?");
+        if (!seguro) return;
+
+        var r = await Servicio.Eliminar(fila.Id);
+        if (r.Ok)
+        {
+            exito = $"Se retiró el registro {fila.Id}.";
+            errores = new();
+            await Cargar();
+        }
+        else
+        {
+            errores = r.Errores;
+            exito = string.Empty;
+        }
+    }
+}

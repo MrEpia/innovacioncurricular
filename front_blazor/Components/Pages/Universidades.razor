@@ -1,0 +1,277 @@
+@page "/universidades"
+@rendermode InteractiveServer
+@inject ServicioUniversidad Servicio
+@inject IJSRuntime JS
+
+@*
+    LA PANTALLA DE `universidad`
+    Tiene dirección propia —/universidades—, siguiendo el mismo patrón de
+    /aliados: dos botones de guardar (ficha completa vs. solo lo que cambió),
+    y un aviso en pantalla —nunca una página de excepción— si algo falla.
+*@
+
+<PageTitle>Universidades</PageTitle>
+
+<div class="encabezado">
+    <div>
+        <h1>Universidades</h1>
+        <p class="nota">
+            Las sedes y seccionales de la universidad en las distintas ciudades del país.
+        </p>
+    </div>
+    @if (!mostrandoFormulario)
+    {
+        <button class="boton primario" @onclick="Agregar">Agregar</button>
+    }
+</div>
+
+@foreach (var error in errores)
+{
+    <p class="aviso error">@error</p>
+}
+@if (!string.IsNullOrEmpty(exito))
+{
+    <p class="aviso exito">@exito</p>
+}
+
+@if (mostrandoFormulario)
+{
+    <div class="tarjeta-formulario">
+        <h2>@(editando ? "Editar la universidad" : "Agregar la universidad")</h2>
+
+        <label>
+            ID
+            <input type="number" @bind="campoId" disabled="@editando" />
+            <span class="ayuda">El identificador numérico de la sede. No se podrá cambiar después.</span>
+        </label>
+
+        <label>
+            Nombre
+            <input type="text" maxlength="60" @bind="campoNombre" />
+        </label>
+
+        <label>
+            Tipo
+            <input type="text" maxlength="45" @bind="campoTipo" />
+        </label>
+
+        <label>
+            Ciudad
+            <input type="text" maxlength="45" @bind="campoCiudad" />
+        </label>
+
+        <div class="pareja">
+            @if (editando)
+            {
+                <button class="boton primario" @onclick="GuardarCompleta" disabled="@guardando">
+                    Guardar la ficha completa
+                </button>
+                <button class="boton" @onclick="GuardarLoQueCambio" disabled="@guardando">
+                    Guardar solo lo que cambié
+                </button>
+            }
+            else
+            {
+                <button class="boton primario" @onclick="Crear" disabled="@guardando">
+                    Agregar
+                </button>
+            }
+            <button class="boton" @onclick="Cancelar" disabled="@guardando">Cancelar</button>
+        </div>
+
+        @if (editando)
+        {
+            <span class="ayuda">
+                «La ficha completa» exige que todos los datos obligatorios estén
+                diligenciados. «Solo lo que cambié» guarda lo que usted escribió
+                y deja lo demás como estaba.
+            </span>
+        }
+    </div>
+}
+
+@if (cargando)
+{
+    <p class="nota">Cargando…</p>
+}
+else if (filas.Count > 0)
+{
+    <div class="tabla-scroll">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Tipo</th>
+                    <th>Ciudad</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var fila in filas)
+                {
+                    <tr>
+                        <td><code>@fila.Id</code></td>
+                        <td>@fila.Nombre</td>
+                        <td>@fila.Tipo</td>
+                        <td>@fila.Ciudad</td>
+                        <td>
+                            <div class="acciones">
+                                <button class="boton" @onclick="() => Editar(fila)">Editar</button>
+                                <button class="boton peligro" @onclick="() => Retirar(fila)">Retirar</button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <p class="nota">@filas.Count ficha(s).</p>
+}
+else
+{
+    <p class="vacio">
+        Todavía no hay universidades. Use «Agregar» para crear la primera.
+    </p>
+}
+
+@code {
+    private List<Universidad> filas = new();
+    private List<string> errores = new();
+    private string exito = string.Empty;
+
+    private bool cargando = true;
+    private bool guardando;
+    private bool mostrandoFormulario;
+    private bool editando;
+
+    private int campoId = 0;
+    private string campoNombre = string.Empty;
+    private string campoTipo = string.Empty;
+    private string campoCiudad = string.Empty;
+
+    protected override async Task OnInitializedAsync() => await Cargar();
+
+    private async Task Cargar()
+    {
+        cargando = true;
+        var r = await Servicio.Listar();
+        cargando = false;
+
+        errores = r.Errores;
+        filas = r.Ok ? r.Datos! : new();
+    }
+
+    private void Agregar()
+    {
+        Limpiar();
+        editando = false;
+        mostrandoFormulario = true;
+    }
+
+    private void Editar(Universidad fila)
+    {
+        campoId = fila.Id;
+        campoNombre = fila.Nombre;
+        campoTipo = fila.Tipo;
+        campoCiudad = fila.Ciudad;
+        editando = true;
+        mostrandoFormulario = true;
+        errores = new();
+        exito = string.Empty;
+    }
+
+    private void Cancelar()
+    {
+        mostrandoFormulario = false;
+        Limpiar();
+    }
+
+    private void Limpiar()
+    {
+        campoId = 0;
+        campoNombre = string.Empty;
+        campoTipo = string.Empty;
+        campoCiudad = string.Empty;
+        errores = new();
+        exito = string.Empty;
+    }
+
+    private async Task Crear()
+    {
+        guardando = true;
+        var r = await Servicio.Crear(new Universidad
+        {
+            Id = campoId,
+            Nombre = campoNombre.Trim(),
+            Tipo = campoTipo.Trim(),
+            Ciudad = campoCiudad.Trim()
+        });
+        guardando = false;
+
+        await TrasGuardar(r, $"Se agregó el registro {campoId}.");
+    }
+
+    private async Task GuardarCompleta()
+    {
+        guardando = true;
+        var r = await Servicio.Reemplazar(campoId, new Universidad
+        {
+            Nombre = campoNombre.Trim(),
+            Tipo = campoTipo.Trim(),
+            Ciudad = campoCiudad.Trim()
+        });
+        guardando = false;
+
+        await TrasGuardar(r, $"Se guardó el registro {campoId}.");
+    }
+
+    private async Task GuardarLoQueCambio()
+    {
+        guardando = true;
+        var r = await Servicio.Actualizar(
+            campoId,
+            campoNombre,
+            campoTipo,
+            campoCiudad);
+        guardando = false;
+
+        await TrasGuardar(r, $"Se guardó el registro {campoId}.");
+    }
+
+    private async Task TrasGuardar(Resultado<bool> r, string mensaje)
+    {
+        if (r.Ok)
+        {
+            mostrandoFormulario = false;
+            exito = mensaje;
+            errores = new();
+            await Cargar();
+        }
+        else
+        {
+            errores = r.Errores;
+            exito = string.Empty;
+        }
+    }
+
+    private async Task Retirar(Universidad fila)
+    {
+        var seguro = await JS.InvokeAsync<bool>(
+            "confirm", $"¿Retirar {fila.Id} del uso?");
+        if (!seguro) return;
+
+        var r = await Servicio.Eliminar(fila.Id);
+        if (r.Ok)
+        {
+            exito = $"Se retiró el registro {fila.Id}.";
+            errores = new();
+            await Cargar();
+        }
+        else
+        {
+            errores = r.Errores;
+            exito = string.Empty;
+        }
+    }
+}

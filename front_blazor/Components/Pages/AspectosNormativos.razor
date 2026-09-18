@@ -1,0 +1,277 @@
+@page "/aspectos-normativos"
+@rendermode InteractiveServer
+@inject ServicioAspectoNormativo Servicio
+@inject IJSRuntime JS
+
+@*
+    LA PANTALLA DE `aspecto_normativo`
+    Tiene dirección propia —/aspectos-normativos—, siguiendo el mismo patrón de
+    /aliados: dos botones de guardar (ficha completa vs. solo lo que cambió),
+    y un aviso en pantalla —nunca una página de excepción— si algo falla.
+*@
+
+<PageTitle>Aspectos normativos</PageTitle>
+
+<div class="encabezado">
+    <div>
+        <h1>Aspectos normativos</h1>
+        <p class="nota">
+            Leyes, decretos, resoluciones y demás normativas que regulan los programas académicos.
+        </p>
+    </div>
+    @if (!mostrandoFormulario)
+    {
+        <button class="boton primario" @onclick="Agregar">Agregar</button>
+    }
+</div>
+
+@foreach (var error in errores)
+{
+    <p class="aviso error">@error</p>
+}
+@if (!string.IsNullOrEmpty(exito))
+{
+    <p class="aviso exito">@exito</p>
+}
+
+@if (mostrandoFormulario)
+{
+    <div class="tarjeta-formulario">
+        <h2>@(editando ? "Editar el aspecto normativo" : "Agregar el aspecto normativo")</h2>
+
+        <label>
+            ID
+            <input type="number" @bind="campoId" disabled="@editando" />
+            <span class="ayuda">El identificador numérico del aspecto normativo. No se podrá cambiar después.</span>
+        </label>
+
+        <label>
+            Tipo
+            <input type="text" maxlength="45" @bind="campoTipo" />
+        </label>
+
+        <label>
+            Descripción
+            <input type="text" maxlength="45" @bind="campoDescripcion" />
+        </label>
+
+        <label>
+            Fuente
+            <input type="text" maxlength="45" @bind="campoFuente" />
+        </label>
+
+        <div class="pareja">
+            @if (editando)
+            {
+                <button class="boton primario" @onclick="GuardarCompleta" disabled="@guardando">
+                    Guardar la ficha completa
+                </button>
+                <button class="boton" @onclick="GuardarLoQueCambio" disabled="@guardando">
+                    Guardar solo lo que cambié
+                </button>
+            }
+            else
+            {
+                <button class="boton primario" @onclick="Crear" disabled="@guardando">
+                    Agregar
+                </button>
+            }
+            <button class="boton" @onclick="Cancelar" disabled="@guardando">Cancelar</button>
+        </div>
+
+        @if (editando)
+        {
+            <span class="ayuda">
+                «La ficha completa» exige que todos los datos obligatorios estén
+                diligenciados. «Solo lo que cambié» guarda lo que usted escribió
+                y deja lo demás como estaba.
+            </span>
+        }
+    </div>
+}
+
+@if (cargando)
+{
+    <p class="nota">Cargando…</p>
+}
+else if (filas.Count > 0)
+{
+    <div class="tabla-scroll">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Tipo</th>
+                    <th>Descripción</th>
+                    <th>Fuente</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var fila in filas)
+                {
+                    <tr>
+                        <td><code>@fila.Id</code></td>
+                        <td>@fila.Tipo</td>
+                        <td>@fila.Descripcion</td>
+                        <td>@fila.Fuente</td>
+                        <td>
+                            <div class="acciones">
+                                <button class="boton" @onclick="() => Editar(fila)">Editar</button>
+                                <button class="boton peligro" @onclick="() => Retirar(fila)">Retirar</button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <p class="nota">@filas.Count ficha(s).</p>
+}
+else
+{
+    <p class="vacio">
+        Todavía no hay aspectos normativos. Use «Agregar» para crear el primero.
+    </p>
+}
+
+@code {
+    private List<AspectoNormativo> filas = new();
+    private List<string> errores = new();
+    private string exito = string.Empty;
+
+    private bool cargando = true;
+    private bool guardando;
+    private bool mostrandoFormulario;
+    private bool editando;
+
+    private int campoId = 0;
+    private string campoTipo = string.Empty;
+    private string campoDescripcion = string.Empty;
+    private string campoFuente = string.Empty;
+
+    protected override async Task OnInitializedAsync() => await Cargar();
+
+    private async Task Cargar()
+    {
+        cargando = true;
+        var r = await Servicio.Listar();
+        cargando = false;
+
+        errores = r.Errores;
+        filas = r.Ok ? r.Datos! : new();
+    }
+
+    private void Agregar()
+    {
+        Limpiar();
+        editando = false;
+        mostrandoFormulario = true;
+    }
+
+    private void Editar(AspectoNormativo fila)
+    {
+        campoId = fila.Id;
+        campoTipo = fila.Tipo;
+        campoDescripcion = fila.Descripcion;
+        campoFuente = fila.Fuente;
+        editando = true;
+        mostrandoFormulario = true;
+        errores = new();
+        exito = string.Empty;
+    }
+
+    private void Cancelar()
+    {
+        mostrandoFormulario = false;
+        Limpiar();
+    }
+
+    private void Limpiar()
+    {
+        campoId = 0;
+        campoTipo = string.Empty;
+        campoDescripcion = string.Empty;
+        campoFuente = string.Empty;
+        errores = new();
+        exito = string.Empty;
+    }
+
+    private async Task Crear()
+    {
+        guardando = true;
+        var r = await Servicio.Crear(new AspectoNormativo
+        {
+            Id = campoId,
+            Tipo = campoTipo.Trim(),
+            Descripcion = campoDescripcion.Trim(),
+            Fuente = campoFuente.Trim()
+        });
+        guardando = false;
+
+        await TrasGuardar(r, $"Se agregó el registro {campoId}.");
+    }
+
+    private async Task GuardarCompleta()
+    {
+        guardando = true;
+        var r = await Servicio.Reemplazar(campoId, new AspectoNormativo
+        {
+            Tipo = campoTipo.Trim(),
+            Descripcion = campoDescripcion.Trim(),
+            Fuente = campoFuente.Trim()
+        });
+        guardando = false;
+
+        await TrasGuardar(r, $"Se guardó el registro {campoId}.");
+    }
+
+    private async Task GuardarLoQueCambio()
+    {
+        guardando = true;
+        var r = await Servicio.Actualizar(
+            campoId,
+            campoTipo,
+            campoDescripcion,
+            campoFuente);
+        guardando = false;
+
+        await TrasGuardar(r, $"Se guardó el registro {campoId}.");
+    }
+
+    private async Task TrasGuardar(Resultado<bool> r, string mensaje)
+    {
+        if (r.Ok)
+        {
+            mostrandoFormulario = false;
+            exito = mensaje;
+            errores = new();
+            await Cargar();
+        }
+        else
+        {
+            errores = r.Errores;
+            exito = string.Empty;
+        }
+    }
+
+    private async Task Retirar(AspectoNormativo fila)
+    {
+        var seguro = await JS.InvokeAsync<bool>(
+            "confirm", $"¿Retirar {fila.Id} del uso?");
+        if (!seguro) return;
+
+        var r = await Servicio.Eliminar(fila.Id);
+        if (r.Ok)
+        {
+            exito = $"Se retiró el registro {fila.Id}.";
+            errores = new();
+            await Cargar();
+        }
+        else
+        {
+            errores = r.Errores;
+            exito = string.Empty;
+        }
+    }
+}

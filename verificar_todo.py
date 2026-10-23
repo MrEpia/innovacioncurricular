@@ -43,8 +43,11 @@ def titulo(texto):
 
 
 def correr(comando, mostrar=True):
+    # PYTHONIOENCODING: en Windows la salida capturada es cp1252 y las
+    # pruebas de humo imprimen tildes y flechas.
     r = subprocess.run(comando, cwd=RAIZ, capture_output=True, text=True,
-                       encoding="utf-8", errors="replace")
+                       encoding="utf-8", errors="replace",
+                       env={**os.environ, "PYTHONIOENCODING": "utf-8"})
     if mostrar and r.returncode != 0:
         print((r.stdout + r.stderr)[-3000:])
     return r

@@ -1,3 +1,4 @@
+using ApiInnovacion.Excepciones;
 using System.Data;
 using ApiInnovacion.Modelos;
 using Dapper;
@@ -125,14 +126,19 @@ public class RepositorioAliadoSqlServer : IRepositorioAliado
     public async Task<int> EliminarLogico(int nit)
     {
         using var conexion = CrearConexion();
-        // Borrado LÓGICO en una sola consulta: cero filas afectadas significa
-        // "no existe o ya estaba inactivo", que es justo el 404 que pide el
-        // contrato — sin necesidad de consultar antes (D-v1-4).
-        const string sql = @"
-            UPDATE aliado
-            SET activo = 0
-            WHERE nit = @Nit AND activo = 1";
-
-        return await conexion.ExecuteAsync(sql, new { Nit = nit });
+        // Procedimiento sp_retirar_aliado (migración v3_002): comprueba que no
+        // tenga hijos activos y lo retira en la MISMA transacción, para que
+        // nadie le cuelgue un hijo entre la comprobación y el retiro.
+        // Cero filas = no existe o ya estaba inactivo (404).
+        try
+        {
+            return await conexion.ExecuteScalarAsync<int>(
+                "dbo.sp_retirar_aliado", new { Nit = nit }, commandType: CommandType.StoredProcedure);
+        }
+        catch (SqlException ex) when (ex.Number == 50409)
+        {
+            throw new DependenciasActivasExcepcion(
+                $"No se puede retirar el aliado {nit}: {ex.Message}. Retírelos primero.");
+        }
     }
 }

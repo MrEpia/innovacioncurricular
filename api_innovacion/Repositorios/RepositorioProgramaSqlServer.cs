@@ -155,13 +155,19 @@ public class RepositorioProgramaSqlServer : IRepositorioPrograma
     public async Task<int> EliminarLogico(int id)
     {
         using var conexion = CrearConexion();
-        // Borrado LÓGICO en una sola consulta: cero filas = no existe o ya
-        // estaba inactivo, que es el 404 del contrato.
-        const string sql = @"
-            UPDATE programa
-            SET activo = 0
-            WHERE id = @Id AND activo = 1";
-
-        return await conexion.ExecuteAsync(sql, new { Id = id });
+        // Procedimiento sp_retirar_programa (migración v3_002): comprueba que no
+        // tenga hijos activos y lo retira en la MISMA transacción, para que
+        // nadie le cuelgue un hijo entre la comprobación y el retiro.
+        // Cero filas = no existe o ya estaba inactivo (404).
+        try
+        {
+            return await conexion.ExecuteScalarAsync<int>(
+                "dbo.sp_retirar_programa", new { Id = id }, commandType: CommandType.StoredProcedure);
+        }
+        catch (SqlException ex) when (ex.Number == 50409)
+        {
+            throw new DependenciasActivasExcepcion(
+                $"No se puede retirar el programa {id}: {ex.Message}. Retírelos primero.");
+        }
     }
 }

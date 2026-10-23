@@ -133,9 +133,17 @@ public class RepositorioUsuarioSqlServer : IRepositorioUsuario
     public async Task<int> EliminarLogico(int id)
     {
         using var conexion = CrearConexion();
-        return await conexion.ExecuteAsync(@"
-            UPDATE usuario SET activo = 0, fecha_actualizacion = GETDATE()
-            WHERE id = @Id AND activo = 1", new { Id = id });
+        // sp_usuario_retirar: rechaza retirar al último administrador activo;
+        // la comprobación y el retiro van en la misma transacción.
+        try
+        {
+            return await conexion.ExecuteScalarAsync<int>(
+                "dbo.sp_usuario_retirar", new { Id = id }, commandType: CommandType.StoredProcedure);
+        }
+        catch (SqlException ex) when (ex.Number == 50410)
+        {
+            throw new OperacionNoPermitidaExcepcion(ex.Message);
+        }
     }
 
     public async Task<CredencialesUsuario?> ObtenerCredenciales(string username)
@@ -164,12 +172,8 @@ public class RepositorioUsuarioSqlServer : IRepositorioUsuario
     public async Task<int> ContarAdministradoresActivos()
     {
         using var conexion = CrearConexion();
-        return await conexion.ExecuteScalarAsync<int>(@"
-            SELECT COUNT(DISTINCT u.id)
-            FROM usuario u
-            JOIN rol_usuario ru ON ru.usuario_id = u.id AND ru.activo = 1
-            JOIN rol r ON r.id = ru.rol_id AND r.activo = 1
-            WHERE u.activo = 1 AND r.nombre = 'administrador'");
+        return await conexion.ExecuteScalarAsync<int>(
+            "dbo.sp_contar_administradores_activos", commandType: CommandType.StoredProcedure);
     }
 
     public async Task RestablecerAdministrador(int id, string hashClave, string email)

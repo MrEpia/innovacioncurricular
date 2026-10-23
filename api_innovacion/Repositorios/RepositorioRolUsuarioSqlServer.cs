@@ -1,3 +1,4 @@
+using ApiInnovacion.Excepciones;
 using System.Data;
 using ApiInnovacion.Modelos;
 using Dapper;
@@ -48,33 +49,27 @@ public class RepositorioRolUsuarioSqlServer : IRepositorioRolUsuario
     public async Task<bool> Asignar(int usuarioId, int rolId)
     {
         using var conexion = CrearConexion();
-        // Tres casos en una sola consulta:
-        //   - ya está activa        → no hace nada y responde 0 (el servicio dirá 409)
-        //   - existe pero retirada  → la reactiva: la llave es la misma
-        //   - no existe             → la crea
-        const string sql = @"
-            IF EXISTS (SELECT 1 FROM rol_usuario WHERE usuario_id = @UsuarioId AND rol_id = @RolId AND activo = 1)
-                SELECT 0;
-            ELSE IF EXISTS (SELECT 1 FROM rol_usuario WHERE usuario_id = @UsuarioId AND rol_id = @RolId)
-            BEGIN
-                UPDATE rol_usuario SET activo = 1 WHERE usuario_id = @UsuarioId AND rol_id = @RolId;
-                SELECT 1;
-            END
-            ELSE
-            BEGIN
-                INSERT INTO rol_usuario (usuario_id, rol_id, activo) VALUES (@UsuarioId, @RolId, 1);
-                SELECT 1;
-            END";
-
-        return await conexion.ExecuteScalarAsync<int>(sql, new { UsuarioId = usuarioId, RolId = rolId }) == 1;
+        // sp_rol_usuario_asignar, en una transacción: 0 si ya estaba activa
+        // (el servicio dirá 409), 1 si la creó o la reactivó.
+        return await conexion.ExecuteScalarAsync<int>(
+            "dbo.sp_rol_usuario_asignar", new { UsuarioId = usuarioId, RolId = rolId },
+            commandType: CommandType.StoredProcedure) == 1;
     }
 
     public async Task<int> EliminarLogico(int usuarioId, int rolId)
     {
         using var conexion = CrearConexion();
-        return await conexion.ExecuteAsync(@"
-            UPDATE rol_usuario SET activo = 0
-            WHERE usuario_id = @UsuarioId AND rol_id = @RolId AND activo = 1",
-            new { UsuarioId = usuarioId, RolId = rolId });
+        // sp_rol_usuario_quitar: no deja quitar el rol administrador al último
+        // administrador activo, ni siquiera con dos peticiones simultáneas.
+        try
+        {
+            return await conexion.ExecuteScalarAsync<int>(
+                "dbo.sp_rol_usuario_quitar", new { UsuarioId = usuarioId, RolId = rolId },
+                commandType: CommandType.StoredProcedure);
+        }
+        catch (SqlException ex) when (ex.Number == 50410)
+        {
+            throw new OperacionNoPermitidaExcepcion(ex.Message);
+        }
     }
 }

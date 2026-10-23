@@ -92,6 +92,14 @@ asunto del programa, no de quien usa el sistema.
   concatenar valores). El ejecutor es **Dapper**, un micro-ejecutor sobre
   ADO.NET: mapea fila→objeto pero nunca genera SQL por nosotros. Si una
   consulta existe, está escrita en el repositorio y se puede leer.
+- *(Enmienda 1.3.0)* **Procedimientos almacenados** solo para operaciones de
+  varios pasos que deben ser atómicas (comprobar y escribir): retirar un padre
+  sin dejar huérfanos, retirar un rol con usuarios, proteger al último
+  administrador y asignar roles. Viven en una migración (`db/migraciones/`),
+  se llaman SOLO desde la capa de repositorio con
+  `CommandType.StoredProcedure`, y sus errores (`THROW 5xxxx`) se traducen allí
+  a las excepciones de siempre. Así el contrato no cambia. El CRUD de una sola
+  sentencia sigue con SQL a la vista en el repositorio.
 - Paquetes permitidos, y ninguno más sin que una spec lo pida:
   `Microsoft.Data.SqlClient` (el cliente del motor), `Dapper` y
   `Swashbuckle.AspNetCore` (Swagger). *(Enmienda 1.2.0)* Desde la v3,
@@ -267,12 +275,13 @@ o se corrige el plan, o se enmienda esto.
 
 ---
 
-*Versión 1.2.0 · Ratificada el 2026-08-29 · Última enmienda: 2026-10-22*
+*Versión 1.3.0 · Ratificada el 2026-08-29 · Última enmienda: 2026-10-23*
 
 ### Registro de enmiendas
 
 | Versión | Fecha | Artículos | Qué cambió y por qué | Dónde se propuso |
 |---|---|---|---|---|
+| 1.3.0 | 2026-10-23 | 2 | Se permiten procedimientos almacenados para las operaciones atómicas de comprobar y escribir (27, en la migración `v3_002`) | [v3_seguridad/4_research.md](versiones/v3_seguridad/4_research.md), D-v3-10 |
 | 1.2.0 | 2026-10-22 | 2, 10 | Se permite el paquete JwtBearer y se agregan 401/403 y la tabla de permisos por verbo | [v3_seguridad/4_research.md](versiones/v3_seguridad/4_research.md), D-v3-1 y D-v3-4 |
 | 1.1.0 | 2026-10-22 | 3, 7, 10, 10.1 | El ensamblador se reparte en `Ensamblador/` por bloque (tres estudiantes en paralelo) · se elimina la excepción de secretos de la plantilla: todo va en `.env` · se agregan los códigos 409 (llave duplicada, dependencias activas) y 201 (creación) para la v2 · el front comparte el transporte (`ClienteApi`), no los recursos | [v2_entrega2/4_research.md](versiones/v2_entrega2/4_research.md), D-v2-1 a D-v2-4 |
 

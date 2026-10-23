@@ -13,9 +13,14 @@ public class ServicioUniversidad : IServicioUniversidad
 {
     private readonly IRepositorioUniversidad _repositorio;
 
-    public ServicioUniversidad(IRepositorioUniversidad repositorio)
+    // v2: desde que existen tablas que apuntan aquí (facultades), retirar este
+    // registro puede dejar huérfanos. Se pregunta antes (2_spec.md de la v2, RF9).
+    private readonly IRepositorioReferencias _referencias;
+
+    public ServicioUniversidad(IRepositorioUniversidad repositorio, IRepositorioReferencias referencias)
     {
         _repositorio = repositorio;
+        _referencias = referencias;
     }
 
     public async Task<IEnumerable<Universidad>> ObtenerTodos(int limite)
@@ -83,6 +88,13 @@ public class ServicioUniversidad : IServicioUniversidad
 
     public async Task<int> Eliminar(int id)
     {
+        var dependientes = await _referencias.DependientesDeUniversidad(id);
+        if (dependientes.Count > 0)
+        {
+            throw new DependenciasActivasExcepcion(
+                $"No se puede retirar la universidad {id}: tiene registros activos en {string.Join(", ", dependientes)}. Retírelos primero.");
+        }
+
         var filasAfectadas = await _repositorio.EliminarLogico(id);
         if (filasAfectadas == 0)
         {

@@ -13,9 +13,14 @@ public class ServicioPracticaEstrategia : IServicioPracticaEstrategia
 {
     private readonly IRepositorioPracticaEstrategia _repositorio;
 
-    public ServicioPracticaEstrategia(IRepositorioPracticaEstrategia repositorio)
+    // v2: desde que existen tablas que apuntan aquí (programas que la aplican), retirar este
+    // registro puede dejar huérfanos. Se pregunta antes (2_spec.md de la v2, RF9).
+    private readonly IRepositorioReferencias _referencias;
+
+    public ServicioPracticaEstrategia(IRepositorioPracticaEstrategia repositorio, IRepositorioReferencias referencias)
     {
         _repositorio = repositorio;
+        _referencias = referencias;
     }
 
     public async Task<IEnumerable<PracticaEstrategia>> ObtenerTodos(int limite)
@@ -83,6 +88,13 @@ public class ServicioPracticaEstrategia : IServicioPracticaEstrategia
 
     public async Task<int> Eliminar(int id)
     {
+        var dependientes = await _referencias.DependientesDePracticaEstrategia(id);
+        if (dependientes.Count > 0)
+        {
+            throw new DependenciasActivasExcepcion(
+                $"No se puede retirar la práctica o estrategia {id}: tiene registros activos en {string.Join(", ", dependientes)}. Retírelos primero.");
+        }
+
         var filasAfectadas = await _repositorio.EliminarLogico(id);
         if (filasAfectadas == 0)
         {

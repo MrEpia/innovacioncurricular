@@ -36,8 +36,11 @@ flowchart LR
 ## 3. Comprobaciones automáticas
 
 ```powershell
-# Criterio 9 — prueba de capas, SIN base de datos
-docker compose exec api-innovacion dotnet run --project pruebas/PruebaCapas.csproj
+# Criterio 9 — prueba de capas, SIN base de datos. Corre en un contenedor
+# DESECHABLE (--rm) y sin levantar SQL Server (--no-deps). No use «exec» sobre
+# el contenedor de la API: compilaría encima de la API en marcha y dotnet watch
+# la reiniciaría.
+docker compose run --rm --no-deps api-innovacion dotnet run --project pruebas/PruebaCapas.csproj
 
 # Criterios 2 a 8 — humo de la API, un guion por bloque
 python pruebas_humo/humo_academico.py

@@ -13,9 +13,14 @@ public class ServicioCarInnovacion : IServicioCarInnovacion
 {
     private readonly IRepositorioCarInnovacion _repositorio;
 
-    public ServicioCarInnovacion(IRepositorioCarInnovacion repositorio)
+    // v2: desde que existen tablas que apuntan aquí (programas que la tienen), retirar este
+    // registro puede dejar huérfanos. Se pregunta antes (2_spec.md de la v2, RF9).
+    private readonly IRepositorioReferencias _referencias;
+
+    public ServicioCarInnovacion(IRepositorioCarInnovacion repositorio, IRepositorioReferencias referencias)
     {
         _repositorio = repositorio;
+        _referencias = referencias;
     }
 
     public async Task<IEnumerable<CarInnovacion>> ObtenerTodos(int limite)
@@ -83,6 +88,13 @@ public class ServicioCarInnovacion : IServicioCarInnovacion
 
     public async Task<int> Eliminar(int id)
     {
+        var dependientes = await _referencias.DependientesDeCarInnovacion(id);
+        if (dependientes.Count > 0)
+        {
+            throw new DependenciasActivasExcepcion(
+                $"No se puede retirar la característica de innovación {id}: tiene registros activos en {string.Join(", ", dependientes)}. Retírelos primero.");
+        }
+
         var filasAfectadas = await _repositorio.EliminarLogico(id);
         if (filasAfectadas == 0)
         {

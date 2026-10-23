@@ -13,9 +13,14 @@ public class ServicioAspectoNormativo : IServicioAspectoNormativo
 {
     private readonly IRepositorioAspectoNormativo _repositorio;
 
-    public ServicioAspectoNormativo(IRepositorioAspectoNormativo repositorio)
+    // v2: desde que existen tablas que apuntan aquí (programas que regula), retirar este
+    // registro puede dejar huérfanos. Se pregunta antes (2_spec.md de la v2, RF9).
+    private readonly IRepositorioReferencias _referencias;
+
+    public ServicioAspectoNormativo(IRepositorioAspectoNormativo repositorio, IRepositorioReferencias referencias)
     {
         _repositorio = repositorio;
+        _referencias = referencias;
     }
 
     public async Task<IEnumerable<AspectoNormativo>> ObtenerTodos(int limite)
@@ -83,6 +88,13 @@ public class ServicioAspectoNormativo : IServicioAspectoNormativo
 
     public async Task<int> Eliminar(int id)
     {
+        var dependientes = await _referencias.DependientesDeAspectoNormativo(id);
+        if (dependientes.Count > 0)
+        {
+            throw new DependenciasActivasExcepcion(
+                $"No se puede retirar el aspecto normativo {id}: tiene registros activos en {string.Join(", ", dependientes)}. Retírelos primero.");
+        }
+
         var filasAfectadas = await _repositorio.EliminarLogico(id);
         if (filasAfectadas == 0)
         {

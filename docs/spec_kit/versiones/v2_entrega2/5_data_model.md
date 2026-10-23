@@ -177,6 +177,17 @@ Las alianzas formales entre un aliado externo y un programa académico. No tiene
 | `fecha_fin` | `DATE` | **no** (NULL) |  |  | `fechaFin` |
 | `docente` | `INT` | **no** (NULL) |  |  | `docente` |
 
+#### `aa_rc`
+
+Qué actividades académicas incluye cada registro calificado, con su componente y semestre. No tiene hijos.
+
+| Columna | Tipo | Obligatoria | Llave | Referencia | JSON |
+|---|---|---|---|---|---|
+| `activ_academicas_idcurso` | `INT` | sí | PK | `activ_academica` | `activAcademicasIdcurso` |
+| `registro_calificado_codigo` | `INT` | sí | PK | `registro_calificado` | `registroCalificadoCodigo` |
+| `componente` | `VARCHAR(45)` | sí |  |  | `componente` |
+| `semestre` | `VARCHAR(45)` | sí |  |  | `semestre` |
+
 ### Bloque Puentes — responsable: Sebastián Brunal
 
 #### `programa_ac`
@@ -223,17 +234,6 @@ Qué enfoques pedagógicos declara cada registro calificado. No tiene hijos.
 |---|---|---|---|---|---|
 | `enfoque` | `INT` | sí | PK | `enfoque` | `enfoque` |
 | `registro_calificado` | `INT` | sí | PK | `registro_calificado` | `registroCalificado` |
-
-#### `aa_rc`
-
-Qué actividades académicas incluye cada registro calificado, con su componente y semestre. No tiene hijos.
-
-| Columna | Tipo | Obligatoria | Llave | Referencia | JSON |
-|---|---|---|---|---|---|
-| `activ_academicas_idcurso` | `INT` | sí | PK | `activ_academica` | `activAcademicasIdcurso` |
-| `registro_calificado_codigo` | `INT` | sí | PK | `registro_calificado` | `registroCalificadoCodigo` |
-| `componente` | `VARCHAR(45)` | sí |  |  | `componente` |
-| `semestre` | `VARCHAR(45)` | sí |  |  | `semestre` |
 
 
 ## 3. Invariantes de la v2

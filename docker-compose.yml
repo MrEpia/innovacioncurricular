@@ -68,6 +68,8 @@ services:
       - ./api_innovacion:/app      # el código montado: guardar un .cs recompila solo
       - /app/bin                   # bin y obj quedan DENTRO del contenedor (Linux),
       - /app/obj                   #   sin mezclarse con los compilados de Windows
+      - /app/pruebas/bin           # ídem para la prueba de capas: así correrla con
+      - /app/pruebas/obj           #   «docker compose run» no escribe en la carpeta del PC
     environment:
       # El host es el NOMBRE del servicio. El doble guion bajo hace que ASP.NET
       # lea esto como ConnectionStrings:SqlServer y SOBREESCRIBA appsettings.json.

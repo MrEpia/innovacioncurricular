@@ -1,0 +1,384 @@
+@page "/registros-calificados"
+@rendermode InteractiveServer
+@inject ServicioRegistroCalificado Servicio
+@inject ServicioPrograma ServicioProgramaPadre
+@inject IJSRuntime JS
+
+@*
+    LA PANTALLA DE `registro_calificado` (v2 — bloque Academico)
+
+    El mismo patrón de las pantallas de la v1, con una diferencia: cada clave
+    foránea es una LISTA DESPLEGABLE cargada desde la API por el servicio de
+    su tabla padre, nunca escrita a mano ni leída de la base.
+*@
+
+<PageTitle>Registros calificados</PageTitle>
+
+<div class="encabezado">
+    <div>
+        <h1>Registros calificados</h1>
+        <p class="nota">El documento legal que autoriza el funcionamiento de cada programa.</p>
+    </div>
+    @if (!mostrandoFormulario)
+    {
+        <button class="boton primario" @onclick="Agregar">Agregar</button>
+    }
+</div>
+
+@foreach (var error in errores)
+{
+    <p class="aviso error">@error</p>
+}
+@if (!string.IsNullOrEmpty(exito))
+{
+    <p class="aviso exito">@exito</p>
+}
+
+@if (mostrandoFormulario)
+{
+    <div class="tarjeta-formulario">
+        <h2>@(editando ? "Editar" : "Agregar") el registro calificado</h2>
+
+        <label>
+            Código
+            <input type="number" @bind="campoCodigo" disabled="@editando" />
+            <span class="ayuda">Forma parte de la llave: no se podrá cambiar después.</span>
+        </label>
+
+        <label>
+            Créditos
+            <input type="text" maxlength="45" @bind="campoCantCreditos" />
+        </label>
+
+        <label>
+            Horas de acompañamiento
+            <input type="text" maxlength="45" @bind="campoHoraAcom" />
+        </label>
+
+        <label>
+            Horas independientes
+            <input type="text" maxlength="45" @bind="campoHoraInd" />
+        </label>
+
+        <label>
+            Metodología
+            <input type="text" maxlength="45" @bind="campoMetodologia" />
+        </label>
+
+        <label>
+            Fecha de inicio
+            <input type="date" @bind="campoFechaInicio" />
+        </label>
+
+        <label>
+            Fecha de fin
+            <input type="date" @bind="campoFechaFin" />
+        </label>
+
+        <label>
+            Duración (años)
+            <input type="text" maxlength="45" @bind="campoDuracionAnios" />
+        </label>
+
+        <label>
+            Duración (semestres)
+            <input type="text" maxlength="45" @bind="campoDuracionSemestres" />
+        </label>
+
+        <label>
+            Tipo de titulación
+            <input type="text" maxlength="45" @bind="campoTipoTitulacion" />
+        </label>
+
+        <label>
+            Programa
+            <select @bind="campoPrograma">
+                <option value="">— seleccione —</option>
+                @foreach (var p in listaPrograma)
+                {
+                    <option value="@p.Id">@p.Id — @p.Nombre</option>
+                }
+            </select>
+        </label>
+
+        <div class="pareja">
+            @if (editando)
+            {
+                <button class="boton primario" @onclick="GuardarCompleta" disabled="@guardando">
+                    Guardar la ficha completa
+                </button>
+                <button class="boton" @onclick="GuardarLoQueCambio" disabled="@guardando">
+                    Guardar solo lo que cambié
+                </button>
+            }
+            else
+            {
+                <button class="boton primario" @onclick="Crear" disabled="@guardando">
+                    Agregar
+                </button>
+            }
+            <button class="boton" @onclick="Cancelar" disabled="@guardando">Cancelar</button>
+        </div>
+
+        @if (editando)
+        {
+            <span class="ayuda">
+                «La ficha completa» exige todos los datos obligatorios. «Solo lo que
+                cambié» guarda únicamente lo que usted modificó.
+            </span>
+        }
+    </div>
+}
+
+@if (cargando)
+{
+    <p class="nota">Cargando…</p>
+}
+else if (filas.Count > 0)
+{
+    <div class="tabla-scroll">
+        <table>
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Créditos</th>
+                    <th>Horas de acompañamiento</th>
+                    <th>Horas independientes</th>
+                    <th>Metodología</th>
+                    <th>Fecha de inicio</th>
+                    <th>Fecha de fin</th>
+                    <th>Duración (años)</th>
+                    <th>Duración (semestres)</th>
+                    <th>Tipo de titulación</th>
+                    <th>Programa</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var fila in filas)
+                {
+                    <tr>
+                        <td>@fila.Codigo</td>
+                        <td>@fila.CantCreditos</td>
+                        <td>@fila.HoraAcom</td>
+                        <td>@fila.HoraInd</td>
+                        <td>@fila.Metodologia</td>
+                        <td>@(fila.FechaInicio?.ToString("yyyy-MM-dd"))</td>
+                        <td>@(fila.FechaFin?.ToString("yyyy-MM-dd"))</td>
+                        <td>@fila.DuracionAnios</td>
+                        <td>@fila.DuracionSemestres</td>
+                        <td>@fila.TipoTitulacion</td>
+                        <td>@NombrePrograma(fila.Programa)</td>
+                        <td>
+                            <div class="acciones">
+                                <button class="boton" @onclick="() => Editar(fila)">Editar</button>
+                                <button class="boton peligro" @onclick="() => Retirar(fila)">Retirar</button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <p class="nota">@filas.Count registro(s).</p>
+}
+else
+{
+    <p class="vacio">
+        Todavía no hay registros. Use «Agregar» para crear el primero.
+    </p>
+}
+
+@code {
+    private List<RegistroCalificado> filas = new();
+    private List<Programa> listaPrograma = new();
+    private List<string> errores = new();
+    private string exito = string.Empty;
+
+    private bool cargando = true;
+    private bool guardando;
+    private bool mostrandoFormulario;
+    private bool editando;
+    private RegistroCalificado? original;
+
+    private int? campoCodigo;
+    private string campoCantCreditos = string.Empty;
+    private string campoHoraAcom = string.Empty;
+    private string campoHoraInd = string.Empty;
+    private string campoMetodologia = string.Empty;
+    private DateTime? campoFechaInicio;
+    private DateTime? campoFechaFin;
+    private string campoDuracionAnios = string.Empty;
+    private string campoDuracionSemestres = string.Empty;
+    private string campoTipoTitulacion = string.Empty;
+    private int? campoPrograma;
+
+    protected override async Task OnInitializedAsync()
+    {
+        errores = new();
+        // Las listas desplegables: los registros ACTIVOS de cada tabla padre,
+        // pedidos a la API por el servicio de esa tabla.
+        var rPrograma = await ServicioProgramaPadre.Listar();
+        if (rPrograma.Ok) listaPrograma = rPrograma.Datos!;
+        else errores.AddRange(rPrograma.Errores);
+        await Cargar();
+    }
+
+    private async Task Cargar()
+    {
+        cargando = true;
+        var r = await Servicio.Listar();
+        cargando = false;
+
+        if (!r.Ok) errores.AddRange(r.Errores);
+        filas = r.Ok ? r.Datos! : new();
+    }
+
+    // Muestra «llave — nombre» con la lista que dio la API; si el padre ya no
+    // está en la lista (fue retirado), muestra al menos la llave.
+    private string NombrePrograma(int? llave)
+    {
+        if (llave == null) return "—";
+        var p = listaPrograma.FirstOrDefault(x => Equals(x.Id, llave));
+        return p == null ? $"{llave}" : $"{p.Id} — {p.Nombre}";
+    }
+
+    private RegistroCalificado Construir() => new RegistroCalificado
+    {
+            Codigo = campoCodigo,
+            CantCreditos = campoCantCreditos.Trim(),
+            HoraAcom = campoHoraAcom.Trim(),
+            HoraInd = campoHoraInd.Trim(),
+            Metodologia = campoMetodologia.Trim(),
+            FechaInicio = campoFechaInicio,
+            FechaFin = campoFechaFin,
+            DuracionAnios = campoDuracionAnios.Trim(),
+            DuracionSemestres = campoDuracionSemestres.Trim(),
+            TipoTitulacion = campoTipoTitulacion.Trim(),
+            Programa = campoPrograma
+    };
+
+    private void Agregar()
+    {
+        Limpiar();
+        editando = false;
+        mostrandoFormulario = true;
+    }
+
+    private void Editar(RegistroCalificado fila)
+    {
+        campoCodigo = fila.Codigo;
+        campoCantCreditos = fila.CantCreditos;
+        campoHoraAcom = fila.HoraAcom;
+        campoHoraInd = fila.HoraInd;
+        campoMetodologia = fila.Metodologia;
+        campoFechaInicio = fila.FechaInicio;
+        campoFechaFin = fila.FechaFin;
+        campoDuracionAnios = fila.DuracionAnios;
+        campoDuracionSemestres = fila.DuracionSemestres;
+        campoTipoTitulacion = fila.TipoTitulacion;
+        campoPrograma = fila.Programa;
+        original = new RegistroCalificado
+        {
+            Codigo = fila.Codigo,
+            CantCreditos = fila.CantCreditos,
+            HoraAcom = fila.HoraAcom,
+            HoraInd = fila.HoraInd,
+            Metodologia = fila.Metodologia,
+            FechaInicio = fila.FechaInicio,
+            FechaFin = fila.FechaFin,
+            DuracionAnios = fila.DuracionAnios,
+            DuracionSemestres = fila.DuracionSemestres,
+            TipoTitulacion = fila.TipoTitulacion,
+            Programa = fila.Programa
+        };
+        editando = true;
+        mostrandoFormulario = true;
+        errores = new();
+        exito = string.Empty;
+    }
+
+    private async Task GuardarCompleta()
+    {
+        guardando = true;
+        var r = await Servicio.Reemplazar(campoCodigo!.Value, Construir());
+        guardando = false;
+        await TrasGuardar(r, $"Se guardó el registro calificado {campoCodigo}.");
+    }
+
+    private async Task GuardarLoQueCambio()
+    {
+        guardando = true;
+        var r = await Servicio.Actualizar(campoCodigo!.Value, original!, Construir());
+        guardando = false;
+        await TrasGuardar(r, $"Se guardó el registro calificado {campoCodigo}.");
+    }
+
+    private void Cancelar()
+    {
+        mostrandoFormulario = false;
+        Limpiar();
+    }
+
+    private void Limpiar()
+    {
+        campoCodigo = null;
+        campoCantCreditos = string.Empty;
+        campoHoraAcom = string.Empty;
+        campoHoraInd = string.Empty;
+        campoMetodologia = string.Empty;
+        campoFechaInicio = null;
+        campoFechaFin = null;
+        campoDuracionAnios = string.Empty;
+        campoDuracionSemestres = string.Empty;
+        campoTipoTitulacion = string.Empty;
+        campoPrograma = null;
+        original = null;
+        errores = new();
+        exito = string.Empty;
+    }
+
+    private async Task Crear()
+    {
+        guardando = true;
+        var r = await Servicio.Crear(Construir());
+        guardando = false;
+        await TrasGuardar(r, "Se agregó el registro.");
+    }
+
+    private async Task TrasGuardar(Resultado<bool> r, string mensaje)
+    {
+        if (r.Ok)
+        {
+            mostrandoFormulario = false;
+            exito = mensaje;
+            errores = new();
+            await Cargar();
+        }
+        else
+        {
+            errores = r.Errores;
+            exito = string.Empty;
+        }
+    }
+
+    private async Task Retirar(RegistroCalificado fila)
+    {
+        var seguro = await JS.InvokeAsync<bool>("confirm", $"¿Retirar {fila.Codigo} del uso?");
+        if (!seguro) return;
+
+        var r = await Servicio.Eliminar(fila.Codigo!.Value);
+        if (r.Ok)
+        {
+            exito = $"Se retiró el registro calificado {fila.Codigo}.";
+            errores = new();
+            await Cargar();
+        }
+        else
+        {
+            // Un 409 llega aquí con su explicación: «tiene registros activos en…».
+            errores = r.Errores;
+            exito = string.Empty;
+        }
+    }
+}

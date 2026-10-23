@@ -30,10 +30,39 @@ builder.Services.Configure<ApiBehaviorOptions>(opciones =>
 {
     opciones.InvalidModelStateResponseFactory = contexto =>
     {
-        var errores = contexto.ModelState
-            .Where(e => e.Value?.Errors.Count > 0)
-            .SelectMany(e => e.Value!.Errors.Select(x => x.ErrorMessage))
-            .ToList();
+        // Los mensajes de las anotaciones ya están en español. Los que produce
+        // el LECTOR DE JSON —un número donde va un texto, un JSON mal formado—
+        // llegan en inglés y con jerga interna: se traducen aquí, señalando el
+        // campo cuando se sabe cuál es (Artículo 8: todo en español).
+        var errores = new List<string>();
+        foreach (var (clave, estado) in contexto.ModelState)
+        {
+            foreach (var error in estado.Errors)
+            {
+                var deLector = error.Exception != null
+                    || error.ErrorMessage.StartsWith("The JSON value", StringComparison.Ordinal)
+                    || error.ErrorMessage.EndsWith("field is required.", StringComparison.Ordinal);
+
+                if (!deLector)
+                {
+                    errores.Add(error.ErrorMessage);
+                }
+                else if (clave.StartsWith("$.", StringComparison.Ordinal))
+                {
+                    errores.Add($"El campo {clave[2..]} no tiene el formato esperado: revise el tipo del valor enviado.");
+                }
+                else
+                {
+                    errores.Add("El cuerpo de la petición no es un JSON válido.");
+                }
+            }
+        }
+        // Si ya se señaló el campo exacto, el aviso genérico del cuerpo sobra.
+        if (errores.Any(e => e.StartsWith("El campo ", StringComparison.Ordinal)))
+        {
+            errores.Remove("El cuerpo de la petición no es un JSON válido.");
+        }
+        errores = errores.Distinct().ToList();
 
         return new ObjectResult(new
         {

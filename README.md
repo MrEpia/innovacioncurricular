@@ -72,6 +72,14 @@ esconde lo que el rol no puede usar.
 
 ## 3. Pruebas
 
+**Todo de una vez** (levanta el sistema y corre todas las pruebas; `--limpio` borra la base y la crea desde cero):
+
+```powershell
+python verificar_todo.py --limpio
+```
+
+O cada una por separado:
+
 ```powershell
 # Prueba de capas: los servicios SIN base de datos (contenedor desechable)
 docker compose run --rm --no-deps api-innovacion dotnet run --project pruebas/PruebaCapas.csproj

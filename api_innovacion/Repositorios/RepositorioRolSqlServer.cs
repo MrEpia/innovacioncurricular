@@ -99,7 +99,17 @@ public class RepositorioRolSqlServer : IRepositorioRol
     public async Task<int> EliminarLogico(int id)
     {
         using var conexion = CrearConexion();
-        return await conexion.ExecuteAsync("UPDATE rol SET activo = 0 WHERE id = @Id AND activo = 1", new { Id = id });
+        // sp_rol_retirar: comprueba que ningún usuario activo lo tenga y lo
+        // retira en la misma transacción.
+        try
+        {
+            return await conexion.ExecuteScalarAsync<int>(
+                "dbo.sp_rol_retirar", new { Id = id }, commandType: CommandType.StoredProcedure);
+        }
+        catch (SqlException ex) when (ex.Number == 50409)
+        {
+            throw new DependenciasActivasExcepcion($"No se puede retirar el rol {id}: {ex.Message}. Quíteselo primero.");
+        }
     }
 
     public async Task<int> UsuariosActivosConRol(int id)

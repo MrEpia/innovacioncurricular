@@ -1,3 +1,4 @@
+using ApiInnovacion.Excepciones;
 using System.Data;
 using ApiInnovacion.Modelos;
 using Dapper;
@@ -110,14 +111,19 @@ public class RepositorioCarInnovacionSqlServer : IRepositorioCarInnovacion
     public async Task<int> EliminarLogico(int id)
     {
         using var conexion = CrearConexion();
-        // Borrado LÓGICO en una sola consulta: cero filas afectadas significa
-        // "no existe o ya estaba inactivo", que es justo el 404 que pide el
-        // contrato — sin necesidad de consultar antes.
-        const string sql = @"
-            UPDATE car_innovacion
-            SET activo = 0
-            WHERE id = @Id AND activo = 1";
-
-        return await conexion.ExecuteAsync(sql, new { Id = id });
+        // Procedimiento sp_retirar_car_innovacion (migración v3_002): comprueba que no
+        // tenga hijos activos y lo retira en la MISMA transacción, para que
+        // nadie le cuelgue un hijo entre la comprobación y el retiro.
+        // Cero filas = no existe o ya estaba inactivo (404).
+        try
+        {
+            return await conexion.ExecuteScalarAsync<int>(
+                "dbo.sp_retirar_car_innovacion", new { Id = id }, commandType: CommandType.StoredProcedure);
+        }
+        catch (SqlException ex) when (ex.Number == 50409)
+        {
+            throw new DependenciasActivasExcepcion(
+                $"No se puede retirar la característica de innovación {id}: {ex.Message}. Retírelos primero.");
+        }
     }
 }

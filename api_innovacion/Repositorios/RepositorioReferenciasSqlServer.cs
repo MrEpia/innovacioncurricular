@@ -37,10 +37,16 @@ public class RepositorioReferenciasSqlServer : IRepositorioReferencias
         public int Cantidad { get; set; }
     }
 
-    private async Task<IReadOnlyList<string>> Dependientes(string sql, object parametros)
+    /// <summary>
+    /// Quién depende de quién vive en los procedimientos sp_dependientes_&lt;tabla&gt;
+    /// (migración v3_002): los mismos que usa sp_retirar_&lt;tabla&gt; para retirar
+    /// sin dejar huérfanos, así la regla está escrita una sola vez.
+    /// </summary>
+    private async Task<IReadOnlyList<string>> Dependientes(string procedimiento, object parametros)
     {
         using var conexion = CrearConexion();
-        var conteos = await conexion.QueryAsync<Conteo>(sql, parametros);
+        var conteos = await conexion.QueryAsync<Conteo>(
+            procedimiento, parametros, commandType: CommandType.StoredProcedure);
         return conteos
             .Where(c => c.Cantidad > 0)
             .Select(c => $"{c.Tabla} ({c.Cantidad})")
@@ -91,69 +97,36 @@ public class RepositorioReferenciasSqlServer : IRepositorioReferencias
     // ===================== 2. ¿Quién depende de él? =====================
 
     public Task<IReadOnlyList<string>> DependientesDeUniversidad(int id) =>
-        Dependientes(@"
-            SELECT 'facultad' AS Tabla, COUNT(*) AS Cantidad FROM facultad WHERE universidad = @Id AND activo = 1",
-            new { Id = id });
+        Dependientes("dbo.sp_dependientes_universidad", new { Id = id });
 
     public Task<IReadOnlyList<string>> DependientesDeFacultad(int id) =>
-        Dependientes(@"
-            SELECT 'programa' AS Tabla, COUNT(*) AS Cantidad FROM programa WHERE facultad = @Id AND activo = 1",
-            new { Id = id });
+        Dependientes("dbo.sp_dependientes_facultad", new { Id = id });
 
     // programa es el centro del modelo: once tablas apuntan a él.
     public Task<IReadOnlyList<string>> DependientesDePrograma(int id) =>
-        Dependientes(@"
-            SELECT 'acreditacion' AS Tabla, COUNT(*) AS Cantidad FROM acreditacion WHERE programa = @Id AND activo = 1
-            UNION ALL SELECT 'registro_calificado', COUNT(*) FROM registro_calificado WHERE programa = @Id AND activo = 1
-            UNION ALL SELECT 'activ_academica', COUNT(*) FROM activ_academica WHERE disenio = @Id AND activo = 1
-            UNION ALL SELECT 'pasantia', COUNT(*) FROM pasantia WHERE programa = @Id AND activo = 1
-            UNION ALL SELECT 'premio', COUNT(*) FROM premio WHERE programa = @Id AND activo = 1
-            UNION ALL SELECT 'programa_ac', COUNT(*) FROM programa_ac WHERE programa = @Id AND activo = 1
-            UNION ALL SELECT 'programa_pe', COUNT(*) FROM programa_pe WHERE programa = @Id AND activo = 1
-            UNION ALL SELECT 'programa_ci', COUNT(*) FROM programa_ci WHERE programa = @Id AND activo = 1
-            UNION ALL SELECT 'an_programa', COUNT(*) FROM an_programa WHERE programa = @Id AND activo = 1
-            UNION ALL SELECT 'docente_departamento', COUNT(*) FROM docente_departamento WHERE departamento = @Id AND activo = 1
-            UNION ALL SELECT 'alianza', COUNT(*) FROM alianza WHERE departamento = @Id AND activo = 1",
-            new { Id = id });
+        Dependientes("dbo.sp_dependientes_programa", new { Id = id });
 
     public Task<IReadOnlyList<string>> DependientesDeRegistroCalificado(int codigo) =>
-        Dependientes(@"
-            SELECT 'enfoque_rc' AS Tabla, COUNT(*) AS Cantidad FROM enfoque_rc WHERE registro_calificado = @Codigo AND activo = 1
-            UNION ALL SELECT 'aa_rc', COUNT(*) FROM aa_rc WHERE registro_calificado_codigo = @Codigo AND activo = 1",
-            new { Codigo = codigo });
+        Dependientes("dbo.sp_dependientes_registro_calificado", new { Codigo = codigo });
 
     public Task<IReadOnlyList<string>> DependientesDeActivAcademica(int id) =>
-        Dependientes(@"
-            SELECT 'aa_rc' AS Tabla, COUNT(*) AS Cantidad FROM aa_rc WHERE activ_academicas_idcurso = @Id AND activo = 1",
-            new { Id = id });
+        Dependientes("dbo.sp_dependientes_activ_academica", new { Id = id });
 
     public Task<IReadOnlyList<string>> DependientesDeAreaConocimiento(string id) =>
-        Dependientes(@"
-            SELECT 'programa_ac' AS Tabla, COUNT(*) AS Cantidad FROM programa_ac WHERE area_conocimiento = @Id AND activo = 1",
-            new { Id = id });
+        Dependientes("dbo.sp_dependientes_area_conocimiento", new { Id = id });
 
     public Task<IReadOnlyList<string>> DependientesDePracticaEstrategia(int id) =>
-        Dependientes(@"
-            SELECT 'programa_pe' AS Tabla, COUNT(*) AS Cantidad FROM programa_pe WHERE practica_estrategia = @Id AND activo = 1",
-            new { Id = id });
+        Dependientes("dbo.sp_dependientes_practica_estrategia", new { Id = id });
 
     public Task<IReadOnlyList<string>> DependientesDeCarInnovacion(int id) =>
-        Dependientes(@"
-            SELECT 'programa_ci' AS Tabla, COUNT(*) AS Cantidad FROM programa_ci WHERE car_innovacion = @Id AND activo = 1",
-            new { Id = id });
+        Dependientes("dbo.sp_dependientes_car_innovacion", new { Id = id });
 
     public Task<IReadOnlyList<string>> DependientesDeAspectoNormativo(int id) =>
-        Dependientes(@"
-            SELECT 'an_programa' AS Tabla, COUNT(*) AS Cantidad FROM an_programa WHERE aspecto_normativo = @Id AND activo = 1",
-            new { Id = id });
+        Dependientes("dbo.sp_dependientes_aspecto_normativo", new { Id = id });
 
     public Task<IReadOnlyList<string>> DependientesDeEnfoque(int id) =>
-        Dependientes(@"
-            SELECT 'enfoque_rc' AS Tabla, COUNT(*) AS Cantidad FROM enfoque_rc WHERE enfoque = @Id AND activo = 1",
-            new { Id = id });
+        Dependientes("dbo.sp_dependientes_enfoque", new { Id = id });
 
     public Task<IReadOnlyList<string>> DependientesDeAliado(int nit) =>
-        Dependientes(@"
-            SELECT 'alianza' AS Tabla, COUNT(*) AS Cantidad FROM alianza WHERE aliado = @Nit AND activo = 1",
-            new { Nit = nit });
+        Dependientes("dbo.sp_dependientes_aliado", new { Nit = nit });
 }

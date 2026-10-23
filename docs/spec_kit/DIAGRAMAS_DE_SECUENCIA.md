@@ -220,14 +220,18 @@ sequenceDiagram
     Note over C: PermisoPorVerbo: solo administrador (diagrama 9)
     C->>S: Eliminar(id)
     S->>RR: DependientesDePrograma(id)
-    RR->>B: SELECT 'acreditacion', COUNT(*) … UNION ALL … (11 tablas hijas, activo = 1)
+    RR->>B: EXEC sp_dependientes_programa @Id (11 tablas hijas, activo = 1)
     alt tiene hijos activos
         S-->>C: DependenciasActivasExcepcion
         C-->>CA: 409 «tiene registros activos en acreditacion (1)…»
     else sin hijos
         S->>R: EliminarLogico(id)
-        R->>B: UPDATE programa SET activo = 0 WHERE id = @Id AND activo = 1
-        alt 0 filas (no existe o ya retirado)
+        R->>B: EXEC sp_retirar_programa @Id
+        Note over B: transacción SERIALIZABLE: vuelve a contar los hijos<br/>y hace UPDATE programa SET activo = 0 en el mismo paso
+        alt un hijo se creó entretanto (THROW 50409)
+            R-->>S: DependenciasActivasExcepcion
+            C-->>CA: 409
+        else 0 filas (no existe o ya retirado)
             S-->>C: NoEncontradoExcepcion
             C-->>CA: 404
         else 1 fila
@@ -236,7 +240,7 @@ sequenceDiagram
     end
 ```
 
-La fila **nunca** se borra (Artículo 6). Las tablas que no son padre de nadie se saltan la consulta de dependientes. Las 7 tablas de la v1 también la hacen desde la v2 (RF9).
+La fila **nunca** se borra (Artículo 6). Las 11 tablas que son padre de alguna otra usan su `sp_dependientes_<tabla>` y su `sp_retirar_<tabla>`; se crearon en la migración `v3_002` (D-v3-10). Las tablas que no son padre de nadie se saltan la consulta de dependientes. Las 7 tablas de la v1 también la hacen desde la v2 (RF9).
 
 ## 7. `ValidarReglas` — claves foráneas activas (método privado de cada servicio v2)
 
@@ -369,14 +373,18 @@ sequenceDiagram
         S-->>C: NoEncontradoExcepcion → 404
     else es administrador
         S->>R: ContarAdministradoresActivos()
-        R->>B: SELECT COUNT(DISTINCT u.id) … rol = 'administrador'
+        R->>B: EXEC sp_contar_administradores_activos
         alt queda solo él
             S-->>C: OperacionNoPermitidaExcepcion → 409
         end
     end
     S->>R: EliminarLogico(id)
-    R->>B: UPDATE usuario SET activo = 0 WHERE id = @Id AND activo = 1
-    C-->>C: 200
+    R->>B: EXEC sp_usuario_retirar @Id (vuelve a comprobar y retira en una transacción)
+    alt otro retiro simultáneo lo dejó como el último (THROW 50410)
+        R-->>C: OperacionNoPermitidaExcepcion → 409
+    else
+        C-->>C: 200
+    end
 ```
 
 `ServicioRol.Eliminar` sigue la misma forma: 409 si es un rol del sistema o si tiene usuarios activos.
@@ -396,7 +404,7 @@ sequenceDiagram
         S-->>C: ReferenciaInvalidaExcepcion → 400
     else
         S->>R: Asignar(usuarioId, rolId)
-        R->>B: IF activa → 0 · ELSE IF existe → UPDATE activo = 1 · ELSE INSERT
+        R->>B: EXEC sp_rol_usuario_asignar (activa → 0 · existe → UPDATE activo = 1 · si no, INSERT)
         alt ya la tenía (0)
             S-->>C: LlaveDuplicadaExcepcion → 409
         else
@@ -407,7 +415,7 @@ sequenceDiagram
     alt es quitar «administrador» al último administrador
         S-->>C: OperacionNoPermitidaExcepcion → 409
     else
-        S->>R: EliminarLogico → UPDATE rol_usuario SET activo = 0
+        S->>R: EliminarLogico → EXEC sp_rol_usuario_quitar (THROW 50410 si quedaría sin administrador)
         C-->>C: 200
     end
 ```

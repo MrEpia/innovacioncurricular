@@ -86,3 +86,52 @@ rol quitado **reactiva** la fila en vez de responder 409: la llave es la misma.
 **Decisión.** La API (todo lo que exige seguridad de verdad) la hace el
 encargado del `main`; la sesión del front y el panel de administración, los
 otros dos. Ver [8_tasks.md](8_tasks.md).
+
+## D-v3-10 — Procedimientos almacenados para las operaciones atómicas *(enmienda 1.3.0 del Artículo 2)*
+
+**Contexto.** Varias operaciones comprueban algo y luego escriben, en dos
+viajes a la base: retirar un padre (¿tiene hijos activos? → `UPDATE`), retirar
+un rol (¿algún usuario activo lo tiene?), quitar el rol administrador o retirar
+un usuario (¿es el último administrador?) y asignar un rol (¿ya lo tenía? →
+reactivar o insertar). Entre la comprobación y la escritura puede colarse otra
+petición: dos administradores que se retiran el rol al mismo tiempo dejarían
+el sistema sin administrador, y un hijo creado en ese instante quedaría
+huérfano. Además el curso pide procedimientos almacenados.
+
+**Decisión.** Migración idempotente `db/migraciones/v3_002_procedimientos_almacenados.sql`
+con 27 procedimientos. Cada uno hace la comprobación y la escritura en UNA
+transacción `SERIALIZABLE`:
+
+| Procedimiento | Tablas | Lo llama |
+|---|---|---|
+| `sp_dependientes_<tabla>` (11) | universidad, facultad, programa, registro_calificado, activ_academica, area_conocimiento, practica_estrategia, car_innovacion, aspecto_normativo, enfoque, aliado | `RepositorioReferenciasSqlServer.DependientesDe<Tabla>` |
+| `sp_retirar_<tabla>` (11) | las mismas 11: son las únicas que tienen hijos | `Repositorio<Tabla>SqlServer.EliminarLogico` |
+| `sp_rol_retirar` | rol | `RepositorioRolSqlServer.EliminarLogico` |
+| `sp_rol_usuario_asignar` / `sp_rol_usuario_quitar` | rol_usuario | `RepositorioRolUsuarioSqlServer.Asignar` / `EliminarLogico` |
+| `sp_usuario_retirar` / `sp_contar_administradores_activos` | usuario | `RepositorioUsuarioSqlServer.EliminarLogico` / `ContarAdministradoresActivos` |
+
+Los procedimientos avisan con `THROW 50409` (tiene dependientes) o `50410`
+(dejaría el sistema sin administrador). El repositorio traduce esos números a
+las excepciones de siempre, así que el servicio, el controlador y el contrato
+no cambian: siguen respondiendo 409 con el mismo sobre.
+
+Los servicios **conservan** su comprobación previa. Da el mensaje amable y es
+lo que verifica la prueba de capas (sin base). El procedimiento es la garantía
+final cuando dos peticiones llegan al mismo tiempo.
+
+**Por qué no en todas las tablas.** El CRUD de una sola tabla es una sola
+sentencia (`SELECT`, `INSERT`, `UPDATE`): ya es atómico, y un procedimiento solo
+escondería el SQL que el Artículo 2 quiere a la vista. Las 11 tablas que no son
+padre de nadie, por ejemplo `acreditacion`, `premio` o los puentes, no
+necesitan ninguno.
+
+**Alternativa descartada.** Transacciones abiertas desde C# alrededor de dos
+consultas. Funcionan, pero reparten la regla entre la API y la base, y el
+curso pide procedimientos.
+
+**Pendiente conocido.** Crear un hijo sigue en dos pasos: el servicio comprueba
+que el padre esté activo y después inserta. Si el padre se retira justo en
+medio, el hijo nace apuntando a un padre inactivo. La ventana es muy corta; si
+se quiere cerrar, el siguiente paso es un `sp_crear_<tabla>` por cada tabla
+hija.
+

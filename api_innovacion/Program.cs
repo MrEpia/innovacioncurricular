@@ -1,5 +1,4 @@
-using ApiInnovacion.Repositorios;
-using ApiInnovacion.Servicios;
+using ApiInnovacion.Ensamblador;
 using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,30 +8,15 @@ var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.UseUrls("http://0.0.0.0:8072");
 
 // ============================================================
-// EL ENSAMBLADOR (Artículo 3)
-// Estas dos líneas son el ÚNICO lugar donde una clase concreta aparece junto a su
-// interfaz. Todo lo demás recibe interfaces por constructor.
+// EL ENSAMBLADOR (Artículo 3, enmienda 1.1.0)
+// Cada bloque registra sus pares interfaz → clase concreta en su propio
+// archivo de Ensamblador/. Aquí solo se llaman: Program.cs deja de ser el
+// archivo que los tres estudiantes editan a la vez.
 // ============================================================
-builder.Services.AddScoped<IRepositorioAliado, RepositorioAliadoSqlServer>();
-builder.Services.AddScoped<IServicioAliado, ServicioAliado>();
-
-builder.Services.AddScoped<IRepositorioAreaConocimiento, RepositorioAreaConocimientoSqlServer>();
-builder.Services.AddScoped<IServicioAreaConocimiento, ServicioAreaConocimiento>();
-
-builder.Services.AddScoped<IRepositorioUniversidad, RepositorioUniversidadSqlServer>();
-builder.Services.AddScoped<IServicioUniversidad, ServicioUniversidad>();
-
-builder.Services.AddScoped<IRepositorioAspectoNormativo, RepositorioAspectoNormativoSqlServer>();
-builder.Services.AddScoped<IServicioAspectoNormativo, ServicioAspectoNormativo>();
-
-builder.Services.AddScoped<IRepositorioPracticaEstrategia, RepositorioPracticaEstrategiaSqlServer>();
-builder.Services.AddScoped<IServicioPracticaEstrategia, ServicioPracticaEstrategia>();
-
-builder.Services.AddScoped<IRepositorioEnfoque, RepositorioEnfoqueSqlServer>();
-builder.Services.AddScoped<IServicioEnfoque, ServicioEnfoque>();
-
-builder.Services.AddScoped<IRepositorioCarInnovacion, RepositorioCarInnovacionSqlServer>();
-builder.Services.AddScoped<IServicioCarInnovacion, ServicioCarInnovacion>();
+builder.Services.AgregarTablasV1();
+builder.Services.AgregarBloqueAcademico();      // v2 — Sebastián Calvo
+builder.Services.AgregarBloqueActividades();    // v2 — David Epia
+builder.Services.AgregarBloquePuentes();        // v2 — Sebastián Brunal
 
 builder.Services.AddControllers();
 
@@ -73,8 +57,8 @@ app.UseSwaggerUI();
 // Si esto no responde, el problema no es de contrato: la API no está arriba.
 app.MapGet("/", () => Results.Ok(new
 {
-    mensaje = "API Innovación Curricular — v1: tablas sin clave foránea",
-    version = "v1",
+    mensaje = "API Innovación Curricular — v2: las 22 tablas del módulo",
+    version = "v2",
     contratos = "/swagger"
 }));
 

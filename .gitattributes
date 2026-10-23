@@ -1,0 +1,5 @@
+# Los scripts de shell corren DENTRO de contenedores Linux: con fin de línea
+# de Windows (CRLF) bash falla con "\r: command not found". Se fuerzan a LF
+# aunque el equipo trabaje en Windows con core.autocrlf.
+*.sh text eol=lf
+*.sql text eol=lf

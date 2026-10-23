@@ -136,6 +136,9 @@ flowchart TB
     class F prueba
 ```
 
+Cada método de estas capas tiene su diagrama de secuencia en
+[DIAGRAMAS_DE_SECUENCIA.md](DIAGRAMAS_DE_SECUENCIA.md).
+
 Fíjese en el repositorio falso: como el servicio solo conoce la interfaz,
 se le puede enchufar uno de mentiras y probarlo **sin base de datos**. Esa
 prueba es un criterio de aceptación, no un adorno.

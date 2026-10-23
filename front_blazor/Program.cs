@@ -20,6 +20,7 @@ builder.Services.AgregarServiciosV1(urlApi);
 builder.Services.AgregarServiciosAcademico();     // v2 — Sebastián Calvo
 builder.Services.AgregarServiciosActividades();   // v2 — David Epia
 builder.Services.AgregarServiciosPuentes();       // v2 — Sebastián Brunal
+builder.Services.AgregarSesion(urlApi);           // v3 — David Epia: ingreso y sesión
 
 var app = builder.Build();
 
@@ -28,8 +29,12 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
 }
 
+// v3: quién es (cookie de sesión) y qué puede, ANTES de la antifalsificación y
+// de las pantallas.
+app.UsarSesion();
 app.UseAntiforgery();
 app.MapStaticAssets();
 app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
+app.MapearSesion();                               // /sesion/salir y /sesion/expirada
 
 app.Run();

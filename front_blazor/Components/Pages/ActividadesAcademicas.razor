@@ -21,7 +21,7 @@
     </div>
     @if (!mostrandoFormulario)
     {
-        <button class="boton primario" @onclick="Agregar">Agregar</button>
+        <AuthorizeView Roles="administrador,editor" Context="permiso"><button class="boton primario" @onclick="Agregar">Agregar</button></AuthorizeView>
     }
 </div>
 
@@ -182,8 +182,8 @@ else if (filas.Count > 0)
                         <td>@NombreDisenio(fila.Disenio)</td>
                         <td>
                             <div class="acciones">
-                                <button class="boton" @onclick="() => Editar(fila)">Editar</button>
-                                <button class="boton peligro" @onclick="() => Retirar(fila)">Retirar</button>
+                                <AuthorizeView Roles="administrador,editor" Context="permiso"><button class="boton" @onclick="() => Editar(fila)">Editar</button></AuthorizeView>
+                                <AuthorizeView Roles="administrador" Context="permiso"><button class="boton peligro" @onclick="() => Retirar(fila)">Retirar</button></AuthorizeView>
                             </div>
                         </td>
                     </tr>

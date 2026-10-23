@@ -100,6 +100,11 @@ asunto del programa, no de quien usa el sistema.
   `CommandType.StoredProcedure`, y sus errores (`THROW 5xxxx`) se traducen allí
   a las excepciones de siempre. Así el contrato no cambia. El CRUD de una sola
   sentencia sigue con SQL a la vista en el repositorio.
+- *(Enmienda 1.4.0)* También **guardar un maestro con su detalle** (un padre y
+  varios hijos de otras tablas) es una operación de varios pasos que debe ser
+  atómica: va en un procedimiento que inserta todo en una transacción o no
+  inserta nada. El detalle viaja como JSON **en un parámetro** y se lee con
+  `OPENJSON`: nunca se concatena.
 - Paquetes permitidos, y ninguno más sin que una spec lo pida:
   `Microsoft.Data.SqlClient` (el cliente del motor), `Dapper` y
   `Swashbuckle.AspNetCore` (Swagger). *(Enmienda 1.2.0)* Desde la v3,
@@ -230,7 +235,7 @@ un 404 o un 422 tienen su formato exacto documentado.
 |---|---|
 | Puertos del proyecto | API **8072** · **front 8073** · SQL Server **11471** |
 | Base de datos | `innovacion_local` |
-| Rutas | `/` (diagnóstico) · `/swagger` (documentación interactiva) · `/api/{tabla}` |
+| Rutas | `/` (diagnóstico) · `/swagger` (documentación interactiva) · `/api/{tabla}` · *(enmienda 1.4.0)* maestro-detalle: `POST /api/{tabla}/completo` y `GET /api/{tabla}/{llave}/completo`, escritas con el nombre real de la tabla |
 | Nombres | PascalCase en español; interfaces con prefijo `I`; carpetas `Controllers/ Modelos/ Peticiones/ Servicios/ Repositorios/ Excepciones/ pruebas/` (`Modelos/` = clases entidad; `Peticiones/` = el cuerpo de cada verbo) |
 | Sobre de respuesta | Lecturas: `{tabla, limite, total, datos}` · Errores: `{estado, mensaje, detalle}` (+ `errores:[…]` en el 422) |
 | Errores | Cuerpo inválido (la petición) → **422** · `ArgumentException` → **400** (incluye `ReferenciaInvalidaExcepcion`: una clave foránea que no apunta a un registro activo) · `NoEncontradoExcepcion` → **404** · `LlaveDuplicadaExcepcion` y `DependenciasActivasExcepcion` → **409** *(enmienda 1.1.0)* · `SqlException` y demás → **500** · lectura sin filas → **204** |
@@ -275,12 +280,13 @@ o se corrige el plan, o se enmienda esto.
 
 ---
 
-*Versión 1.3.0 · Ratificada el 2026-08-29 · Última enmienda: 2026-10-23*
+*Versión 1.4.0 · Ratificada el 2026-08-29 · Última enmienda: 2026-10-23*
 
 ### Registro de enmiendas
 
 | Versión | Fecha | Artículos | Qué cambió y por qué | Dónde se propuso |
 |---|---|---|---|---|
+| 1.4.0 | 2026-10-23 | 2, 10 | El maestro-detalle (registro calificado y programa con sus hijos) se guarda en un procedimiento, todo o nada, con el detalle como parámetro JSON · rutas `/api/{tabla}/completo` y `/api/{tabla}/{llave}/completo` | [v3_maestro_detalle/4_research.md](versiones/v3_maestro_detalle/4_research.md), D-MD-1 |
 | 1.3.0 | 2026-10-23 | 2 | Se permiten procedimientos almacenados para las operaciones atómicas de comprobar y escribir (27, en la migración `v3_002`) | [v3_seguridad/4_research.md](versiones/v3_seguridad/4_research.md), D-v3-10 |
 | 1.2.0 | 2026-10-22 | 2, 10 | Se permite el paquete JwtBearer y se agregan 401/403 y la tabla de permisos por verbo | [v3_seguridad/4_research.md](versiones/v3_seguridad/4_research.md), D-v3-1 y D-v3-4 |
 | 1.1.0 | 2026-10-22 | 3, 7, 10, 10.1 | El ensamblador se reparte en `Ensamblador/` por bloque (tres estudiantes en paralelo) · se elimina la excepción de secretos de la plantilla: todo va en `.env` · se agregan los códigos 409 (llave duplicada, dependencias activas) y 201 (creación) para la v2 · el front comparte el transporte (`ClienteApi`), no los recursos | [v2_entrega2/4_research.md](versiones/v2_entrega2/4_research.md), D-v2-1 a D-v2-4 |

@@ -1,0 +1,270 @@
+@page "/registros-calificados/completo"
+@rendermode InteractiveServer
+@inject ServicioRegistroCalificadoCompleto Servicio
+@inject ServicioRegistroCalificado ServicioRegistros
+@inject ServicioPrograma ServicioProgramaPadre
+@inject ServicioEnfoque ServicioEnfoqueHijo
+@inject ServicioActivAcademica ServicioActividadHijo
+
+@*
+    MAESTRO-DETALLE de `registro_calificado`
+
+    Arriba el MAESTRO (el registro calificado); abajo el DETALLE en dos tablas
+    editables: sus enfoques (enfoque_rc) y sus actividades académicas (aa_rc).
+    «Guardar todo» manda una sola petición a POST /api/registro_calificado/completo
+    y la API lo guarda en UNA transacción: o queda todo, o no queda nada.
+
+    Cada lista desplegable sale de la API, por el servicio de su tabla.
+*@
+
+<PageTitle>Registro calificado con su detalle</PageTitle>
+
+<div class="encabezado">
+    <div>
+        <h1>Registro calificado con su detalle</h1>
+        <p class="nota">El registro calificado (maestro) con sus enfoques y sus actividades académicas (detalle), guardados juntos.</p>
+    </div>
+</div>
+
+@foreach (var error in errores)
+{
+    <p class="aviso error">@error</p>
+}
+@if (!string.IsNullOrEmpty(exito))
+{
+    <p class="aviso exito">@exito</p>
+}
+
+@* ----------------------------------------------------------- CONSULTAR *@
+<div class="tarjeta-formulario">
+    <h2>Consultar un registro con su detalle</h2>
+    <div class="pareja">
+        <select @bind="codigoConsulta">
+            <option value="">— seleccione un registro calificado —</option>
+            @foreach (var r in listaRegistros)
+            {
+                <option value="@r.Codigo">@r.Codigo — @r.TipoTitulacion (programa @r.Programa)</option>
+            }
+        </select>
+        <button class="boton" @onclick="Consultar" disabled="@(codigoConsulta == null)">Ver</button>
+    </div>
+
+    @if (consultado != null)
+    {
+        <div class="tabla-scroll">
+            <table>
+                <thead><tr><th>Código</th><th>Programa</th><th>Metodología</th><th>Créditos</th><th>Desde</th><th>Hasta</th><th>Titulación</th></tr></thead>
+                <tbody>
+                    <tr>
+                        <td>@consultado.Codigo</td>
+                        <td>@NombrePrograma(consultado.Programa)</td>
+                        <td>@consultado.Metodologia</td>
+                        <td>@consultado.CantCreditos</td>
+                        <td>@(consultado.FechaInicio?.ToString("yyyy-MM-dd"))</td>
+                        <td>@(consultado.FechaFin?.ToString("yyyy-MM-dd"))</td>
+                        <td>@consultado.TipoTitulacion</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>Enfoques (@consultado.Enfoques.Count)</h3>
+        @if (consultado.Enfoques.Count == 0)
+        {
+            <p class="nota">Sin enfoques.</p>
+        }
+        else
+        {
+            <table>
+                <thead><tr><th>Enfoque</th><th>Nombre</th></tr></thead>
+                <tbody>
+                    @foreach (var e in consultado.Enfoques)
+                    {
+                        <tr><td>@e.Enfoque</td><td>@e.Nombre</td></tr>
+                    }
+                </tbody>
+            </table>
+        }
+
+        <h3>Actividades académicas (@consultado.Actividades.Count)</h3>
+        @if (consultado.Actividades.Count == 0)
+        {
+            <p class="nota">Sin actividades.</p>
+        }
+        else
+        {
+            <table>
+                <thead><tr><th>Actividad</th><th>Nombre</th><th>Componente</th><th>Semestre</th></tr></thead>
+                <tbody>
+                    @foreach (var a in consultado.Actividades)
+                    {
+                        <tr><td>@a.ActivAcademicasIdcurso</td><td>@a.Nombre</td><td>@a.Componente</td><td>@a.Semestre</td></tr>
+                    }
+                </tbody>
+            </table>
+        }
+    }
+</div>
+
+@* ----------------------------------------------------------- CREAR *@
+<AuthorizeView Roles="administrador,editor" Context="permiso">
+<div class="tarjeta-formulario">
+    <h2>Nuevo registro calificado con su detalle</h2>
+
+    <h3>1. El registro (maestro)</h3>
+    <label>Código <input type="number" @bind="nuevo.Codigo" /></label>
+    <label>Créditos <input type="text" maxlength="45" @bind="nuevo.CantCreditos" /></label>
+    <label>Horas de acompañamiento <input type="text" maxlength="45" @bind="nuevo.HoraAcom" /></label>
+    <label>Horas independientes <input type="text" maxlength="45" @bind="nuevo.HoraInd" /></label>
+    <label>Metodología <input type="text" maxlength="45" @bind="nuevo.Metodologia" /></label>
+    <label>Fecha de inicio <input type="date" @bind="nuevo.FechaInicio" /></label>
+    <label>Fecha de fin <input type="date" @bind="nuevo.FechaFin" /></label>
+    <label>Duración (años) <input type="text" maxlength="45" @bind="nuevo.DuracionAnios" /></label>
+    <label>Duración (semestres) <input type="text" maxlength="45" @bind="nuevo.DuracionSemestres" /></label>
+    <label>Tipo de titulación <input type="text" maxlength="45" @bind="nuevo.TipoTitulacion" /></label>
+    <label>
+        Programa
+        <select @bind="nuevo.Programa">
+            <option value="">— seleccione —</option>
+            @foreach (var p in listaPrograma)
+            {
+                <option value="@p.Id">@p.Id — @p.Nombre</option>
+            }
+        </select>
+    </label>
+
+    <h3>2. Sus enfoques (detalle)</h3>
+    <table>
+        <thead><tr><th>Enfoque</th><th></th></tr></thead>
+        <tbody>
+            @foreach (var fila in nuevo.Enfoques)
+            {
+                <tr>
+                    <td>
+                        <select @bind="fila.Enfoque">
+                            <option value="">— seleccione —</option>
+                            @foreach (var e in listaEnfoque)
+                            {
+                                <option value="@e.Id">@e.Id — @e.Nombre</option>
+                            }
+                        </select>
+                    </td>
+                    <td><button class="boton peligro" @onclick="() => nuevo.Enfoques.Remove(fila)">Quitar</button></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div class="pareja"><button class="boton" @onclick="() => nuevo.Enfoques.Add(new())">+ Agregar enfoque</button></div>
+
+    <h3>3. Sus actividades académicas (detalle)</h3>
+    <table>
+        <thead><tr><th>Actividad</th><th>Componente</th><th>Semestre</th><th></th></tr></thead>
+        <tbody>
+            @foreach (var fila in nuevo.Actividades)
+            {
+                <tr>
+                    <td>
+                        <select @bind="fila.ActivAcademicasIdcurso">
+                            <option value="">— seleccione —</option>
+                            @foreach (var a in listaActividad)
+                            {
+                                <option value="@a.Id">@a.Id — @a.Nombre</option>
+                            }
+                        </select>
+                    </td>
+                    <td><input type="text" maxlength="45" @bind="fila.Componente" /></td>
+                    <td><input type="text" maxlength="45" @bind="fila.Semestre" /></td>
+                    <td><button class="boton peligro" @onclick="() => nuevo.Actividades.Remove(fila)">Quitar</button></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div class="pareja"><button class="boton" @onclick="() => nuevo.Actividades.Add(new())">+ Agregar actividad</button></div>
+
+    <div class="pareja">
+        <button class="boton primario" @onclick="GuardarTodo" disabled="@guardando">Guardar todo</button>
+        <button class="boton" @onclick="Limpiar" disabled="@guardando">Limpiar</button>
+    </div>
+    <span class="ayuda">
+        Se guarda en una sola operación: si un enfoque o una actividad no es válido,
+        no se guarda nada, ni siquiera el registro.
+    </span>
+</div>
+</AuthorizeView>
+
+@code {
+    private List<RegistroCalificado> listaRegistros = new();
+    private List<Programa> listaPrograma = new();
+    private List<Enfoque> listaEnfoque = new();
+    private List<ActivAcademica> listaActividad = new();
+    private List<string> errores = new();
+    private string exito = string.Empty;
+    private bool guardando;
+
+    private int? codigoConsulta;
+    private RegistroCalificadoCompleto? consultado;
+    private RegistroCalificadoCompleto nuevo = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var rPrograma = await ServicioProgramaPadre.Listar();
+        if (rPrograma.Ok) listaPrograma = rPrograma.Datos!; else errores.AddRange(rPrograma.Errores);
+        var rEnfoque = await ServicioEnfoqueHijo.Listar();
+        if (rEnfoque.Ok) listaEnfoque = rEnfoque.Datos!; else errores.AddRange(rEnfoque.Errores);
+        var rActividad = await ServicioActividadHijo.Listar();
+        if (rActividad.Ok) listaActividad = rActividad.Datos!; else errores.AddRange(rActividad.Errores);
+        await CargarRegistros();
+    }
+
+    private async Task CargarRegistros()
+    {
+        var r = await ServicioRegistros.Listar();
+        if (r.Ok) listaRegistros = r.Datos!; else errores.AddRange(r.Errores);
+    }
+
+    private string NombrePrograma(int? llave)
+    {
+        var p = listaPrograma.FirstOrDefault(x => Equals(x.Id, llave));
+        return p == null ? $"{llave}" : $"{p.Id} — {p.Nombre}";
+    }
+
+    private async Task Consultar()
+    {
+        errores = new();
+        exito = string.Empty;
+        var r = await Servicio.Obtener(codigoConsulta!.Value);
+        consultado = r.Ok ? r.Datos : null;
+        if (!r.Ok) errores = r.Errores;
+    }
+
+    private async Task GuardarTodo()
+    {
+        guardando = true;
+        var r = await Servicio.Crear(nuevo);
+        guardando = false;
+
+        if (r.Ok)
+        {
+            var mensaje = $"Se guardó el registro calificado {nuevo.Codigo} con {nuevo.Enfoques.Count} enfoque(s) y {nuevo.Actividades.Count} actividad(es).";
+            codigoConsulta = nuevo.Codigo;
+            nuevo = new();
+            await CargarRegistros();
+            await Consultar();       // se muestra arriba, leído de la API
+            exito = mensaje;
+        }
+        else
+        {
+            // 400/409/422 con su explicación. No se guardó nada: el formulario
+            // queda como estaba para corregir y volver a intentar.
+            errores = r.Errores;
+            exito = string.Empty;
+        }
+    }
+
+    private void Limpiar()
+    {
+        nuevo = new();
+        errores = new();
+        exito = string.Empty;
+    }
+}

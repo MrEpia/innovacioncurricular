@@ -133,5 +133,7 @@ curso pide procedimientos.
 que el padre esté activo y después inserta. Si el padre se retira justo en
 medio, el hijo nace apuntando a un padre inactivo. La ventana es muy corta; si
 se quiere cerrar, el siguiente paso es un `sp_crear_<tabla>` por cada tabla
-hija.
+hija. *(Actualización)* Para los hijos creados con el maestro-detalle ya está
+cerrado: el procedimiento revalida los padres dentro de su transacción
+([D-MD-3](../v3_maestro_detalle/4_research.md)).
 

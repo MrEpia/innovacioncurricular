@@ -18,6 +18,7 @@ builder.Services.AgregarBloqueAcademico();      // v2 — Sebastián Calvo
 builder.Services.AgregarBloqueActividades();    // v2 — David Epia
 builder.Services.AgregarBloquePuentes();        // v2 — Sebastián Brunal
 builder.Services.AgregarSeguridad(builder.Configuration);   // v3 — JWT, roles, usuarios
+builder.Services.AgregarMaestroDetalle();         // v3 — maestro-detalle (registro calificado y programa)
 
 builder.Services.AddControllers();
 

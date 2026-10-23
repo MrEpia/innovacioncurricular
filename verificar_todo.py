@@ -32,6 +32,7 @@ HUMOS = [
     ("Bloque Académico (v2)", "humo_academico.py"),
     ("Bloque Actividades (v2)", "humo_actividades.py"),
     ("Bloque Puentes (v2)", "humo_puentes.py"),
+    ("Maestro-detalle: registro calificado y programa", "humo_maestro_detalle.py"),
     ("Front con sesión (v1 + v3)", "humo_front.py"),
 ]
 

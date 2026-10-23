@@ -34,6 +34,10 @@
 | 15 | Ingresar en el front (`/ingresar`) | `Ingresar.razor` | v3 |
 | 16 | `ClienteApi.Enviar` — token y sesión vencida | front | v3 |
 | 17 | Cerrar sesión (`/sesion/salir`) | `EnsambladorSesion` | v3 |
+| 18 | Maestro-detalle: `ServicioRegistroCalificadoCompleto.Crear` | `RegistroCalificadoCompletoController.Crear` | v3 · MD |
+| 19 | Maestro-detalle: `ObtenerCompleto` (registro y programa) | `…CompletoController.ObtenerCompleto` | v3 · MD |
+| 20 | Maestro-detalle: `ServicioProgramaCompleto.Crear` | `ProgramaCompletoController.Crear` | v3 · MD |
+| 21 | Maestro-detalle en el front: «Guardar todo» | `RegistrosCalificadosCompleto.razor` / `ProgramasCompleto.razor` | v3 · MD |
 
 ---
 
@@ -505,3 +509,106 @@ sequenceDiagram
     AS-->>E: ticket y JWT borrados del servidor
     E-->>U: redirige a /ingresar?salio=1
 ```
+
+---
+
+## 18. Maestro-detalle: `ServicioRegistroCalificadoCompleto.Crear`
+
+```mermaid
+sequenceDiagram
+    participant CA as ClienteApi
+    participant C as RegistroCalificadoCompletoController
+    participant S as ServicioRegistroCalificadoCompleto
+    participant RR as IRepositorioReferencias
+    participant R as RepositorioRegistroCalificadoCompletoSqlServer
+    participant B as sp_registro_calificado_completo_crear
+    CA->>C: POST /api/registro_calificado/completo {registro, enfoques[], actividades[]}
+    Note over C: [ApiController] valida el registro Y cada actividad → 422
+    C->>S: Crear(registroCompleto)
+    alt sin hijos · hijo repetido · fechaFin < fechaInicio
+        S-->>C: ArgumentException → 400
+    end
+    S->>RR: ProgramaActivo · EnfoqueActivo (cada uno) · ActivAcademicaActiva (cada una)
+    alt alguno inactivo
+        S-->>C: ReferenciaInvalidaExcepcion → 400 (no se llamó al repositorio)
+    else todo válido
+        S->>R: Crear(registroCompleto)
+        R->>B: EXEC con @Enfoques y @Actividades como JSON
+        B->>B: BEGIN TRAN · revalida padres · INSERT registro · INSERT enfoque_rc · INSERT aa_rc · COMMIT
+        alt un padre se retiró entretanto (THROW 50400)
+            B-->>R: rollback de TODO
+            R-->>C: ReferenciaInvalidaExcepcion → 400
+        else llave repetida (2627)
+            B-->>R: rollback de TODO
+            R-->>C: LlaveDuplicadaExcepcion → 409
+        else
+            C-->>CA: 201 {llave:{codigo}, detalle:{enfoques, actividades}}
+        end
+    end
+```
+
+## 19. Maestro-detalle: `ObtenerCompleto`
+
+```mermaid
+sequenceDiagram
+    participant CA as ClienteApi
+    participant C as …CompletoController
+    participant S as Servicio…Completo
+    participant R as Repositorio…CompletoSqlServer
+    participant B as SQL Server
+    CA->>C: GET /api/registro_calificado/{codigo}/completo
+    C->>S: ObtenerCompleto(codigo)
+    S->>R: ObtenerCompleto(codigo)
+    R->>B: QueryMultiple: el maestro · sus enfoque_rc JOIN enfoque · sus aa_rc JOIN activ_academica (todo activo = 1)
+    alt sin maestro
+        R-->>S: null
+        S-->>C: NoEncontradoExcepcion → 404
+    else
+        R-->>S: maestro con sus listas y los nombres
+        C-->>CA: 200
+    end
+```
+
+`GET /api/programa/{id}/completo` es igual, con tres listas: áreas, prácticas y características.
+
+## 20. Maestro-detalle: `ServicioProgramaCompleto.Crear`
+
+```mermaid
+sequenceDiagram
+    participant C as ProgramaCompletoController
+    participant S as ServicioProgramaCompleto
+    participant RR as IRepositorioReferencias
+    participant R as RepositorioProgramaCompletoSqlServer
+    participant B as sp_programa_completo_crear
+    C->>S: Crear(programaCompleto)
+    S->>S: ¿algún hijo? · ¿repetidos en alguna lista?
+    S->>RR: FacultadActiva · AreaConocimientoActiva · PracticaEstrategiaActiva · CarInnovacionActiva
+    S->>R: Crear(programaCompleto)
+    R->>B: EXEC con @Areas, @Practicas y @Caracteristicas como JSON
+    B->>B: BEGIN TRAN · revalida · INSERT programa · INSERT programa_ac / _pe / _ci · COMMIT
+    B-->>R: ok · o THROW 50400 / 2627 (rollback de todo)
+    R-->>C: 201 · 400 · 409
+```
+
+## 21. Maestro-detalle en el front: «Guardar todo»
+
+```mermaid
+sequenceDiagram
+    actor U as Editor
+    participant P as RegistrosCalificadosCompleto.razor
+    participant SF as ServicioRegistroCalificadoCompleto (front)
+    participant CA as ClienteApi
+    U->>P: llena el registro, «+ Agregar enfoque», «+ Agregar actividad», elige en cada fila
+    U->>P: «Guardar todo»
+    P->>SF: Crear(nuevo)
+    SF->>CA: Enviar(POST, "/api/registro_calificado/completo", cuerpo con las listas)
+    alt 201
+        CA-->>P: Resultado.Bien
+        P->>SF: Obtener(codigo) → GET …/completo
+        P-->>U: «Se guardó…» y el registro con su detalle, leído de la API
+    else 400 / 409 / 422
+        CA-->>P: Resultado.Mal(errores)
+        P-->>U: aviso en rojo, el formulario queda lleno para corregir (no se guardó nada)
+    end
+```
+

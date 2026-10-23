@@ -21,6 +21,7 @@ builder.Services.AgregarServiciosAcademico();     // v2 — Sebastián Calvo
 builder.Services.AgregarServiciosActividades();   // v2 — David Epia
 builder.Services.AgregarServiciosPuentes();       // v2 — Sebastián Brunal
 builder.Services.AgregarSesion(urlApi);           // v3 — David Epia: ingreso y sesión
+builder.Services.AgregarAdministracion();         // v3 — Sebastián Brunal: usuarios y roles
 
 var app = builder.Build();
 

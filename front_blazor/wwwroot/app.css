@@ -182,3 +182,9 @@ footer p { color: var(--suave); font-size: .85rem; margin: 0; }
   position: fixed; width: 100%; z-index: 1000; border-top: 2px solid var(--error);
 }
 #blazor-error-ui .dismiss { cursor: pointer; position: absolute; right: 16px; top: 10px; }
+
+/* --- v3: sesión --- */
+.sesion { margin-left: auto; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.form-salir { margin: 0; }
+.ingreso { max-width: 420px; margin: 40px auto; }
+.validation-message { color: var(--error); font-size: .82rem; font-weight: 400; }

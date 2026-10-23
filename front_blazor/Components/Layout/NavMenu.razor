@@ -8,9 +8,19 @@
     agrupan en cuatro menús desplegables por tema. Se usa <details>, que es
     HTML puro: abre y cierra sin una línea de JavaScript y funciona aunque la
     conexión de Blazor todavía no haya subido.
+
+    v3 (David Epia): el menú depende de la sesión. Sin sesión, solo «Ingresar».
+    Con sesión, los catálogos para todos y «Administración» SOLO para el rol
+    administrador. Esconder un enlace no protege nada —eso lo hace la API—: es
+    para no ofrecerle a nadie una puerta que no puede usar.
 *@
 <nav class="menu">
     <div class="contenedor menu-interno">
+    <AuthorizeView>
+    <NotAuthorized>
+        <NavLink class="enlace" href="ingresar">Ingresar</NavLink>
+    </NotAuthorized>
+    <Authorized>
         <NavLink class="enlace" href="" Match="NavLinkMatch.All">Inicio</NavLink>
 
         <details class="grupo-menu">
@@ -58,5 +68,27 @@
                 <NavLink class="enlace" href="actividades-registros">Actividades por registro calificado</NavLink>
             </div>
         </details>
+
+        <AuthorizeView Roles="administrador" Context="admin">
+            <details class="grupo-menu">
+                <summary class="enlace">Administración</summary>
+                <div class="submenu">
+                    <NavLink class="enlace" href="admin/usuarios">Usuarios</NavLink>
+                    <NavLink class="enlace" href="admin/roles">Roles</NavLink>
+                    <NavLink class="enlace" href="admin/asignaciones">Asignación de roles</NavLink>
+                </div>
+            </details>
+        </AuthorizeView>
+
+        <span class="sesion">
+            <span class="nota">@context.User.Identity?.Name · @string.Join(", ", context.User.FindAll(System.Security.Claims.ClaimTypes.Role).Select(c => c.Value))</span>
+            @* Cerrar sesión es un POST con token antifalsificación (RF10). *@
+            <form method="post" action="/sesion/salir" class="form-salir">
+                <AntiforgeryToken />
+                <button type="submit" class="boton">Cerrar sesión</button>
+            </form>
+        </span>
+    </Authorized>
+    </AuthorizeView>
     </div>
 </nav>

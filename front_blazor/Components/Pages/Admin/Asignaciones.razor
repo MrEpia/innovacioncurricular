@@ -1,0 +1,157 @@
+@page "/admin/asignaciones"
+@rendermode InteractiveServer
+@attribute [Authorize(Roles = "administrador")]
+@inject ServicioRolUsuario Servicio
+@inject ServicioUsuario Usuarios
+@inject ServicioRol Roles
+@inject IJSRuntime JS
+
+@*
+    PANEL DE ADMINISTRACIÓN — ASIGNACIÓN DE ROLES (v3, RF9) — Sebastián Brunal
+
+    Usuario y rol se eligen de listas cargadas desde la API. El cambio de roles
+    tiene efecto en el PRÓXIMO ingreso del usuario: los roles viajan dentro de
+    su token, y el token que ya tiene no cambia.
+*@
+
+<PageTitle>Asignación de roles</PageTitle>
+
+<div class="encabezado">
+    <div>
+        <h1>Asignación de roles</h1>
+        <p class="nota">Qué rol tiene cada usuario. El cambio se aplica la próxima vez que el usuario ingrese.</p>
+    </div>
+</div>
+
+@foreach (var error in errores)
+{
+    <p class="aviso error">@error</p>
+}
+@if (!string.IsNullOrEmpty(exito))
+{
+    <p class="aviso exito">@exito</p>
+}
+
+<div class="tarjeta-formulario">
+    <h2>Asignar un rol</h2>
+    <label>
+        Usuario
+        <select @bind="campoUsuario">
+            <option value="">— seleccione —</option>
+            @foreach (var u in listaUsuarios)
+            {
+                <option value="@u.Id">@u.Username — @(u.NombreCompleto ?? u.Email)</option>
+            }
+        </select>
+    </label>
+    <label>
+        Rol
+        <select @bind="campoRol">
+            <option value="">— seleccione —</option>
+            @foreach (var r in listaRoles)
+            {
+                <option value="@r.Id">@r.Nombre</option>
+            }
+        </select>
+    </label>
+    <button class="boton primario" @onclick="Asignar" disabled="@guardando">Asignar</button>
+</div>
+
+@if (cargando)
+{
+    <p class="nota">Cargando…</p>
+}
+else if (filas.Count > 0)
+{
+    <div class="tabla-scroll">
+        <table>
+            <thead><tr><th>Usuario</th><th>Rol</th><th></th></tr></thead>
+            <tbody>
+                @foreach (var fila in filas)
+                {
+                    <tr>
+                        <td>@fila.Username</td>
+                        <td>@fila.Rol</td>
+                        <td><button class="boton peligro" @onclick="() => Quitar(fila)">Quitar</button></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <p class="vacio">No hay roles asignados.</p>
+}
+
+@code {
+    private List<AsignacionRol> filas = new();
+    private List<UsuarioSistema> listaUsuarios = new();
+    private List<RolSistema> listaRoles = new();
+    private List<string> errores = new();
+    private string exito = string.Empty;
+    private bool cargando = true, guardando;
+    private int? campoUsuario, campoRol;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var u = await Usuarios.Listar();
+        if (u.Ok) listaUsuarios = u.Datos!; else errores.AddRange(u.Errores);
+        var r = await Roles.Listar();
+        if (r.Ok) listaRoles = r.Datos!; else errores.AddRange(r.Errores);
+        await Cargar();
+    }
+
+    private async Task Cargar()
+    {
+        cargando = true;
+        var r = await Servicio.Listar();
+        cargando = false;
+        if (!r.Ok) errores.AddRange(r.Errores);
+        filas = r.Ok ? r.Datos! : new();
+    }
+
+    private async Task Asignar()
+    {
+        if (campoUsuario == null || campoRol == null)
+        {
+            errores = new() { "Elija el usuario y el rol." };
+            return;
+        }
+
+        guardando = true;
+        var r = await Servicio.Asignar(campoUsuario.Value, campoRol.Value);
+        guardando = false;
+
+        if (r.Ok)
+        {
+            exito = "Rol asignado. Tendrá efecto en el próximo ingreso del usuario.";
+            errores = new();
+            campoUsuario = campoRol = null;
+            await Cargar();
+        }
+        else
+        {
+            errores = r.Errores;   // por ejemplo: «ya tiene el rol»
+            exito = string.Empty;
+        }
+    }
+
+    private async Task Quitar(AsignacionRol fila)
+    {
+        if (!await JS.InvokeAsync<bool>("confirm", $"¿Quitarle el rol {fila.Rol} a {fila.Username}?")) return;
+
+        var r = await Servicio.Quitar(fila.UsuarioId, fila.RolId);
+        if (r.Ok)
+        {
+            exito = $"Se le quitó el rol {fila.Rol} a {fila.Username}.";
+            errores = new();
+            await Cargar();
+        }
+        else
+        {
+            errores = r.Errores;   // por ejemplo: «único administrador activo»
+            exito = string.Empty;
+        }
+    }
+}

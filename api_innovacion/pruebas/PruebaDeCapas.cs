@@ -22,6 +22,7 @@ public class PruebaDeCapas
         await PruebasAcademico.Ejecutar();
         await PruebasActividades.Ejecutar();
         await PruebasPuentes.Ejecutar();
+        await PruebasSeguridad.Ejecutar();      // v3 — Sebastián Calvo
 
         Console.WriteLine();
         Console.WriteLine(Verificador.TodoBien

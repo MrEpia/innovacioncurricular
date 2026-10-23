@@ -1,0 +1,17 @@
+@page "/sin-permiso"
+@attribute [AllowAnonymous]
+
+@*
+    Adónde llega quien abre una pantalla que su rol no permite (por ejemplo,
+    un editor que escribe /admin/usuarios a mano). La API también lo
+    impediría: esta página solo evita mostrarle una pantalla rota.
+*@
+
+<PageTitle>Sin permiso</PageTitle>
+
+<div class="tarjeta-formulario">
+    <h1>Sin permiso</h1>
+    <p class="aviso error">Su rol no permite ver esta pantalla.</p>
+    <p class="nota">Si cree que debería poder, pídale al administrador que revise sus roles.</p>
+    <a class="boton" href="/">Volver al inicio</a>
+</div>

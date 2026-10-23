@@ -1,0 +1,121 @@
+@page "/ingresar"
+@attribute [AllowAnonymous]
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authentication.Cookies
+@inject ServicioSesion Sesion
+@inject NavigationManager Navegacion
+
+@*
+    LA PÁGINA DE INGRESO (v3, RF7) — David Epia
+
+    Es ESTÁTICA (sin @rendermode) a propósito: para dejar la cookie de sesión
+    hace falta la respuesta HTTP del navegador, y una pantalla interactiva ya
+    no la tiene —habla por una conexión abierta, no por peticiones—. El
+    formulario se envía como un POST de toda la vida, con su token
+    antifalsificación (lo agrega EditForm solo).
+*@
+
+<PageTitle>Ingresar</PageTitle>
+
+<div class="tarjeta-formulario ingreso">
+    <h1>Ingresar</h1>
+    <p class="nota">Sistema de innovación curricular — Universidad Monte Verde</p>
+
+    @if (Expirada == 1)
+    {
+        <p class="aviso error">Su sesión expiró. Vuelva a ingresar.</p>
+    }
+    @if (Salio == 1)
+    {
+        <p class="aviso exito">Cerró su sesión.</p>
+    }
+    @if (!string.IsNullOrEmpty(error))
+    {
+        <p class="aviso error">@error</p>
+    }
+
+    <EditForm Model="Datos" FormName="ingreso" OnValidSubmit="EnviarIngreso" method="post">
+        <DataAnnotationsValidator />
+        <label>
+            Usuario
+            <InputText @bind-Value="Datos.Usuario" autocomplete="username" />
+            <ValidationMessage For="() => Datos.Usuario" />
+        </label>
+        <label>
+            Contraseña
+            <InputText type="password" @bind-Value="Datos.Clave" autocomplete="current-password" />
+            <ValidationMessage For="() => Datos.Clave" />
+        </label>
+        <button type="submit" class="boton primario">Ingresar</button>
+    </EditForm>
+</div>
+
+@code {
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; } = default!;
+
+    [SupplyParameterFromForm]
+    private DatosIngreso Datos { get; set; } = new();
+
+    [SupplyParameterFromQuery]
+    private string? ReturnUrl { get; set; }
+
+    [SupplyParameterFromQuery]
+    private int? Expirada { get; set; }
+
+    [SupplyParameterFromQuery]
+    private int? Salio { get; set; }
+
+    private string error = string.Empty;
+
+    private async Task EnviarIngreso()
+    {
+        var r = await Sesion.IniciarSesion(Datos.Usuario.Trim(), Datos.Clave);
+        if (!r.Ok)
+        {
+            error = string.Join(" ", r.Errores);
+            return;
+        }
+
+        var ingreso = r.Datos!;
+
+        // El JWT viaja como un claim más del ticket. Como el ticket vive en la
+        // memoria del SERVIDOR (AlmacenSesionesMemoria), el navegador nunca lo ve.
+        var claims = new List<Claim>
+        {
+            new(ClaimTypes.NameIdentifier, ingreso.Usuario.Id.ToString()),
+            new(ClaimTypes.Name, ingreso.Usuario.NombreCompleto ?? ingreso.Usuario.Username),
+            new(ProveedorToken.ClaimToken, ingreso.Token)
+        };
+        claims.AddRange(ingreso.Usuario.Roles.Select(rol => new Claim(ClaimTypes.Role, rol)));
+
+        var identidad = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+        await HttpContext.SignInAsync(
+            CookieAuthenticationDefaults.AuthenticationScheme,
+            new ClaimsPrincipal(identidad),
+            new AuthenticationProperties
+            {
+                // La sesión vence exactamente cuando vence el token.
+                ExpiresUtc = DateTime.SpecifyKind(ingreso.Expira, DateTimeKind.Utc),
+                IsPersistent = false,
+                AllowRefresh = false
+            });
+
+        // Solo se vuelve a direcciones de ESTE sitio: un ReturnUrl hacia otro
+        // dominio sería una redirección abierta para quien armó el enlace.
+        var destino = !string.IsNullOrEmpty(ReturnUrl) && ReturnUrl.StartsWith('/') && !ReturnUrl.StartsWith("//")
+            ? ReturnUrl
+            : "/";
+        Navegacion.NavigateTo(destino, forceLoad: true);
+    }
+
+    private sealed class DatosIngreso
+    {
+        [System.ComponentModel.DataAnnotations.Required(ErrorMessage = "Escriba su usuario.")]
+        public string Usuario { get; set; } = string.Empty;
+
+        [System.ComponentModel.DataAnnotations.Required(ErrorMessage = "Escriba su contraseña.")]
+        public string Clave { get; set; } = string.Empty;
+    }
+}

@@ -1,6 +1,22 @@
+@*
+    v3: AuthorizeRouteView en vez de RouteView. Respeta el [Authorize] de cada
+    pantalla: sin sesión lleva a /ingresar; con sesión pero sin el rol, muestra
+    «sin permiso».
+*@
 <Router AppAssembly="typeof(Program).Assembly">
     <Found Context="routeData">
-        <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />
+        <AuthorizeRouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)">
+            <NotAuthorized>
+                @if (context.User.Identity?.IsAuthenticated != true)
+                {
+                    <RedirigirAIngreso />
+                }
+                else
+                {
+                    <p class="aviso error">Su rol no permite ver esta pantalla.</p>
+                }
+            </NotAuthorized>
+        </AuthorizeRouteView>
         <FocusOnNavigate RouteData="routeData" Selector="h1" />
     </Found>
 </Router>

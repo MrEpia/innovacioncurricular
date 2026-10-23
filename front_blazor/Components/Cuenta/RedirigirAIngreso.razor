@@ -1,0 +1,16 @@
+@inject NavigationManager Navegacion
+
+@*
+    Lo que muestra el enrutador cuando una pantalla exige sesión y no la hay:
+    lleva a /ingresar recordando adónde se quería ir. (En una petición normal
+    lo hace antes el middleware de cookies; esto cubre la navegación dentro de
+    una pantalla interactiva.)
+*@
+
+@code {
+    protected override void OnInitialized()
+    {
+        var volver = Uri.EscapeDataString("/" + Navegacion.ToBaseRelativePath(Navegacion.Uri));
+        Navegacion.NavigateTo($"/ingresar?ReturnUrl={volver}", forceLoad: true);
+    }
+}

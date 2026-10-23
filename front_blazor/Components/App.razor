@@ -11,7 +11,10 @@
 </head>
 
 <body>
-    <Routes @rendermode="InteractiveServer" />
+    @* v3: sin modo global. Cada pantalla de datos declara @rendermode
+       InteractiveServer; /ingresar queda ESTÁTICA porque necesita la respuesta
+       HTTP para dejar la cookie de sesión. *@
+    <Routes />
     <script src="_framework/blazor.web.js"></script>
 </body>
 

@@ -33,15 +33,24 @@ prueba que se pone roja por eso no está midiendo el sistema: está midiendo el
 computador.
 
 Uso:  python pruebas_humo/humo_front.py     (parado en la raíz del proyecto)
+
+v3 (David Epia): desde la entrega 3 todas las pantallas exigen sesión y la
+API exige JWT. El guion inicia sesión como lo haría una persona —llenando el
+formulario de /ingresar, con su token antifalsificación— usando el
+administrador del .env, y guarda la cookie de sesión. Para sus peticiones
+directas a la API pide su propio token con POST /api/login.
 """
 import html
+import http.cookiejar
 import json
+import os
 import random
 import re
 import string
 import subprocess
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 
 FRONT = "http://localhost:8073"
@@ -67,14 +76,62 @@ FICHA = {
 ETIQUETAS = ("NIT", "Razón social", "Nombre del contacto", "Correo", "Ciudad")
 
 
+def leer_env(nombre):
+    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".env"), encoding="utf-8") as f:
+        for linea in f:
+            if linea.startswith(nombre + "="):
+                return linea.strip().split("=", 1)[1]
+    return None
+
+
+# El navegador del guion: guarda las cookies (la de sesión y la de
+# antifalsificación) igual que un navegador de verdad.
+COOKIES = http.cookiejar.CookieJar()
+NAVEGADOR = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(COOKIES))
+TOKEN_API = None
+
+
+class _SinRedireccion(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, *args, **kwargs):
+        return None
+
+
+SIN_SEGUIR = urllib.request.build_opener(_SinRedireccion)
+
+
 def ver(url):
+    """GET como un navegador: al front con la cookie de sesión; a la API, con
+    el token del guion."""
+    peticion = urllib.request.Request(url)
+    if url.startswith(API) and TOKEN_API:
+        peticion.add_header("Authorization", "Bearer " + TOKEN_API)
     try:
-        with urllib.request.urlopen(url, timeout=15) as r:
+        with NAVEGADOR.open(peticion, timeout=15) as r:
             return r.status, r.read().decode("utf-8", "replace")
     except urllib.error.HTTPError as e:
         return e.code, e.read().decode("utf-8", "replace")
     except Exception as e:
         return 0, str(e)
+
+
+def ingresar_por_formulario(usuario, clave):
+    """Llena /ingresar como una persona: lee el token antifalsificación del
+    formulario y lo devuelve en el POST junto con la cookie que lo acompaña."""
+    _, pagina = ver(f"{FRONT}/ingresar")
+    token = re.search(r'name="__RequestVerificationToken"[^>]*value="([^"]+)"', pagina)
+    manejador = re.search(r'name="_handler"[^>]*value="([^"]+)"', pagina)
+    datos = urllib.parse.urlencode({
+        "__RequestVerificationToken": html.unescape(token.group(1)) if token else "",
+        "_handler": manejador.group(1) if manejador else "ingreso",
+        "Datos.Usuario": usuario,
+        "Datos.Clave": clave,
+    }).encode()
+    peticion = urllib.request.Request(f"{FRONT}/ingresar", data=datos, method="POST")
+    try:
+        with NAVEGADOR.open(peticion, timeout=20) as r:
+            return r.status, r.geturl(), r.read().decode("utf-8", "replace")
+    except urllib.error.HTTPError as e:
+        return e.code, f"{FRONT}/ingresar", e.read().decode("utf-8", "replace")
 
 
 def api(metodo, ruta, cuerpo=None):
@@ -83,6 +140,8 @@ def api(metodo, ruta, cuerpo=None):
     datos = json.dumps(cuerpo).encode() if cuerpo is not None else None
     p = urllib.request.Request(API + ruta, data=datos, method=metodo,
                                headers={"Content-Type": "application/json"})
+    if TOKEN_API:
+        p.add_header("Authorization", "Bearer " + TOKEN_API)
     try:
         with urllib.request.urlopen(p, timeout=15) as r:
             return r.status
@@ -128,10 +187,44 @@ def esperar_api(segundos=180):
     return False
 
 
-if not esperar_api():
-    print("La API no respondió. ¿Está levantado el sistema?")
+# v3: el guion pide su propio token para hablar con la API directamente.
+for _ in range(60):
+    try:
+        req = urllib.request.Request(f"{API}/api/login", method="POST",
+                                     data=json.dumps({"usuario": leer_env("ADMIN_USUARIO"),
+                                                      "clave": leer_env("ADMIN_CLAVE")}).encode(),
+                                     headers={"Content-Type": "application/json"})
+        with urllib.request.urlopen(req, timeout=10) as r:
+            TOKEN_API = json.loads(r.read())["token"]
+            break
+    except Exception:
+        time.sleep(3)
+
+if not TOKEN_API or not esperar_api():
+    print("La API no respondió o no dio token. ¿Está levantado el sistema y el .env tiene ADMIN_*?")
     print("   docker compose up -d --build")
     raise SystemExit(1)
+
+print("=== 0. La sesión (v3) ===")
+try:
+    SIN_SEGUIR.open(f"{FRONT}/aliados", timeout=15)
+    revisar("sin sesión, /aliados redirige a /ingresar", False, "respondió sin redirigir")
+except urllib.error.HTTPError as e:
+    revisar("sin sesión, /aliados redirige a /ingresar",
+            e.code == 302 and "/ingresar" in e.headers.get("Location", ""), e.headers.get("Location", ""))
+codigo, url_final, pagina = ingresar_por_formulario("admin", "clave-equivocada-a-proposito")
+revisar("con clave equivocada, el formulario lo dice y no deja entrar",
+        "incorrectos" in visible(pagina) and "/ingresar" in url_final)
+codigo, url_final, pagina = ingresar_por_formulario(leer_env("ADMIN_USUARIO"), leer_env("ADMIN_CLAVE"))
+revisar("con las credenciales del .env, entra", codigo == 200 and "/ingresar" not in url_final, url_final)
+SESION = next((c for c in COOKIES if c.name == ".Innovacion.Sesion"), None)
+revisar("y la cookie de sesión es HttpOnly (ningún script de la página la lee)",
+        SESION is not None and "httponly" in {k.lower() for k in SESION._rest})
+# Un JWT con sus roles ocupa cientos de caracteres; la cookie solo lleva la
+# llave (cifrada) de la sesión guardada en el SERVIDOR del front (D-v3-7).
+revisar("y no lleva el JWT adentro: es solo la llave de la sesión del servidor",
+        SESION is not None and len(SESION.value) < 500, f"{len(SESION.value) if SESION else 0} caracteres")
+print()
 
 # ----------------------------------------------------------------------
 # Se siembra la ficha de la corrida, POR LA API

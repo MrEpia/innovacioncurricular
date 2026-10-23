@@ -1,5 +1,5 @@
 # ==============================================================
-# Módulo INNOVACIÓN CURRICULAR — versión 1
+# Módulo INNOVACIÓN CURRICULAR — entregas 1, 2 y 3
 #
 #   FRONT Blazor (:8073) → API innovacion (C#, :8072) → SQL Server (innovacion_local)
 #
@@ -7,8 +7,13 @@
 # habla con la API por HTTP: no tiene línea hacia SQL Server, y no la
 # va a tener nunca.
 #
-# Uso: docker compose up -d --build     (UN solo comando)
+# Uso:   cp .env.example .env            (una sola vez, y cambie los valores)
+#        docker compose up -d --build     (UN solo comando)
 # Reset de la BD: docker compose down -v && docker compose up -d
+#
+# NINGÚN secreto está escrito aquí (Artículo 7, enmienda 1.1.0): todos
+# salen del archivo .env, que no se versiona. Si falta una variable,
+# compose se niega a arrancar y dice cuál.
 #
 # Compose v2 ignora la directiva 'version:' y advierte que está obsoleta:
 # por eso no aparece.
@@ -22,9 +27,9 @@ services:
     restart: unless-stopped
     environment:
       - ACCEPT_EULA=Y
-      # Contraseña a la vista: excepción declarada del Artículo 7 — plantilla
-      # didáctica en contenedores desechables. En un proyecto real va en .env.
-      - MSSQL_SA_PASSWORD=Aplicacionweb123!
+      # La contraseña sale del .env. El ':?' hace que compose falle con un
+      # mensaje claro si no existe, en vez de arrancar un SQL Server sin clave.
+      - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD:?Falta MSSQL_SA_PASSWORD en .env}
     ports:
       - "11471:1433"
     volumes:
@@ -44,7 +49,7 @@ services:
     container_name: innovacion-sqlserver-init
     restart: "no"
     environment:
-      - MSSQL_SA_PASSWORD=Aplicacionweb123!
+      - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD:?Falta MSSQL_SA_PASSWORD en .env}
     volumes:
       - ./db:/scripts:ro
     depends_on:
@@ -66,7 +71,7 @@ services:
     environment:
       # El host es el NOMBRE del servicio. El doble guion bajo hace que ASP.NET
       # lea esto como ConnectionStrings:SqlServer y SOBREESCRIBA appsettings.json.
-      - ConnectionStrings__SqlServer=Server=sqlserver,1433;Database=innovacion_local;User Id=sa;Password=Aplicacionweb123!;TrustServerCertificate=True;
+      - ConnectionStrings__SqlServer=Server=sqlserver,1433;Database=innovacion_local;User Id=sa;Password=${MSSQL_SA_PASSWORD:?Falta MSSQL_SA_PASSWORD en .env};TrustServerCertificate=True;
     depends_on:
       sqlserver-init:
         condition: service_completed_successfully   # espera a que la base esté SEMBRADA

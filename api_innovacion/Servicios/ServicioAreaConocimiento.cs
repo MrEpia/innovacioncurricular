@@ -13,9 +13,14 @@ public class ServicioAreaConocimiento : IServicioAreaConocimiento
 {
     private readonly IRepositorioAreaConocimiento _repositorio;
 
-    public ServicioAreaConocimiento(IRepositorioAreaConocimiento repositorio)
+    // v2: desde que existen tablas que apuntan aquí (programas que la cubren), retirar este
+    // registro puede dejar huérfanos. Se pregunta antes (2_spec.md de la v2, RF9).
+    private readonly IRepositorioReferencias _referencias;
+
+    public ServicioAreaConocimiento(IRepositorioAreaConocimiento repositorio, IRepositorioReferencias referencias)
     {
         _repositorio = repositorio;
+        _referencias = referencias;
     }
 
     public async Task<IEnumerable<AreaConocimiento>> ObtenerTodos(int limite)
@@ -83,6 +88,13 @@ public class ServicioAreaConocimiento : IServicioAreaConocimiento
 
     public async Task<int> Eliminar(string id)
     {
+        var dependientes = await _referencias.DependientesDeAreaConocimiento(id);
+        if (dependientes.Count > 0)
+        {
+            throw new DependenciasActivasExcepcion(
+                $"No se puede retirar el área de conocimiento {id}: tiene registros activos en {string.Join(", ", dependientes)}. Retírelos primero.");
+        }
+
         var filasAfectadas = await _repositorio.EliminarLogico(id);
         if (filasAfectadas == 0)
         {

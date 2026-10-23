@@ -15,9 +15,14 @@ public class ServicioAliado : IServicioAliado
 {
     private readonly IRepositorioAliado _repositorio;
 
-    public ServicioAliado(IRepositorioAliado repositorio)
+    // v2: desde que existen tablas que apuntan aquí (alianzas), retirar este
+    // registro puede dejar huérfanos. Se pregunta antes (2_spec.md de la v2, RF9).
+    private readonly IRepositorioReferencias _referencias;
+
+    public ServicioAliado(IRepositorioAliado repositorio, IRepositorioReferencias referencias)
     {
         _repositorio = repositorio;
+        _referencias = referencias;
     }
 
     public async Task<IEnumerable<Aliado>> ObtenerTodos(int limite)
@@ -87,6 +92,13 @@ public class ServicioAliado : IServicioAliado
 
     public async Task<int> Eliminar(int nit)
     {
+        var dependientes = await _referencias.DependientesDeAliado(nit);
+        if (dependientes.Count > 0)
+        {
+            throw new DependenciasActivasExcepcion(
+                $"No se puede retirar el aliado {nit}: tiene registros activos en {string.Join(", ", dependientes)}. Retírelos primero.");
+        }
+
         var filasAfectadas = await _repositorio.EliminarLogico(nit);
         if (filasAfectadas == 0)
         {

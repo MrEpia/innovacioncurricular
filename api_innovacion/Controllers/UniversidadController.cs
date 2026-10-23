@@ -171,6 +171,11 @@ public class UniversidadController : ControllerBase
         {
             return NotFound(new { estado = 404, mensaje = "Registro no encontrado.", detalle = ex.Message });
         }
+        catch (DependenciasActivasExcepcion ex)
+        {
+            // v2: tiene registros activos que dependen de él (RF9).
+            return Conflict(new { estado = 409, mensaje = "Tiene registros que dependen de él.", detalle = ex.Message });
+        }
         catch (Exception ex)
         {
             return StatusCode(500, new { estado = 500, mensaje = "Error interno del servidor.", detalle = ex.Message });

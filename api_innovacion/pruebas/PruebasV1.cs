@@ -75,7 +75,9 @@ public static class PruebasV1
         Console.WriteLine("--- v1 · aliado ---");
 
         IRepositorioAliado repoFalso = new RepositorioFalso();
-        IServicioAliado servicio = new ServicioAliado(repoFalso);
+        // v2: el servicio también pregunta por los hijos antes de retirar.
+        var referencias = new RepositorioReferenciasFalso();
+        IServicioAliado servicio = new ServicioAliado(repoFalso, referencias);
 
         var nuevo = new Aliado
         {
@@ -132,6 +134,13 @@ public static class PruebasV1
         {
             Verificador.Revisar(true, "Cuerpo vacío en actualización parcial rechazado con ArgumentException.", "");
         }
+
+        // v2 (RF9) — Con una alianza activa apuntándole, el aliado no se retira.
+        referencias.Dependientes["aliado:900123456"] = new() { "alianza (1)" };
+        await Verificador.EsperarExcepcion<DependenciasActivasExcepcion>(
+            () => servicio.Eliminar(900123456),
+            "v2: un aliado con alianzas activas no se puede retirar (409).");
+        referencias.Dependientes.Clear();
 
         // 6. Eliminar dos veces: la segunda falla como inexistente (C9)
         await servicio.Eliminar(900123456);

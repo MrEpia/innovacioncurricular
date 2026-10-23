@@ -13,9 +13,14 @@ public class ServicioEnfoque : IServicioEnfoque
 {
     private readonly IRepositorioEnfoque _repositorio;
 
-    public ServicioEnfoque(IRepositorioEnfoque repositorio)
+    // v2: desde que existen tablas que apuntan aquí (registros calificados que lo declaran), retirar este
+    // registro puede dejar huérfanos. Se pregunta antes (2_spec.md de la v2, RF9).
+    private readonly IRepositorioReferencias _referencias;
+
+    public ServicioEnfoque(IRepositorioEnfoque repositorio, IRepositorioReferencias referencias)
     {
         _repositorio = repositorio;
+        _referencias = referencias;
     }
 
     public async Task<IEnumerable<Enfoque>> ObtenerTodos(int limite)
@@ -83,6 +88,13 @@ public class ServicioEnfoque : IServicioEnfoque
 
     public async Task<int> Eliminar(int id)
     {
+        var dependientes = await _referencias.DependientesDeEnfoque(id);
+        if (dependientes.Count > 0)
+        {
+            throw new DependenciasActivasExcepcion(
+                $"No se puede retirar el enfoque {id}: tiene registros activos en {string.Join(", ", dependientes)}. Retírelos primero.");
+        }
+
         var filasAfectadas = await _repositorio.EliminarLogico(id);
         if (filasAfectadas == 0)
         {

@@ -1,0 +1,200 @@
+@page "/admin/usuarios"
+@rendermode InteractiveServer
+@attribute [Authorize(Roles = "administrador")]
+@inject ServicioUsuario Servicio
+@inject IJSRuntime JS
+
+@*
+    PANEL DE ADMINISTRACIÓN — USUARIOS (v3, RF9) — Sebastián Brunal
+
+    Solo el rol administrador llega aquí: el [Authorize(Roles = ...)] de arriba
+    lo comprueba el front, y /api/usuario lo vuelve a comprobar en la API. La
+    contraseña se escribe una vez y no se muestra nunca: la API solo guarda su
+    hash.
+*@
+
+<PageTitle>Usuarios</PageTitle>
+
+<div class="encabezado">
+    <div>
+        <h1>Usuarios</h1>
+        <p class="nota">Quién puede ingresar al sistema. Un usuario nuevo no entra hasta que se le asigne un rol.</p>
+    </div>
+    @if (!mostrandoFormulario)
+    {
+        <button class="boton primario" @onclick="Agregar">Agregar</button>
+    }
+</div>
+
+@foreach (var error in errores)
+{
+    <p class="aviso error">@error</p>
+}
+@if (!string.IsNullOrEmpty(exito))
+{
+    <p class="aviso exito">@exito</p>
+}
+
+@if (mostrandoFormulario)
+{
+    <div class="tarjeta-formulario">
+        <h2>@(editandoId == null ? "Agregar un usuario" : $"Editar a {campoUsuario}")</h2>
+        <label>Usuario <input type="text" maxlength="100" @bind="campoUsuario" autocomplete="off" /></label>
+        <label>Correo <input type="email" maxlength="150" @bind="campoCorreo" /></label>
+        <label>Nombre completo <input type="text" maxlength="200" @bind="campoNombre" /></label>
+        <label>
+            @(editandoId == null ? "Contraseña" : "Contraseña nueva")
+            <input type="password" maxlength="100" @bind="campoClave" autocomplete="new-password" />
+            <span class="ayuda">
+                @(editandoId == null
+                    ? "Mínimo 8 caracteres. Se guarda cifrada: nadie podrá verla después."
+                    : "Déjela vacía para no cambiarla. Si escribe una, reemplaza la anterior.")
+            </span>
+        </label>
+        <div class="pareja">
+            <button class="boton primario" @onclick="Guardar" disabled="@guardando">Guardar</button>
+            <button class="boton" @onclick="Cancelar" disabled="@guardando">Cancelar</button>
+        </div>
+    </div>
+}
+
+@if (cargando)
+{
+    <p class="nota">Cargando…</p>
+}
+else if (filas.Count > 0)
+{
+    <div class="tabla-scroll">
+        <table>
+            <thead><tr><th>ID</th><th>Usuario</th><th>Correo</th><th>Nombre</th><th>Roles</th><th></th></tr></thead>
+            <tbody>
+                @foreach (var fila in filas)
+                {
+                    <tr>
+                        <td><code>@fila.Id</code></td>
+                        <td>@fila.Username</td>
+                        <td>@fila.Email</td>
+                        <td>@fila.NombreCompleto</td>
+                        <td>@(fila.Roles.Count == 0 ? "— sin rol —" : string.Join(", ", fila.Roles))</td>
+                        <td>
+                            <div class="acciones">
+                                <button class="boton" @onclick="() => Editar(fila)">Editar</button>
+                                <button class="boton peligro" @onclick="() => Retirar(fila)">Retirar</button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <p class="vacio">No hay usuarios activos.</p>
+}
+
+@code {
+    private List<UsuarioSistema> filas = new();
+    private List<string> errores = new();
+    private string exito = string.Empty;
+    private bool cargando = true, guardando, mostrandoFormulario;
+    private int? editandoId;
+    private string campoUsuario = "", campoCorreo = "", campoNombre = "", campoClave = "";
+
+    protected override async Task OnInitializedAsync() => await Cargar();
+
+    private async Task Cargar()
+    {
+        cargando = true;
+        var r = await Servicio.Listar();
+        cargando = false;
+        if (!r.Ok) errores = r.Errores;
+        filas = r.Ok ? r.Datos! : new();
+    }
+
+    private void Agregar()
+    {
+        Limpiar();
+        mostrandoFormulario = true;
+    }
+
+    private void Editar(UsuarioSistema fila)
+    {
+        Limpiar();
+        editandoId = fila.Id;
+        campoUsuario = fila.Username;
+        campoCorreo = fila.Email;
+        campoNombre = fila.NombreCompleto ?? "";
+        mostrandoFormulario = true;
+    }
+
+    private void Cancelar()
+    {
+        mostrandoFormulario = false;
+        Limpiar();
+    }
+
+    private void Limpiar()
+    {
+        editandoId = null;
+        campoUsuario = campoCorreo = campoNombre = campoClave = "";
+        errores = new();
+        exito = string.Empty;
+    }
+
+    private async Task Guardar()
+    {
+        guardando = true;
+        Resultado<bool> r;
+        if (editandoId == null)
+        {
+            r = await Servicio.Crear(campoUsuario.Trim(), campoClave, campoCorreo.Trim(), NullSiVacio(campoNombre));
+        }
+        else
+        {
+            r = await Servicio.Reemplazar(editandoId.Value, campoUsuario.Trim(), campoCorreo.Trim(), NullSiVacio(campoNombre));
+            if (r.Ok && !string.IsNullOrEmpty(campoClave))
+            {
+                r = await Servicio.CambiarClave(editandoId.Value, campoClave);
+            }
+        }
+        guardando = false;
+
+        if (r.Ok)
+        {
+            exito = editandoId == null
+                ? $"Se creó el usuario {campoUsuario}. Asígnele un rol en «Asignación de roles»."
+                : $"Se guardó el usuario {campoUsuario}.";
+            mostrandoFormulario = false;
+            campoClave = "";
+            errores = new();
+            await Cargar();
+        }
+        else
+        {
+            errores = r.Errores;
+            exito = string.Empty;
+        }
+    }
+
+    private async Task Retirar(UsuarioSistema fila)
+    {
+        if (!await JS.InvokeAsync<bool>("confirm", $"¿Retirar al usuario {fila.Username}? No podrá volver a ingresar.")) return;
+
+        var r = await Servicio.Eliminar(fila.Id);
+        if (r.Ok)
+        {
+            exito = $"Se retiró al usuario {fila.Username}.";
+            errores = new();
+            await Cargar();
+        }
+        else
+        {
+            // Por ejemplo: «No se puede retirar al único administrador activo».
+            errores = r.Errores;
+            exito = string.Empty;
+        }
+    }
+
+    private static string? NullSiVacio(string texto) => string.IsNullOrWhiteSpace(texto) ? null : texto.Trim();
+}

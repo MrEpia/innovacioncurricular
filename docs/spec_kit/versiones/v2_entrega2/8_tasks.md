@@ -79,12 +79,12 @@ bloque Académico. Entre ellas no hay orden obligatorio: no comparten archivos.
 
 ## 4. Ronda 1 — Académico (Calvo)
 
-- [ ] API de `facultad`, `programa`, `acreditacion`, `registro_calificado`
-- [ ] Reglas: tipo de facultad, orden de fechas del registro calificado
-- [ ] Protección de padres en los 7 servicios de la v1 (RF9)
-- [ ] Front: 4 servicios + 4 pantallas con listas desplegables
-- [ ] `PruebasAcademico.cs` y `pruebas_humo/humo_academico.py`
-- [ ] **Compuerta:** compila, prueba de capas, humo del bloque
+- [x] API de `facultad`, `programa`, `acreditacion`, `registro_calificado`
+- [x] Reglas: tipo de facultad, orden de fechas del registro calificado
+- [x] Protección de padres en los 7 servicios de la v1 (RF9)
+- [x] Front: 4 servicios + 4 pantallas con listas desplegables
+- [x] `PruebasAcademico.cs` y `pruebas_humo/humo_academico.py`
+- [x] **Compuerta:** compila, prueba de capas (46 comprobaciones), humo del bloque (40 comprobaciones) y regresión v1 (`humo_front.py`) en verde
 
 ## 5. Ronda 2 — Actividades (Epia)
 

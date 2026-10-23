@@ -1,0 +1,289 @@
+@page "/programas/completo"
+@rendermode InteractiveServer
+@inject ServicioProgramaCompleto Servicio
+@inject ServicioPrograma ServicioProgramas
+@inject ServicioFacultad ServicioFacultadPadre
+@inject ServicioAreaConocimiento ServicioAreaHijo
+@inject ServicioPracticaEstrategia ServicioPracticaHijo
+@inject ServicioCarInnovacion ServicioCaracteristicaHijo
+
+@*
+    MAESTRO-DETALLE de `programa`
+
+    Arriba el MAESTRO (el programa); abajo el DETALLE en tres tablas editables:
+    sus áreas de conocimiento (programa_ac), sus prácticas y estrategias
+    (programa_pe) y sus características de innovación (programa_ci).
+    «Guardar todo» es una sola petición a POST /api/programa/completo: todo o nada.
+*@
+
+<PageTitle>Programa con su detalle</PageTitle>
+
+<div class="encabezado">
+    <div>
+        <h1>Programa con su detalle</h1>
+        <p class="nota">El programa (maestro) con sus áreas, prácticas y características de innovación (detalle), guardados juntos.</p>
+    </div>
+</div>
+
+@foreach (var error in errores)
+{
+    <p class="aviso error">@error</p>
+}
+@if (!string.IsNullOrEmpty(exito))
+{
+    <p class="aviso exito">@exito</p>
+}
+
+@* ----------------------------------------------------------- CONSULTAR *@
+<div class="tarjeta-formulario">
+    <h2>Consultar un programa con su detalle</h2>
+    <div class="pareja">
+        <select @bind="idConsulta">
+            <option value="">— seleccione un programa —</option>
+            @foreach (var p in listaProgramas)
+            {
+                <option value="@p.Id">@p.Id — @p.Nombre</option>
+            }
+        </select>
+        <button class="boton" @onclick="Consultar" disabled="@(idConsulta == null)">Ver</button>
+    </div>
+
+    @if (consultado != null)
+    {
+        <div class="tabla-scroll">
+            <table>
+                <thead><tr><th>Id</th><th>Nombre</th><th>Tipo</th><th>Nivel</th><th>Ciudad</th><th>Facultad</th></tr></thead>
+                <tbody>
+                    <tr>
+                        <td>@consultado.Id</td>
+                        <td>@consultado.Nombre</td>
+                        <td>@consultado.Tipo</td>
+                        <td>@consultado.Nivel</td>
+                        <td>@consultado.Ciudad</td>
+                        <td>@NombreFacultad(consultado.Facultad)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>Áreas de conocimiento (@consultado.AreasConocimiento.Count)</h3>
+        <table>
+            <thead><tr><th>Área</th><th>Nombre</th></tr></thead>
+            <tbody>
+                @foreach (var a in consultado.AreasConocimiento)
+                {
+                    <tr><td>@a.AreaConocimiento</td><td>@a.Nombre</td></tr>
+                }
+            </tbody>
+        </table>
+
+        <h3>Prácticas y estrategias (@consultado.PracticasEstrategias.Count)</h3>
+        <table>
+            <thead><tr><th>Práctica</th><th>Nombre</th></tr></thead>
+            <tbody>
+                @foreach (var p in consultado.PracticasEstrategias)
+                {
+                    <tr><td>@p.PracticaEstrategia</td><td>@p.Nombre</td></tr>
+                }
+            </tbody>
+        </table>
+
+        <h3>Características de innovación (@consultado.CaracteristicasInnovacion.Count)</h3>
+        <table>
+            <thead><tr><th>Característica</th><th>Nombre</th></tr></thead>
+            <tbody>
+                @foreach (var c in consultado.CaracteristicasInnovacion)
+                {
+                    <tr><td>@c.CarInnovacion</td><td>@c.Nombre</td></tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+@* ----------------------------------------------------------- CREAR *@
+<AuthorizeView Roles="administrador,editor" Context="permiso">
+<div class="tarjeta-formulario">
+    <h2>Nuevo programa con su detalle</h2>
+
+    <h3>1. El programa (maestro)</h3>
+    <label>Id <input type="number" @bind="nuevo.Id" /></label>
+    <label>Nombre <input type="text" maxlength="150" @bind="nuevo.Nombre" /></label>
+    <label>Tipo <input type="text" maxlength="45" @bind="nuevo.Tipo" /></label>
+    <label>Nivel <input type="text" maxlength="45" @bind="nuevo.Nivel" /></label>
+    <label>Fecha de creación <input type="text" maxlength="45" @bind="nuevo.FechaCreacion" /></label>
+    <label>Fecha de cierre <input type="text" maxlength="45" @bind="nuevo.FechaCierre" /><span class="ayuda">Opcional.</span></label>
+    <label>Número de cohortes <input type="text" maxlength="45" @bind="nuevo.NumeroCohortes" /></label>
+    <label>Cantidad de graduados <input type="text" maxlength="45" @bind="nuevo.CantGraduados" /></label>
+    <label>Fecha de actualización <input type="text" maxlength="45" @bind="nuevo.FechaActualizacion" /></label>
+    <label>Ciudad <input type="text" maxlength="45" @bind="nuevo.Ciudad" /></label>
+    <label>
+        Facultad
+        <select @bind="nuevo.Facultad">
+            <option value="">— seleccione —</option>
+            @foreach (var f in listaFacultad)
+            {
+                <option value="@f.Id">@f.Id — @f.Nombre</option>
+            }
+        </select>
+    </label>
+
+    <h3>2. Sus áreas de conocimiento (detalle)</h3>
+    <table>
+        <thead><tr><th>Área</th><th></th></tr></thead>
+        <tbody>
+            @foreach (var fila in nuevo.AreasConocimiento)
+            {
+                <tr>
+                    <td>
+                        <select @bind="fila.AreaConocimiento">
+                            <option value="">— seleccione —</option>
+                            @foreach (var a in listaArea)
+                            {
+                                <option value="@a.Id">@a.Id — @a.Area</option>
+                            }
+                        </select>
+                    </td>
+                    <td><button class="boton peligro" @onclick="() => nuevo.AreasConocimiento.Remove(fila)">Quitar</button></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div class="pareja"><button class="boton" @onclick="() => nuevo.AreasConocimiento.Add(new())">+ Agregar área</button></div>
+
+    <h3>3. Sus prácticas y estrategias (detalle)</h3>
+    <table>
+        <thead><tr><th>Práctica o estrategia</th><th></th></tr></thead>
+        <tbody>
+            @foreach (var fila in nuevo.PracticasEstrategias)
+            {
+                <tr>
+                    <td>
+                        <select @bind="fila.PracticaEstrategia">
+                            <option value="">— seleccione —</option>
+                            @foreach (var p in listaPractica)
+                            {
+                                <option value="@p.Id">@p.Id — @p.Nombre</option>
+                            }
+                        </select>
+                    </td>
+                    <td><button class="boton peligro" @onclick="() => nuevo.PracticasEstrategias.Remove(fila)">Quitar</button></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div class="pareja"><button class="boton" @onclick="() => nuevo.PracticasEstrategias.Add(new())">+ Agregar práctica</button></div>
+
+    <h3>4. Sus características de innovación (detalle)</h3>
+    <table>
+        <thead><tr><th>Característica</th><th></th></tr></thead>
+        <tbody>
+            @foreach (var fila in nuevo.CaracteristicasInnovacion)
+            {
+                <tr>
+                    <td>
+                        <select @bind="fila.CarInnovacion">
+                            <option value="">— seleccione —</option>
+                            @foreach (var c in listaCaracteristica)
+                            {
+                                <option value="@c.Id">@c.Id — @c.Nombre</option>
+                            }
+                        </select>
+                    </td>
+                    <td><button class="boton peligro" @onclick="() => nuevo.CaracteristicasInnovacion.Remove(fila)">Quitar</button></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div class="pareja"><button class="boton" @onclick="() => nuevo.CaracteristicasInnovacion.Add(new())">+ Agregar característica</button></div>
+
+    <div class="pareja">
+        <button class="boton primario" @onclick="GuardarTodo" disabled="@guardando">Guardar todo</button>
+        <button class="boton" @onclick="Limpiar" disabled="@guardando">Limpiar</button>
+    </div>
+    <span class="ayuda">
+        Se guarda en una sola operación: si un hijo no es válido, no se guarda
+        nada, ni siquiera el programa.
+    </span>
+</div>
+</AuthorizeView>
+
+@code {
+    private List<Programa> listaProgramas = new();
+    private List<Facultad> listaFacultad = new();
+    private List<AreaConocimiento> listaArea = new();
+    private List<PracticaEstrategia> listaPractica = new();
+    private List<CarInnovacion> listaCaracteristica = new();
+    private List<string> errores = new();
+    private string exito = string.Empty;
+    private bool guardando;
+
+    private int? idConsulta;
+    private ProgramaCompleto? consultado;
+    private ProgramaCompleto nuevo = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var rFacultad = await ServicioFacultadPadre.Listar();
+        if (rFacultad.Ok) listaFacultad = rFacultad.Datos!; else errores.AddRange(rFacultad.Errores);
+        var rArea = await ServicioAreaHijo.Listar();
+        if (rArea.Ok) listaArea = rArea.Datos!; else errores.AddRange(rArea.Errores);
+        var rPractica = await ServicioPracticaHijo.Listar();
+        if (rPractica.Ok) listaPractica = rPractica.Datos!; else errores.AddRange(rPractica.Errores);
+        var rCaracteristica = await ServicioCaracteristicaHijo.Listar();
+        if (rCaracteristica.Ok) listaCaracteristica = rCaracteristica.Datos!; else errores.AddRange(rCaracteristica.Errores);
+        await CargarProgramas();
+    }
+
+    private async Task CargarProgramas()
+    {
+        var r = await ServicioProgramas.Listar();
+        if (r.Ok) listaProgramas = r.Datos!; else errores.AddRange(r.Errores);
+    }
+
+    private string NombreFacultad(int? llave)
+    {
+        var f = listaFacultad.FirstOrDefault(x => Equals(x.Id, llave));
+        return f == null ? $"{llave}" : $"{f.Id} — {f.Nombre}";
+    }
+
+    private async Task Consultar()
+    {
+        errores = new();
+        exito = string.Empty;
+        var r = await Servicio.Obtener(idConsulta!.Value);
+        consultado = r.Ok ? r.Datos : null;
+        if (!r.Ok) errores = r.Errores;
+    }
+
+    private async Task GuardarTodo()
+    {
+        guardando = true;
+        var r = await Servicio.Crear(nuevo);
+        guardando = false;
+
+        if (r.Ok)
+        {
+            var mensaje = $"Se guardó el programa {nuevo.Id} con {nuevo.AreasConocimiento.Count} área(s), " +
+                          $"{nuevo.PracticasEstrategias.Count} práctica(s) y {nuevo.CaracteristicasInnovacion.Count} característica(s).";
+            idConsulta = nuevo.Id;
+            nuevo = new();
+            await CargarProgramas();
+            await Consultar();       // se muestra arriba, leído de la API
+            exito = mensaje;
+        }
+        else
+        {
+            // No se guardó nada: el formulario queda igual para corregir.
+            errores = r.Errores;
+            exito = string.Empty;
+        }
+    }
+
+    private void Limpiar()
+    {
+        nuevo = new();
+        errores = new();
+        exito = string.Empty;
+    }
+}

@@ -17,6 +17,7 @@ builder.Services.AgregarTablasV1();
 builder.Services.AgregarBloqueAcademico();      // v2 — Sebastián Calvo
 builder.Services.AgregarBloqueActividades();    // v2 — David Epia
 builder.Services.AgregarBloquePuentes();        // v2 — Sebastián Brunal
+builder.Services.AgregarSeguridad(builder.Configuration);   // v3 — JWT, roles, usuarios
 
 builder.Services.AddControllers();
 
@@ -86,10 +87,15 @@ app.UseSwaggerUI();
 // Si esto no responde, el problema no es de contrato: la API no está arriba.
 app.MapGet("/", () => Results.Ok(new
 {
-    mensaje = "API Innovación Curricular — v2: las 22 tablas del módulo",
-    version = "v2",
+    mensaje = "API Innovación Curricular — v3: las 22 tablas con JWT y roles",
+    version = "v3",
     contratos = "/swagger"
 }));
+
+// v3: autenticación y autorización ANTES de los controladores. El diagnóstico
+// de arriba y Swagger siguen respondiendo sin token: sirven para saber si la
+// API está viva y para conseguir el primero.
+await app.UsarSeguridad();
 
 app.MapControllers();
 

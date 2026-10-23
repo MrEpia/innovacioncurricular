@@ -11,6 +11,9 @@
     <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.2" />
     <PackageReference Include="Dapper" Version="2.1.35" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+    <!-- v3 (enmienda 1.2.0 del Artículo 2): validar los JWT en cada petición.
+         El hash de contraseñas NO necesita paquete: PBKDF2 viene en .NET. -->
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.13" />
   </ItemGroup>
 
   <ItemGroup>

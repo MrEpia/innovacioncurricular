@@ -82,6 +82,12 @@ public class RepositorioReferenciasSqlServer : IRepositorioReferencias
     public Task<bool> AliadoActivo(int nit) =>
         Existe("SELECT COUNT(*) FROM aliado WHERE nit = @Nit AND activo = 1", new { Nit = nit });
 
+    public Task<bool> UsuarioActivo(int id) =>
+        Existe("SELECT COUNT(*) FROM usuario WHERE id = @Id AND activo = 1", new { Id = id });
+
+    public Task<bool> RolActivo(int id) =>
+        Existe("SELECT COUNT(*) FROM rol WHERE id = @Id AND activo = 1", new { Id = id });
+
     // ===================== 2. ¿Quién depende de él? =====================
 
     public Task<IReadOnlyList<string>> DependientesDeUniversidad(int id) =>

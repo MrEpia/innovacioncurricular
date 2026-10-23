@@ -1,5 +1,5 @@
 # ==============================================================
-# Módulo INNOVACIÓN CURRICULAR — entregas 1, 2 y 3
+# Módulo INNOVACIÓN CURRICULAR — entregas 1, 2 y 3 (v3: JWT y roles)
 #
 #   FRONT Blazor (:8073) → API innovacion (C#, :8072) → SQL Server (innovacion_local)
 #
@@ -74,6 +74,12 @@ services:
       # El host es el NOMBRE del servicio. El doble guion bajo hace que ASP.NET
       # lea esto como ConnectionStrings:SqlServer y SOBREESCRIBA appsettings.json.
       - ConnectionStrings__SqlServer=Server=sqlserver,1433;Database=innovacion_local;User Id=sa;Password=${MSSQL_SA_PASSWORD:?Falta MSSQL_SA_PASSWORD en .env};TrustServerCertificate=True;
+      # Entrega 3: la llave de firma del JWT y el administrador inicial.
+      - Jwt__Secreto=${JWT_SECRETO:?Falta JWT_SECRETO en .env}
+      - Jwt__Minutos=${JWT_MINUTOS:-60}
+      - AdminInicial__Usuario=${ADMIN_USUARIO:?Falta ADMIN_USUARIO en .env}
+      - AdminInicial__Correo=${ADMIN_CORREO:?Falta ADMIN_CORREO en .env}
+      - AdminInicial__Clave=${ADMIN_CLAVE:?Falta ADMIN_CLAVE en .env}
     depends_on:
       sqlserver-init:
         condition: service_completed_successfully   # espera a que la base esté SEMBRADA

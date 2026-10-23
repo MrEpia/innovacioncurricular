@@ -94,7 +94,9 @@ asunto del programa, no de quien usa el sistema.
   consulta existe, está escrita en el repositorio y se puede leer.
 - Paquetes permitidos, y ninguno más sin que una spec lo pida:
   `Microsoft.Data.SqlClient` (el cliente del motor), `Dapper` y
-  `Swashbuckle.AspNetCore` (Swagger).
+  `Swashbuckle.AspNetCore` (Swagger). *(Enmienda 1.2.0)* Desde la v3,
+  también `Microsoft.AspNetCore.Authentication.JwtBearer`, para validar los
+  tokens. Las contraseñas se hashean con PBKDF2 de .NET: sin paquete.
 
 ## Artículo 3 — Arquitectura en tres capas con interfaces, desde el día 1
 
@@ -222,6 +224,7 @@ un 404 o un 422 tienen su formato exacto documentado.
 | Sobre de respuesta | Lecturas: `{tabla, limite, total, datos}` · Errores: `{estado, mensaje, detalle}` (+ `errores:[…]` en el 422) |
 | Errores | Cuerpo inválido (la petición) → **422** · `ArgumentException` → **400** (incluye `ReferenciaInvalidaExcepcion`: una clave foránea que no apunta a un registro activo) · `NoEncontradoExcepcion` → **404** · `LlaveDuplicadaExcepcion` y `DependenciasActivasExcepcion` → **409** *(enmienda 1.1.0)* · `SqlException` y demás → **500** · lectura sin filas → **204** |
 | Creación | v1: **200** (versión cerrada, no se toca) · desde la v2: **201** con la llave creada *(enmienda 1.1.0)* |
+| Seguridad | *(Enmienda 1.2.0)* Sin token, token inválido o vencido → **401** · rol insuficiente → **403**, ambos con el sobre `{estado, mensaje, detalle}`. Permisos por verbo: GET los tres roles · POST/PUT/PATCH administrador y editor · DELETE administrador. `usuario`, `rol` y `rol_usuario`, solo administrador |
 | Credenciales | Usuario `sa`. **La contraseña no se escribe en este documento ni en ningún archivo versionado:** vive en el `.env` (Artículo 7) |
 
 ## Artículo 10.1 — Una ruta y un servicio por recurso, nunca genéricos
@@ -261,12 +264,13 @@ o se corrige el plan, o se enmienda esto.
 
 ---
 
-*Versión 1.1.0 · Ratificada el 2026-08-29 · Última enmienda: 2026-10-22*
+*Versión 1.2.0 · Ratificada el 2026-08-29 · Última enmienda: 2026-10-22*
 
 ### Registro de enmiendas
 
 | Versión | Fecha | Artículos | Qué cambió y por qué | Dónde se propuso |
 |---|---|---|---|---|
+| 1.2.0 | 2026-10-22 | 2, 10 | Se permite el paquete JwtBearer y se agregan 401/403 y la tabla de permisos por verbo | [v3_seguridad/4_research.md](versiones/v3_seguridad/4_research.md), D-v3-1 y D-v3-4 |
 | 1.1.0 | 2026-10-22 | 3, 7, 10, 10.1 | El ensamblador se reparte en `Ensamblador/` por bloque (tres estudiantes en paralelo) · se elimina la excepción de secretos de la plantilla: todo va en `.env` · se agregan los códigos 409 (llave duplicada, dependencias activas) y 201 (creación) para la v2 · el front comparte el transporte (`ClienteApi`), no los recursos | [v2_entrega2/4_research.md](versiones/v2_entrega2/4_research.md), D-v2-1 a D-v2-4 |
 
 ## Artículo 12 — La identidad visual es ARTEFACTO DADO

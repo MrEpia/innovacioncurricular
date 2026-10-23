@@ -1,181 +1,108 @@
-# Módulo Innovación Curricular — ejemplo de referencia
+# Módulo Innovación Curricular
 
-Este repositorio contiene **dos cosas distintas**, y conviene no
-confundirlas:
+Proyecto de aula del curso de Diseño de Software: el módulo **Innovación
+Curricular** del Sistema de Gestión de Información del Conocimiento
+Universitario, para la *Universidad Monte Verde* (institución ficticia del
+curso).
 
-| | Qué es |
-|---|---|
-| [`ProyectosDeAula/`](ProyectosDeAula/) | **El material del curso**: la metodología, los cuatro documentos de módulo y los scripts de base de datos. Es lo que ya conocen |
-| Todo lo demás | **El ejemplo de referencia** del módulo Innovación Curricular: su versión 1, construida siguiendo esa metodología al pie de la letra |
+**Equipo:** Sebastián Calvo (encargado del `main`) · David Epia · Sebastián Brunal
 
-El ejemplo no es un sistema para descargar: es un **molde de método**. Se
-ejecuta, se estudia, y se reconstruye.
+| Entrega | Qué agrega | Spec kit |
+|---|---|---|
+| 1 — v1 | CRUD de las 7 tablas sin clave foránea | [v1_entrega1](docs/spec_kit/versiones/v1_entrega1/2_spec.md) |
+| 2 — v2 | CRUD de las 15 tablas con clave foránea, listas desplegables desde la API, integridad referencial | [v2_entrega2](docs/spec_kit/versiones/v2_entrega2/2_spec.md) |
+| 3 — v3 | JWT, sesión del servidor, permisos por rol, administración de usuarios y roles | [v3_seguridad](docs/spec_kit/versiones/v3_seguridad/2_spec.md) |
 
----
+Las reglas que rigen todo están en la [constitución](docs/spec_kit/1_constitution.md)
+y la ruta completa en el [mapa de versiones](docs/spec_kit/versiones/0_mapa_versiones.md).
+El material del curso (metodología, módulos y scripts originales) está en
+[`ProyectosDeAula/`](ProyectosDeAula/).
 
-## 1. Arranque: un solo comando
+## 1. Arranque
 
-Solo hace falta **Docker Desktop**. No hay que instalar .NET ni SQL Server.
+Solo hace falta **Docker Desktop**.
 
 ```powershell
-git clone https://github.com/ccastro2050/proyecto_innovacion_curricular1.git
-cd proyecto_innovacion_curricular1
+git clone https://github.com/MrEpia/innovacioncurricular.git
+cd innovacioncurricular
+Copy-Item .env.example .env       # y cambie TODOS los valores
 docker compose up -d --build
 ```
 
-La primera vez tarda unos minutos: descarga las imágenes, espera a que el
-motor **responda** (no solo a que exista), crea la base con sus 25 tablas y
-sus catálogos, y compila la API **y la pantalla**. Al terminar:
-
 | Qué | Dónde |
 |---|---|
-| **LA PANTALLA** — empiece por aquí | **http://localhost:8073** |
-| **API — diagnóstico** | http://localhost:8072/ |
-| **Documentación interactiva** | http://localhost:8072/swagger |
-| Listado de aliados | http://localhost:8072/api/aliado |
-| SQL Server (SSMS o SQLTools, opcional) | `localhost,11471` · usuario `sa` |
+| **La aplicación** | <http://localhost:8073> — ingrese con `ADMIN_USUARIO` / `ADMIN_CLAVE` de su `.env` |
+| API · diagnóstico | <http://localhost:8072/> |
+| Swagger | <http://localhost:8072/swagger> — `POST /api/login`, copie el `token`, botón **Authorize** |
+| SQL Server (opcional) | `localhost,11471` · usuario `sa` · clave: `MSSQL_SA_PASSWORD` de su `.env` |
 
-**Pruebe la joya didáctica de la v1:** un `PUT` sin `correo`
-responde **422**; el **mismo cuerpo** enviado por `PATCH` responde **200**.
-Esa diferencia es parte de lo que enseña esta versión, y está en la
-colección de [Postman](postman/) lista para probar con clics.
-
-> **¿La contraseña de la base?** Está a la vista en el
-> `docker-compose.yml`. Es una excepción **declarada** (Artículo 7 de la
-> [constitución](docs/spec_kit/1_constitution.md)): este repositorio es una
-> plantilla que corre en contenedores desechables y nunca se despliega.
-> **En su proyecto de aula eso no se copia:** ahí los secretos van en un
-> `.env` fuera de git, y un secreto quemado anula el criterio de seguridad
-> de la versión.
-
-### Los días siguientes
+La primera vez tarda unos minutos: descarga imágenes, crea la base con sus 25
+tablas y sus catálogos, corre las migraciones de `db/migraciones/`, compila la
+API y el front, y crea el administrador inicial.
 
 ```powershell
-docker compose up -d           # encender
-docker compose down            # apagar (los datos se conservan)
-docker compose down -v         # resetear la base a su estado original
+docker compose up -d          # encender
+docker compose down           # apagar (los datos se conservan)
+docker compose down -v        # borrar la base y empezar de cero
+docker compose logs -f api-innovacion
 ```
 
-Si edita un `.cs`, **no hay que hacer nada**: el código está montado y
-`dotnet watch` recompila y reinicia solo.
+### Variables del `.env`
 
-## 2. Qué construye la versión 1
+| Variable | Para qué |
+|---|---|
+| `MSSQL_SA_PASSWORD` | Contraseña de SQL Server (8+ caracteres con mayúscula, número y símbolo) |
+| `JWT_SECRETO` | Llave de firma de los tokens. **Mínimo 32 caracteres**: si no, la API no arranca |
+| `JWT_MINUTOS` | Duración del token y de la sesión (60 por defecto) |
+| `ADMIN_USUARIO` · `ADMIN_CORREO` · `ADMIN_CLAVE` | Administrador que la API crea al arrancar si no existe ninguno |
 
-El CRUD completo de **`aliado`** de punta a punta: controlador, servicio,
-repositorio, interfaces, peticiones por verbo y una prueba que corre **sin
-base de datos**.
+**Ningún secreto está en el repositorio** (Artículo 7): el `.env` está en el
+`.gitignore`; `.env.example` trae solo valores de mentira.
 
-**La tabla arranca vacía**, y eso no es una carencia: el smoke test recorre
-el ciclo completo desde el estado inicial —**204 → crear → total 1 → borrar
-→ 204 otra vez**— y ejercita el 204 del listado vacío, que una tabla llena
-nunca deja probar.
+## 2. Roles
 
-Es **una** de las siete tablas sin clave foránea que pide la v1 del módulo.
-Las otras seis son **el mismo patrón** con otros nombres: el equipo que
-tome este ejemplo lo revisa y, si está de acuerdo, lo retoma y lo completa;
-si no, lo rehace a su manera. Lo que no puede es cambiar la especificación
-sin pasar por sus compuertas.
+| Rol | Puede |
+|---|---|
+| `consulta` | Ver |
+| `editor` | Ver, crear y modificar (no retirar) |
+| `administrador` | Todo, incluida la administración de usuarios y roles |
 
-## 3. Estructura
+Los permisos se aplican **en la API** (403 si el rol no alcanza); el front además
+esconde lo que el rol no puede usar.
 
-```
-proyecto_innovacion_curricular1/
-├── db/                                 el script y su inicializador (artefacto DADO)
-├── api_innovacion/
-│   ├── Controllers/                    CAPA 1: HTTP — códigos de estado y JSON
-│   ├── Peticiones/                     la frontera de entrada: valida el cuerpo → 422
-│   ├── Modelos/                        la entidad, lo que viaja entre capas
-│   ├── Servicios/                      CAPA 2: negocio — no conoce HTTP ni el motor
-│   ├── Repositorios/                   CAPA 3: datos — el SQL con Dapper
-│   ├── Excepciones/                    cómo el negocio avisa un 404 sin hablar de HTTP
-│   └── pruebas/                        el servicio con un repositorio de mentiras
-├── front_blazor/                     LA PANTALLA: Blazor Server, un TERCER proceso
-│   ├── Program.cs                    registra UN servicio por recurso
-│   ├── Servicios/                    lo ÚNICO que habla HTTP con la API
-│   ├── Components/Pages/             una pantalla por recurso, con dirección propia
-│   └── wwwroot/app.css               los estilos, servidos del propio contenedor
-│
-├── pruebas_humo/                     humo_front.py: recorre el sistema DESDE LA
-│                                     PANTALLA y apaga la API para probar que
-│                                     son procesos distintos
-├── docs/spec_kit/                      LA FUENTE DE VERDAD (ver abajo)
-├── postman/                            los 14 endpoints listos para probar con clics
-├── docker-compose.yml                  TODO el sistema declarado en un archivo
-└── ProyectosDeAula/                    el material del curso
+## 3. Pruebas
+
+```powershell
+# Prueba de capas: los servicios SIN base de datos (contenedor desechable)
+docker compose run --rm --no-deps api-innovacion dotnet run --project pruebas/PruebaCapas.csproj
+
+# Pruebas de humo contra el sistema levantado (usan el administrador del .env)
+python pruebas_humo/humo_seguridad.py
+python pruebas_humo/humo_academico.py
+python pruebas_humo/humo_actividades.py
+python pruebas_humo/humo_puentes.py
+python pruebas_humo/humo_front.py
 ```
 
-**La regla de lectura:** el sistema vive en `docker-compose.yml`, la API en
-`api_innovacion/` (una carpeta por capa), y **todo lo que explica** vive
-en `docs/`.
+## 4. Estructura
 
-## 4. El spec kit: lo que se escribió ANTES del código
+```
+api_innovacion/          API REST — C# / ASP.NET Core 10, Dapper, SQL a mano
+  Controllers/ Modelos/ Peticiones/ Servicios/ Repositorios/ Excepciones/
+  Seguridad/             JWT, hash PBKDF2, permisos por verbo
+  Ensamblador/           registro de dependencias, un archivo por bloque
+  pruebas/               prueba de capas (repositorios de mentiras)
+front_blazor/            Blazor Server: solo habla con la API por HTTP
+db/                      script de la base + migraciones idempotentes
+docs/spec_kit/           constitución y spec kit de cada versión
+pruebas_humo/            pruebas contra el sistema levantado
+```
 
-| Documento | Qué contiene |
-|---|---|
-| [SDD_SPECKIT.md](docs/SDD_SPECKIT.md) | **Empiece por aquí**: qué es SDD, qué es GitHub Spec Kit, y cómo se arman estos documentos |
-| [1_constitution.md](docs/spec_kit/1_constitution.md) | Las 11 reglas permanentes del proyecto |
-| [0_mapa_versiones.md](docs/spec_kit/versiones/0_mapa_versiones.md) | La ruta v1 → v4 y qué tabla entra en cada versión |
-| [2_spec.md](docs/spec_kit/versiones/v1_aliado/2_spec.md) | QUÉ construir, los 7 criterios de aceptación y las **Clarificaciones** |
-| [3_plan.md](docs/spec_kit/versiones/v1_aliado/3_plan.md) | CÓMO: capas, decisiones y el **Chequeo de constitución** |
-| [4_research.md](docs/spec_kit/versiones/v1_aliado/4_research.md) | Las decisiones con la alternativa que se descartó |
-| [5_data_model.md](docs/spec_kit/versiones/v1_aliado/5_data_model.md) | La tabla, sus semillas exactas y quién no puede escribir qué |
-| [6_contracts.md](docs/spec_kit/versiones/v1_aliado/6_contracts.md) | Los 7 endpoints con TODOS sus códigos de respuesta |
-| [7_quickstart.md](docs/spec_kit/versiones/v1_aliado/7_quickstart.md) | El smoke test, comando por comando |
-| [8_tasks.md](docs/spec_kit/versiones/v1_aliado/8_tasks.md) | Las fases de construcción, cada una con su compuerta |
-| [9_checklist.md](docs/spec_kit/versiones/v1_aliado/9_checklist.md) | La lista con la que se revisa la spec **antes** de programar |
-| [GUIA_IA1.md](docs/spec_kit/versiones/v1_aliado/GUIA_IA1.md) | Cómo reconstruir esta versión con ayuda de IA, con el prompt listo |
+## 5. Cómo trabaja el equipo
 
-> 🤖 **¿Va a trabajar con IA?** Empiece por la
-> [GUIA_IA1](docs/spec_kit/versiones/v1_aliado/GUIA_IA1.md): trae
-> los dos caminos —chat web e IDE agéntico— con su prompt exacto, y la
-> regla que más importa: **cuando la IA dice "asumo que…", hay que pararla.**
-
-## 5. Cómo se construyó esto
-
-El [PLAN_V1.md](PLAN_V1.md) documenta el proceso completo, paso a paso: qué
-se copió del ejemplo del curso, qué se adaptó, qué se escribió de cero, y
-los defectos que aparecieron por el camino —incluidos los del propio script
-de base de datos que entrega el módulo—.
-
-Vale la pena leerlo por una razón: **la especificación se escribió primero,
-y el código se construyó con IA siguiéndola.** Las correcciones que hubo no
-fueron parches al código: fueron huecos del plan, que se taparon en el
-documento y no en el programa.
-
-## Material conceptual del curso
-
-Los conceptos del curso, **con el código de este repositorio como material**: los ejemplos hablan de `aliado`, no de un proyecto de otro módulo.
-
-| Documento | Qué cubre |
-|---|---|
-| [Flujo de una peticion](docs/FLUJO_DE_UNA_PETICION.md) | El viaje completo de una petición por las capas, de la ruta al SQL y de vuelta |
-| [Paradigma poo](docs/PARADIGMA_POO.md) | Qué es un paradigma, los cuatro pilares de la P.O.O., y dónde vive cada paradigma en este proyecto |
-| [Solid capas patrones](docs/SOLID_CAPAS_PATRONES.md) | Los cinco principios SOLID y las tres capas — con el archivo de este repositorio donde se ve cada uno |
-| [Principios acid](docs/PRINCIPIOS_ACID.md) | Las cuatro garantías transaccionales, cada una señalada en el código y en la base de ESTE módulo |
-| [Programacion asincronica](docs/PROGRAMACION_ASINCRONICA.md) | Qué resuelve el asincronismo en la web, qué se daña sin él, y cómo se ve en este código |
-| [Conceptos docker](docs/CONCEPTOS_DOCKER.md) | Imagen, contenedor, volumen y compose, con el `docker-compose.yml` de aquí explicado línea por línea |
-| [Calidad de pruebas](docs/PRUEBAS_Y_CALIDAD_DE_PRUEBAS.md) | Cobertura, la métrica CRAP y las pruebas de mutación: cómo saber si sus pruebas de verdad protegen |
-| [Sdd speckit](docs/SDD_SPECKIT.md) | La metodología con la que se trabaja este curso: la especificación manda sobre el código |
-
-> Los tutoriales de administración de la base de datos (pgAdmin, SSMS, phpMyAdmin, SQLTools) **no están todavía**: llevan capturas de pantalla que hay que tomar contra la base de este módulo.
-
----
-
-## La identidad visual
-
-Este proyecto se construye para la **Universidad Monte Verde**, una
-institución **inventada para el curso**, que tiene su manual de marca como lo
-tendría cualquier organización real.
-
-| Archivo | Qué es |
-|---|---|
-| [`MANUAL_DE_MARCA.md`](MANUAL_DE_MARCA.md) | El Manual de Identidad Visual Corporativa: logosímbolo, paleta, tipografía, tamaño mínimo, área de reserva y usos incorrectos |
-| [`docs/CONCEPTOS_IDENTIDAD_VISUAL.md`](docs/CONCEPTOS_IDENTIDAD_VISUAL.md) | Qué es una identidad visual, por qué obliga al software y cómo se calcula el contraste — con referencias verificables |
-| [`front_blazor/wwwroot/marca.css`](front_blazor/wwwroot/marca.css) | Los valores del manual, en un archivo aparte de los estilos de la aplicación |
-| [`marca/`](marca/) | El logosímbolo en sus cuatro versiones |
-
-**Los colores no se cambian.** El artículo tercero de la resolución que
-adopta el manual es explícito, y la **versión 4** del proyecto evalúa que la
-pantalla lo cumpla.
-#   I n n o v a c i o n _ C u r r i c u l a r _ E n t r e g a 1  
- 
+Nadie hace commits en `main`. Cada estudiante trabaja en su rama
+`feature/<nombre>-<descripcion>`, hace commits pequeños con su propia identidad
+de git (`git config user.name` / `user.email` **sin** `--global`, dentro de su
+carpeta) y sube su rama; el encargado del `main` integra y, al pasar los
+criterios, pone el tag de la versión. El reparto y el orden de cada entrega
+están en el `8_tasks.md` de su versión.

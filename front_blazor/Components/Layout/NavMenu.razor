@@ -1,19 +1,62 @@
 @*
     EL MENÚ, CON UN ENLACE POR PANTALLA
 
-    Hoy hay uno porque la v1 construye una tabla. Cuando haya más recursos
-    habrá un enlace por cada uno, escrito aquí, a direcciones que existen — no
-    una dirección con el nombre de la tabla como parámetro (Artículo 10.1).
+    Un enlace por recurso, escrito aquí, a direcciones que existen — no una
+    dirección con el nombre de la tabla como parámetro (Artículo 10.1).
+
+    Con veintidós pantallas, una sola fila de enlaces ya no se puede leer: se
+    agrupan en cuatro menús desplegables por tema. Se usa <details>, que es
+    HTML puro: abre y cierra sin una línea de JavaScript y funciona aunque la
+    conexión de Blazor todavía no haya subido.
 *@
 <nav class="menu">
     <div class="contenedor menu-interno">
         <NavLink class="enlace" href="" Match="NavLinkMatch.All">Inicio</NavLink>
-        <NavLink class="enlace" href="aliados">Aliados</NavLink>
-        <NavLink class="enlace" href="areas-conocimiento">Áreas de conocimiento</NavLink>
-        <NavLink class="enlace" href="universidades">Universidades</NavLink>
-        <NavLink class="enlace" href="aspectos-normativos">Aspectos normativos</NavLink>
-        <NavLink class="enlace" href="practicas-estrategias">Prácticas y estrategias</NavLink>
-        <NavLink class="enlace" href="enfoques">Enfoques</NavLink>
-        <NavLink class="enlace" href="caracteristicas-innovacion">Características de innovación</NavLink>
+
+        <details class="grupo-menu">
+            <summary class="enlace">Catálogos</summary>
+            <div class="submenu">
+                <NavLink class="enlace" href="universidades">Universidades</NavLink>
+                <NavLink class="enlace" href="areas-conocimiento">Áreas de conocimiento</NavLink>
+                <NavLink class="enlace" href="aspectos-normativos">Aspectos normativos</NavLink>
+                <NavLink class="enlace" href="practicas-estrategias">Prácticas y estrategias</NavLink>
+                <NavLink class="enlace" href="enfoques">Enfoques</NavLink>
+                <NavLink class="enlace" href="caracteristicas-innovacion">Características de innovación</NavLink>
+                <NavLink class="enlace" href="aliados">Aliados</NavLink>
+            </div>
+        </details>
+
+        <details class="grupo-menu">
+            <summary class="enlace">Estructura académica</summary>
+            <div class="submenu">
+                <NavLink class="enlace" href="facultades">Facultades</NavLink>
+                <NavLink class="enlace" href="programas">Programas</NavLink>
+                <NavLink class="enlace" href="acreditaciones">Acreditaciones</NavLink>
+                <NavLink class="enlace" href="registros-calificados">Registros calificados</NavLink>
+            </div>
+        </details>
+
+        <details class="grupo-menu">
+            <summary class="enlace">Actividades y vínculos</summary>
+            <div class="submenu">
+                <NavLink class="enlace" href="actividades-academicas">Actividades académicas</NavLink>
+                <NavLink class="enlace" href="pasantias">Pasantías</NavLink>
+                <NavLink class="enlace" href="premios">Premios</NavLink>
+                <NavLink class="enlace" href="docentes-departamentos">Docentes por departamento</NavLink>
+                <NavLink class="enlace" href="alianzas">Alianzas</NavLink>
+            </div>
+        </details>
+
+        <details class="grupo-menu">
+            <summary class="enlace">Relaciones</summary>
+            <div class="submenu">
+                <NavLink class="enlace" href="programas-areas">Programas y áreas</NavLink>
+                <NavLink class="enlace" href="programas-practicas">Programas y prácticas</NavLink>
+                <NavLink class="enlace" href="programas-caracteristicas">Programas y características</NavLink>
+                <NavLink class="enlace" href="aspectos-programas">Aspectos normativos por programa</NavLink>
+                <NavLink class="enlace" href="enfoques-registros">Enfoques por registro calificado</NavLink>
+                <NavLink class="enlace" href="actividades-registros">Actividades por registro calificado</NavLink>
+            </div>
+        </details>
     </div>
 </nav>

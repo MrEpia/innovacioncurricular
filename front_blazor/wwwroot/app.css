@@ -71,6 +71,32 @@ body {
 .menu .enlace:hover { color: var(--oscuro); background: #efedea; }
 .menu .enlace.active { color: var(--oscuro); border-bottom-color: var(--acento); }
 
+/* --- v2: menús desplegables por tema (HTML <details>, sin JavaScript) --- */
+.grupo-menu { position: relative; }
+.grupo-menu > summary { list-style: none; cursor: pointer; }
+.grupo-menu > summary::-webkit-details-marker { display: none; }
+.grupo-menu > summary::after { content: " ▾"; font-size: .75rem; }
+.submenu {
+  position: absolute; z-index: 20; top: 100%; left: 0; min-width: 260px;
+  background: #fff; border: 1px solid var(--borde); box-shadow: 0 6px 18px rgba(0,0,0,.08);
+  display: flex; flex-direction: column; padding: 4px 0;
+}
+.submenu .enlace { border-bottom: 0; padding: 8px 14px; }
+.submenu .enlace.active { border-left: 3px solid var(--acento); }
+@media (max-width: 700px) {
+  .submenu { position: static; box-shadow: none; border: 0; padding-left: 10px; }
+  .grupo-menu { width: 100%; }
+}
+
+/* --- v2: listas desplegables de claves foráneas --- */
+label select {
+  display: block; margin-top: 5px;
+}
+select {
+  width: 100%; padding: 8px 10px; border: 1px solid var(--borde); border-radius: 6px;
+  font: inherit; background: #fff;
+}
+
 main { padding: 28px 20px 40px; }
 
 /* --- encabezado de página --- */
@@ -120,7 +146,7 @@ code { background: #efedea; padding: 1px 6px; border-radius: 4px; font-size: .9e
   padding: 20px; margin: 18px 0; max-width: 620px;
 }
 label { display: block; margin-bottom: 16px; font-weight: 600; font-size: .9rem; }
-input[type=text] {
+input[type=text], input[type=number], input[type=date], input[type=password], input[type=email] {
   display: block; width: 100%; margin-top: 5px; padding: 9px 11px;
   border: 1px solid var(--borde); border-radius: 6px; font: inherit; background: #fff;
 }

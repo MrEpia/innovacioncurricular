@@ -31,6 +31,10 @@ public interface IRepositorioReferencias
     Task<bool> EnfoqueActivo(int id);
     Task<bool> AliadoActivo(int nit);
 
+    // v3: los extremos de una asignación rol_usuario.
+    Task<bool> UsuarioActivo(int id);
+    Task<bool> RolActivo(int id);
+
     // --- 2. ¿Quién depende de él? -----------------------------------------
     // Cada uno devuelve las tablas con hijos activos y cuántos, por ejemplo
     // ["programa (3)"]. Lista vacía = se puede retirar sin dejar huérfanos.

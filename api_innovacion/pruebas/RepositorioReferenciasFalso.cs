@@ -23,6 +23,8 @@ public class RepositorioReferenciasFalso : IRepositorioReferencias
     public HashSet<int> AspectosNormativos { get; } = new();
     public HashSet<int> Enfoques { get; } = new();
     public HashSet<int> Aliados { get; } = new();
+    public HashSet<int> Usuarios { get; } = new();
+    public HashSet<int> RolesActivos { get; } = new();
 
     /// <summary>
     /// Los hijos activos de cada padre. La llave es "tabla:llave", por ejemplo
@@ -44,6 +46,8 @@ public class RepositorioReferenciasFalso : IRepositorioReferencias
     public Task<bool> AspectoNormativoActivo(int id) => Task.FromResult(AspectosNormativos.Contains(id));
     public Task<bool> EnfoqueActivo(int id) => Task.FromResult(Enfoques.Contains(id));
     public Task<bool> AliadoActivo(int nit) => Task.FromResult(Aliados.Contains(nit));
+    public Task<bool> UsuarioActivo(int id) => Task.FromResult(Usuarios.Contains(id));
+    public Task<bool> RolActivo(int id) => Task.FromResult(RolesActivos.Contains(id));
 
     public Task<IReadOnlyList<string>> DependientesDeUniversidad(int id) => Task.FromResult(HijosDe("universidad", id));
     public Task<IReadOnlyList<string>> DependientesDeFacultad(int id) => Task.FromResult(HijosDe("facultad", id));

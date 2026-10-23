@@ -1,0 +1,324 @@
+@page "/pasantias"
+@rendermode InteractiveServer
+@inject ServicioPasantia Servicio
+@inject ServicioPrograma ServicioProgramaPadre
+@inject IJSRuntime JS
+
+@*
+    LA PANTALLA DE `pasantia` (v2 — bloque Actividades)
+
+    El mismo patrón de las pantallas de la v1, con una diferencia: cada clave
+    foránea es una LISTA DESPLEGABLE cargada desde la API por el servicio de
+    su tabla padre, nunca escrita a mano ni leída de la base.
+*@
+
+<PageTitle>Pasantías</PageTitle>
+
+<div class="encabezado">
+    <div>
+        <h1>Pasantías</h1>
+        <p class="nota">Las pasantías disponibles para los estudiantes de cada programa.</p>
+    </div>
+    @if (!mostrandoFormulario)
+    {
+        <button class="boton primario" @onclick="Agregar">Agregar</button>
+    }
+</div>
+
+@foreach (var error in errores)
+{
+    <p class="aviso error">@error</p>
+}
+@if (!string.IsNullOrEmpty(exito))
+{
+    <p class="aviso exito">@exito</p>
+}
+
+@if (mostrandoFormulario)
+{
+    <div class="tarjeta-formulario">
+        <h2>@(editando ? "Editar" : "Agregar") la pasantía</h2>
+
+        <label>
+            ID
+            <input type="number" @bind="campoId" disabled="@editando" />
+            <span class="ayuda">Forma parte de la llave: no se podrá cambiar después.</span>
+        </label>
+
+        <label>
+            Nombre
+            <input type="text" maxlength="45" @bind="campoNombre" />
+        </label>
+
+        <label>
+            País
+            <input type="text" maxlength="45" @bind="campoPais" />
+        </label>
+
+        <label>
+            Empresa
+            <input type="text" maxlength="45" @bind="campoEmpresa" />
+        </label>
+
+        <label>
+            Descripción
+            <input type="text" maxlength="45" @bind="campoDescripcion" />
+        </label>
+
+        <label>
+            Programa
+            <select @bind="campoPrograma">
+                <option value="">— seleccione —</option>
+                @foreach (var p in listaPrograma)
+                {
+                    <option value="@p.Id">@p.Id — @p.Nombre</option>
+                }
+            </select>
+        </label>
+
+        <div class="pareja">
+            @if (editando)
+            {
+                <button class="boton primario" @onclick="GuardarCompleta" disabled="@guardando">
+                    Guardar la ficha completa
+                </button>
+                <button class="boton" @onclick="GuardarLoQueCambio" disabled="@guardando">
+                    Guardar solo lo que cambié
+                </button>
+            }
+            else
+            {
+                <button class="boton primario" @onclick="Crear" disabled="@guardando">
+                    Agregar
+                </button>
+            }
+            <button class="boton" @onclick="Cancelar" disabled="@guardando">Cancelar</button>
+        </div>
+
+        @if (editando)
+        {
+            <span class="ayuda">
+                «La ficha completa» exige todos los datos obligatorios. «Solo lo que
+                cambié» guarda únicamente lo que usted modificó.
+            </span>
+        }
+    </div>
+}
+
+@if (cargando)
+{
+    <p class="nota">Cargando…</p>
+}
+else if (filas.Count > 0)
+{
+    <div class="tabla-scroll">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>País</th>
+                    <th>Empresa</th>
+                    <th>Descripción</th>
+                    <th>Programa</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var fila in filas)
+                {
+                    <tr>
+                        <td>@fila.Id</td>
+                        <td>@fila.Nombre</td>
+                        <td>@fila.Pais</td>
+                        <td>@fila.Empresa</td>
+                        <td>@fila.Descripcion</td>
+                        <td>@NombrePrograma(fila.Programa)</td>
+                        <td>
+                            <div class="acciones">
+                                <button class="boton" @onclick="() => Editar(fila)">Editar</button>
+                                <button class="boton peligro" @onclick="() => Retirar(fila)">Retirar</button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <p class="nota">@filas.Count registro(s).</p>
+}
+else
+{
+    <p class="vacio">
+        Todavía no hay registros. Use «Agregar» para crear el primero.
+    </p>
+}
+
+@code {
+    private List<Pasantia> filas = new();
+    private List<Programa> listaPrograma = new();
+    private List<string> errores = new();
+    private string exito = string.Empty;
+
+    private bool cargando = true;
+    private bool guardando;
+    private bool mostrandoFormulario;
+    private bool editando;
+    private Pasantia? original;
+
+    private int? campoId;
+    private string campoNombre = string.Empty;
+    private string campoPais = string.Empty;
+    private string campoEmpresa = string.Empty;
+    private string campoDescripcion = string.Empty;
+    private int? campoPrograma;
+
+    protected override async Task OnInitializedAsync()
+    {
+        errores = new();
+        // Las listas desplegables: los registros ACTIVOS de cada tabla padre,
+        // pedidos a la API por el servicio de esa tabla.
+        var rPrograma = await ServicioProgramaPadre.Listar();
+        if (rPrograma.Ok) listaPrograma = rPrograma.Datos!;
+        else errores.AddRange(rPrograma.Errores);
+        await Cargar();
+    }
+
+    private async Task Cargar()
+    {
+        cargando = true;
+        var r = await Servicio.Listar();
+        cargando = false;
+
+        if (!r.Ok) errores.AddRange(r.Errores);
+        filas = r.Ok ? r.Datos! : new();
+    }
+
+    // Muestra «llave — nombre» con la lista que dio la API; si el padre ya no
+    // está en la lista (fue retirado), muestra al menos la llave.
+    private string NombrePrograma(int? llave)
+    {
+        if (llave == null) return "—";
+        var p = listaPrograma.FirstOrDefault(x => Equals(x.Id, llave));
+        return p == null ? $"{llave}" : $"{p.Id} — {p.Nombre}";
+    }
+
+    private Pasantia Construir() => new Pasantia
+    {
+            Id = campoId,
+            Nombre = campoNombre.Trim(),
+            Pais = campoPais.Trim(),
+            Empresa = campoEmpresa.Trim(),
+            Descripcion = campoDescripcion.Trim(),
+            Programa = campoPrograma
+    };
+
+    private void Agregar()
+    {
+        Limpiar();
+        editando = false;
+        mostrandoFormulario = true;
+    }
+
+    private void Editar(Pasantia fila)
+    {
+        campoId = fila.Id;
+        campoNombre = fila.Nombre;
+        campoPais = fila.Pais;
+        campoEmpresa = fila.Empresa;
+        campoDescripcion = fila.Descripcion;
+        campoPrograma = fila.Programa;
+        original = new Pasantia
+        {
+            Id = fila.Id,
+            Nombre = fila.Nombre,
+            Pais = fila.Pais,
+            Empresa = fila.Empresa,
+            Descripcion = fila.Descripcion,
+            Programa = fila.Programa
+        };
+        editando = true;
+        mostrandoFormulario = true;
+        errores = new();
+        exito = string.Empty;
+    }
+
+    private async Task GuardarCompleta()
+    {
+        guardando = true;
+        var r = await Servicio.Reemplazar(campoId!.Value, Construir());
+        guardando = false;
+        await TrasGuardar(r, $"Se guardó la pasantía {campoId}.");
+    }
+
+    private async Task GuardarLoQueCambio()
+    {
+        guardando = true;
+        var r = await Servicio.Actualizar(campoId!.Value, original!, Construir());
+        guardando = false;
+        await TrasGuardar(r, $"Se guardó la pasantía {campoId}.");
+    }
+
+    private void Cancelar()
+    {
+        mostrandoFormulario = false;
+        Limpiar();
+    }
+
+    private void Limpiar()
+    {
+        campoId = null;
+        campoNombre = string.Empty;
+        campoPais = string.Empty;
+        campoEmpresa = string.Empty;
+        campoDescripcion = string.Empty;
+        campoPrograma = null;
+        original = null;
+        errores = new();
+        exito = string.Empty;
+    }
+
+    private async Task Crear()
+    {
+        guardando = true;
+        var r = await Servicio.Crear(Construir());
+        guardando = false;
+        await TrasGuardar(r, "Se agregó el registro.");
+    }
+
+    private async Task TrasGuardar(Resultado<bool> r, string mensaje)
+    {
+        if (r.Ok)
+        {
+            mostrandoFormulario = false;
+            exito = mensaje;
+            errores = new();
+            await Cargar();
+        }
+        else
+        {
+            errores = r.Errores;
+            exito = string.Empty;
+        }
+    }
+
+    private async Task Retirar(Pasantia fila)
+    {
+        var seguro = await JS.InvokeAsync<bool>("confirm", $"¿Retirar {fila.Id} del uso?");
+        if (!seguro) return;
+
+        var r = await Servicio.Eliminar(fila.Id!.Value);
+        if (r.Ok)
+        {
+            exito = $"Se retiró la pasantía {fila.Id}.";
+            errores = new();
+            await Cargar();
+        }
+        else
+        {
+            // Un 409 llega aquí con su explicación: «tiene registros activos en…».
+            errores = r.Errores;
+            exito = string.Empty;
+        }
+    }
+}

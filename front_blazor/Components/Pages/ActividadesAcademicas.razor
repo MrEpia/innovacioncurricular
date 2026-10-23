@@ -1,0 +1,400 @@
+@page "/actividades-academicas"
+@rendermode InteractiveServer
+@inject ServicioActivAcademica Servicio
+@inject ServicioPrograma ServicioProgramaPadre
+@inject IJSRuntime JS
+
+@*
+    LA PANTALLA DE `activ_academica` (v2 — bloque Actividades)
+
+    El mismo patrón de las pantallas de la v1, con una diferencia: cada clave
+    foránea es una LISTA DESPLEGABLE cargada desde la API por el servicio de
+    su tabla padre, nunca escrita a mano ni leída de la base.
+*@
+
+<PageTitle>Actividades académicas</PageTitle>
+
+<div class="encabezado">
+    <div>
+        <h1>Actividades académicas</h1>
+        <p class="nota">Los cursos y asignaturas: créditos, horas, idioma y si son espejo con otra institución.</p>
+    </div>
+    @if (!mostrandoFormulario)
+    {
+        <button class="boton primario" @onclick="Agregar">Agregar</button>
+    }
+</div>
+
+@foreach (var error in errores)
+{
+    <p class="aviso error">@error</p>
+}
+@if (!string.IsNullOrEmpty(exito))
+{
+    <p class="aviso exito">@exito</p>
+}
+
+@if (mostrandoFormulario)
+{
+    <div class="tarjeta-formulario">
+        <h2>@(editando ? "Editar" : "Agregar") la actividad académica</h2>
+
+        <label>
+            ID
+            <input type="number" @bind="campoId" disabled="@editando" />
+            <span class="ayuda">Forma parte de la llave: no se podrá cambiar después.</span>
+        </label>
+
+        <label>
+            Nombre
+            <input type="text" maxlength="45" @bind="campoNombre" />
+        </label>
+
+        <label>
+            Créditos
+            <input type="number" @bind="campoNumCreditos" />
+        </label>
+
+        <label>
+            Tipo
+            <input type="text" maxlength="20" @bind="campoTipo" />
+        </label>
+
+        <label>
+            Área de formación
+            <input type="text" maxlength="45" @bind="campoAreaFormacion" />
+        </label>
+
+        <label>
+            Horas de acompañamiento
+            <input type="number" @bind="campoHAcom" />
+        </label>
+
+        <label>
+            Horas independientes
+            <input type="number" @bind="campoHIndep" />
+        </label>
+
+        <label>
+            Idioma
+            <input type="text" maxlength="45" @bind="campoIdioma" />
+        </label>
+
+        <label>
+            ¿Es espejo?
+            <select @bind="campoEspejo">
+                <option value="">— seleccione —</option>
+                <option value="1">Sí</option>
+                <option value="0">No</option>
+            </select>
+        </label>
+
+        <label>
+            Entidad espejo
+            <input type="text" maxlength="45" @bind="campoEntidadEspejo" />
+        </label>
+
+        <label>
+            País espejo
+            <input type="text" maxlength="45" @bind="campoPaisEspejo" />
+        </label>
+
+        <label>
+            Programa (diseño)
+            <select @bind="campoDisenio">
+                <option value="">(ninguno)</option>
+                @foreach (var p in listaDisenio)
+                {
+                    <option value="@p.Id">@p.Id — @p.Nombre</option>
+                }
+            </select>
+        </label>
+
+        <div class="pareja">
+            @if (editando)
+            {
+                <button class="boton primario" @onclick="GuardarCompleta" disabled="@guardando">
+                    Guardar la ficha completa
+                </button>
+                <button class="boton" @onclick="GuardarLoQueCambio" disabled="@guardando">
+                    Guardar solo lo que cambié
+                </button>
+            }
+            else
+            {
+                <button class="boton primario" @onclick="Crear" disabled="@guardando">
+                    Agregar
+                </button>
+            }
+            <button class="boton" @onclick="Cancelar" disabled="@guardando">Cancelar</button>
+        </div>
+
+        @if (editando)
+        {
+            <span class="ayuda">
+                «La ficha completa» exige todos los datos obligatorios. «Solo lo que
+                cambié» guarda únicamente lo que usted modificó.
+            </span>
+        }
+    </div>
+}
+
+@if (cargando)
+{
+    <p class="nota">Cargando…</p>
+}
+else if (filas.Count > 0)
+{
+    <div class="tabla-scroll">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Créditos</th>
+                    <th>Tipo</th>
+                    <th>Área de formación</th>
+                    <th>Horas de acompañamiento</th>
+                    <th>Horas independientes</th>
+                    <th>Idioma</th>
+                    <th>¿Es espejo?</th>
+                    <th>Entidad espejo</th>
+                    <th>País espejo</th>
+                    <th>Programa (diseño)</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var fila in filas)
+                {
+                    <tr>
+                        <td>@fila.Id</td>
+                        <td>@fila.Nombre</td>
+                        <td>@fila.NumCreditos</td>
+                        <td>@fila.Tipo</td>
+                        <td>@fila.AreaFormacion</td>
+                        <td>@fila.HAcom</td>
+                        <td>@fila.HIndep</td>
+                        <td>@fila.Idioma</td>
+                        <td>@(fila.Espejo == 1 ? "Sí" : "No")</td>
+                        <td>@fila.EntidadEspejo</td>
+                        <td>@fila.PaisEspejo</td>
+                        <td>@NombreDisenio(fila.Disenio)</td>
+                        <td>
+                            <div class="acciones">
+                                <button class="boton" @onclick="() => Editar(fila)">Editar</button>
+                                <button class="boton peligro" @onclick="() => Retirar(fila)">Retirar</button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <p class="nota">@filas.Count registro(s).</p>
+}
+else
+{
+    <p class="vacio">
+        Todavía no hay registros. Use «Agregar» para crear el primero.
+    </p>
+}
+
+@code {
+    private List<ActivAcademica> filas = new();
+    private List<Programa> listaDisenio = new();
+    private List<string> errores = new();
+    private string exito = string.Empty;
+
+    private bool cargando = true;
+    private bool guardando;
+    private bool mostrandoFormulario;
+    private bool editando;
+    private ActivAcademica? original;
+
+    private int? campoId;
+    private string campoNombre = string.Empty;
+    private int? campoNumCreditos;
+    private string campoTipo = string.Empty;
+    private string campoAreaFormacion = string.Empty;
+    private int? campoHAcom;
+    private int? campoHIndep;
+    private string campoIdioma = string.Empty;
+    private int? campoEspejo;
+    private string campoEntidadEspejo = string.Empty;
+    private string campoPaisEspejo = string.Empty;
+    private int? campoDisenio;
+
+    protected override async Task OnInitializedAsync()
+    {
+        errores = new();
+        // Las listas desplegables: los registros ACTIVOS de cada tabla padre,
+        // pedidos a la API por el servicio de esa tabla.
+        var rDisenio = await ServicioProgramaPadre.Listar();
+        if (rDisenio.Ok) listaDisenio = rDisenio.Datos!;
+        else errores.AddRange(rDisenio.Errores);
+        await Cargar();
+    }
+
+    private async Task Cargar()
+    {
+        cargando = true;
+        var r = await Servicio.Listar();
+        cargando = false;
+
+        if (!r.Ok) errores.AddRange(r.Errores);
+        filas = r.Ok ? r.Datos! : new();
+    }
+
+    // Muestra «llave — nombre» con la lista que dio la API; si el padre ya no
+    // está en la lista (fue retirado), muestra al menos la llave.
+    private string NombreDisenio(int? llave)
+    {
+        if (llave == null) return "—";
+        var p = listaDisenio.FirstOrDefault(x => Equals(x.Id, llave));
+        return p == null ? $"{llave}" : $"{p.Id} — {p.Nombre}";
+    }
+
+    private ActivAcademica Construir() => new ActivAcademica
+    {
+            Id = campoId,
+            Nombre = campoNombre.Trim(),
+            NumCreditos = campoNumCreditos,
+            Tipo = campoTipo.Trim(),
+            AreaFormacion = campoAreaFormacion.Trim(),
+            HAcom = campoHAcom,
+            HIndep = campoHIndep,
+            Idioma = campoIdioma.Trim(),
+            Espejo = campoEspejo,
+            EntidadEspejo = campoEntidadEspejo.Trim(),
+            PaisEspejo = campoPaisEspejo.Trim(),
+            Disenio = campoDisenio
+    };
+
+    private void Agregar()
+    {
+        Limpiar();
+        editando = false;
+        mostrandoFormulario = true;
+    }
+
+    private void Editar(ActivAcademica fila)
+    {
+        campoId = fila.Id;
+        campoNombre = fila.Nombre;
+        campoNumCreditos = fila.NumCreditos;
+        campoTipo = fila.Tipo;
+        campoAreaFormacion = fila.AreaFormacion;
+        campoHAcom = fila.HAcom;
+        campoHIndep = fila.HIndep;
+        campoIdioma = fila.Idioma;
+        campoEspejo = fila.Espejo;
+        campoEntidadEspejo = fila.EntidadEspejo;
+        campoPaisEspejo = fila.PaisEspejo;
+        campoDisenio = fila.Disenio;
+        original = new ActivAcademica
+        {
+            Id = fila.Id,
+            Nombre = fila.Nombre,
+            NumCreditos = fila.NumCreditos,
+            Tipo = fila.Tipo,
+            AreaFormacion = fila.AreaFormacion,
+            HAcom = fila.HAcom,
+            HIndep = fila.HIndep,
+            Idioma = fila.Idioma,
+            Espejo = fila.Espejo,
+            EntidadEspejo = fila.EntidadEspejo,
+            PaisEspejo = fila.PaisEspejo,
+            Disenio = fila.Disenio
+        };
+        editando = true;
+        mostrandoFormulario = true;
+        errores = new();
+        exito = string.Empty;
+    }
+
+    private async Task GuardarCompleta()
+    {
+        guardando = true;
+        var r = await Servicio.Reemplazar(campoId!.Value, Construir());
+        guardando = false;
+        await TrasGuardar(r, $"Se guardó la actividad académica {campoId}.");
+    }
+
+    private async Task GuardarLoQueCambio()
+    {
+        guardando = true;
+        var r = await Servicio.Actualizar(campoId!.Value, original!, Construir());
+        guardando = false;
+        await TrasGuardar(r, $"Se guardó la actividad académica {campoId}.");
+    }
+
+    private void Cancelar()
+    {
+        mostrandoFormulario = false;
+        Limpiar();
+    }
+
+    private void Limpiar()
+    {
+        campoId = null;
+        campoNombre = string.Empty;
+        campoNumCreditos = null;
+        campoTipo = string.Empty;
+        campoAreaFormacion = string.Empty;
+        campoHAcom = null;
+        campoHIndep = null;
+        campoIdioma = string.Empty;
+        campoEspejo = null;
+        campoEntidadEspejo = string.Empty;
+        campoPaisEspejo = string.Empty;
+        campoDisenio = null;
+        original = null;
+        errores = new();
+        exito = string.Empty;
+    }
+
+    private async Task Crear()
+    {
+        guardando = true;
+        var r = await Servicio.Crear(Construir());
+        guardando = false;
+        await TrasGuardar(r, "Se agregó el registro.");
+    }
+
+    private async Task TrasGuardar(Resultado<bool> r, string mensaje)
+    {
+        if (r.Ok)
+        {
+            mostrandoFormulario = false;
+            exito = mensaje;
+            errores = new();
+            await Cargar();
+        }
+        else
+        {
+            errores = r.Errores;
+            exito = string.Empty;
+        }
+    }
+
+    private async Task Retirar(ActivAcademica fila)
+    {
+        var seguro = await JS.InvokeAsync<bool>("confirm", $"¿Retirar {fila.Id} del uso?");
+        if (!seguro) return;
+
+        var r = await Servicio.Eliminar(fila.Id!.Value);
+        if (r.Ok)
+        {
+            exito = $"Se retiró la actividad académica {fila.Id}.";
+            errores = new();
+            await Cargar();
+        }
+        else
+        {
+            // Un 409 llega aquí con su explicación: «tiene registros activos en…».
+            errores = r.Errores;
+            exito = string.Empty;
+        }
+    }
+}

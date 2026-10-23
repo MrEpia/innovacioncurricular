@@ -12,6 +12,7 @@ curso).
 | 1 — v1 | CRUD de las 7 tablas sin clave foránea | [v1_entrega1](docs/spec_kit/versiones/v1_entrega1/2_spec.md) |
 | 2 — v2 | CRUD de las 15 tablas con clave foránea, listas desplegables desde la API, integridad referencial | [v2_entrega2](docs/spec_kit/versiones/v2_entrega2/2_spec.md) |
 | 3 — v3 | JWT, sesión del servidor, permisos por rol, administración de usuarios y roles | [v3_seguridad](docs/spec_kit/versiones/v3_seguridad/2_spec.md) |
+| 3 — maestro-detalle | Registro calificado y programa guardados con todo su detalle (todo o nada) | [v3_maestro_detalle](docs/spec_kit/versiones/v3_maestro_detalle/2_spec.md) |
 
 Las reglas que rigen todo están en la [constitución](docs/spec_kit/1_constitution.md)
 y la ruta completa en el [mapa de versiones](docs/spec_kit/versiones/0_mapa_versiones.md).
@@ -89,6 +90,7 @@ python pruebas_humo/humo_seguridad.py
 python pruebas_humo/humo_academico.py
 python pruebas_humo/humo_actividades.py
 python pruebas_humo/humo_puentes.py
+python pruebas_humo/humo_maestro_detalle.py
 python pruebas_humo/humo_front.py
 ```
 

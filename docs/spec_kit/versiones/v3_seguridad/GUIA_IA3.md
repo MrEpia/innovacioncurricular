@@ -47,7 +47,9 @@ en cada caso, están en [4_research.md](4_research.md) (D-v3-1 a D-v3-9).
 | 6 | «verifica que si se esta cumpliendo lo que dice cada spec y contrató» | Se corrió `verificar_todo.py --limpio`. Dio 4 fallos, que resultaron ser de la codificación de Windows en la salida de las pruebas, no del sistema | Commit `5585fc9`, luego 10/10 en verde |
 | 7 | «tenemos los procedimientos de almacenado?» | Diagnóstico: no había ninguno, porque el Artículo 2 pedía el SQL a la vista en los repositorios | Búsqueda en `.sql` y `.cs` |
 | 8 | «Si, es necesario agregarlos, modifica esto 1. Enmendar la constitución (Art. 11)… 2. Crear una migración en `db/migraciones/`… 3. Cambiar los repositorios. 4. Volver a correr `verificar_todo.py`. no se cuales tablas lo necesitan verifica en cuales es necesario» | Constitución 1.3.0, decisión D-v3-10 y migración `v3_002` con 27 procedimientos, solo para las operaciones de comprobar y escribir. Se cambiaron 15 repositorios | Commit `f1ee708`, `verificar_todo.py --limpio` 10/10 y prueba directa de los códigos 50409/50410 en SQL Server |
-| 9 | «en la documentacion agregaste el prompt usado?» | Esta guía y la GUIA_IA2 | Este commit |
+| 9 | «en la documentacion agregaste el prompt usado?» | Esta guía y la GUIA_IA2 | Commit `a72eece` |
+| 10 | «donde esta maestro detalle» | Diagnóstico: no existía; solo estaba anunciado en `docs/PRINCIPIOS_ACID.md` | Búsqueda en el código y en el material del curso |
+| 11 | «ok si es necesario hacer los maestro detalle, 1. Un endpoint que reciba el padre con su lista de hijos… 2. Un procedimiento almacenado o una transacción que guarde todo junto, o nada si algo falla. 3. Una pantalla en Blazor con el padre arriba y una tabla editable de hijos abajo. 4. Su spec, su contrato y su diagrama de secuencia, más la enmienda si hace falta. hazlo para los dos maestros que estas proponiendo» y «y lo subes» | Spec kit [v3_maestro_detalle](../v3_maestro_detalle/2_spec.md), enmienda 1.4.0, 2 procedimientos, 4 rutas, 2 pantallas y diagramas 18 a 21 | Prueba de capas (+20), `humo_maestro_detalle.py` (49) y recorrido de las dos pantallas en el navegador |
 
 ## 3. Lo que la IA rompió en este tramo
 

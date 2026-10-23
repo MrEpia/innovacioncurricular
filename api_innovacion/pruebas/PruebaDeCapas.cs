@@ -7,8 +7,12 @@ namespace ApiInnovacion.Pruebas;
 /// Cada bloque escribe sus comprobaciones en su propio archivo
 /// (PruebasV1, PruebasAcademico, ...) y aquí solo se llaman: así los tres
 /// estudiantes no editan el mismo archivo en la misma ronda.
+///
+/// Se llama PruebaDeCapas y no Programa: desde la v2 existe el modelo
+/// Programa (la tabla programa), y dentro de este proyecto el nombre corto
+/// resolvería a la clase equivocada.
 /// </summary>
-public class Programa
+public class PruebaDeCapas
 {
     public static async Task<int> Main(string[] args)
     {

@@ -1,6 +1,3 @@
-using System.Net.Http.Json;
-using System.Text.Json;
-
 namespace FrontInnovacion.Servicios;
 
 /// <summary>
@@ -23,158 +20,45 @@ public class Universidad
 /// </summary>
 public class ServicioUniversidad
 {
-    private readonly HttpClient _http;
+    // El transporte HTTP (sobres, 204, errores, API caída) vive en ClienteApi
+    // desde la v2. Este servicio sigue siendo el que sabe QUÉ recurso es, qué
+    // ruta lleva y qué campos tiene.
+    private readonly ClienteApi _api;
 
-    private static readonly JsonSerializerOptions _opciones = new()
+    public ServicioUniversidad(ClienteApi api)
     {
-        PropertyNameCaseInsensitive = true
-    };
-
-    private static readonly List<string> NoDisponible = new()
-    {
-        "El servicio no está disponible. ¿Está arriba la API?"
-    };
-
-    public ServicioUniversidad(HttpClient http)
-    {
-        _http = http;
+        _api = api;
     }
 
     // RF1 — Listar
-    public async Task<Resultado<List<Universidad>>> Listar(int limite = 1000)
-    {
-        try
-        {
-            var r = await _http.GetAsync($"/api/universidad?limite={limite}");
-
-            if (r.StatusCode == System.Net.HttpStatusCode.NoContent)
-            {
-                return Resultado<List<Universidad>>.Bien(new());
-            }
-
-            if (!r.IsSuccessStatusCode)
-            {
-                return Resultado<List<Universidad>>.Mal(await Mensajes(r));
-            }
-
-            var sobre = await r.Content.ReadFromJsonAsync<JsonElement>();
-            var datos = sobre.GetProperty("datos")
-                .Deserialize<List<Universidad>>(_opciones) ?? new();
-
-            return Resultado<List<Universidad>>.Bien(datos);
-        }
-        catch (Exception e) when (e is HttpRequestException or TaskCanceledException)
-        {
-            return Resultado<List<Universidad>>.Mal(NoDisponible);
-        }
-    }
+    public Task<Resultado<List<Universidad>>> Listar(int limite = 1000) =>
+        _api.Listar<Universidad>($"/api/universidad?limite={limite}");
 
     // RF2 — Obtener uno
-    public async Task<Resultado<Universidad>> Obtener(int id)
-    {
-        try
-        {
-            var r = await _http.GetAsync($"/api/universidad/{id}");
-            if (!r.IsSuccessStatusCode)
-            {
-                return Resultado<Universidad>.Mal(await Mensajes(r));
-            }
-
-            var ficha = await r.Content.ReadFromJsonAsync<Universidad>(_opciones);
-            return Resultado<Universidad>.Bien(ficha!);
-        }
-        catch (Exception e) when (e is HttpRequestException or TaskCanceledException)
-        {
-            return Resultado<Universidad>.Mal(NoDisponible);
-        }
-    }
+    public Task<Resultado<Universidad>> Obtener(int id) =>
+        _api.Obtener<Universidad>($"/api/universidad/{id}");
 
     // RF3 — Crear
-    public async Task<Resultado<bool>> Crear(Universidad entidad)
-    {
-        return await Enviar(HttpMethod.Post, "/api/universidad", entidad);
-    }
+    public Task<Resultado<bool>> Crear(Universidad entidad) =>
+        _api.Enviar(HttpMethod.Post, "/api/universidad", entidad);
 
     // RF4 — Reemplazar: «guardar la ficha completa». La llave no va en el
     // cuerpo: identifica la fila y viaja en la ruta.
-    public async Task<Resultado<bool>> Reemplazar(int id, Universidad entidad)
-    {
-        var cuerpo = new
-        {
-            nombre = entidad.Nombre, tipo = entidad.Tipo, ciudad = entidad.Ciudad
-        };
-        return await Enviar(HttpMethod.Put, $"/api/universidad/{id}", cuerpo);
-    }
+    public Task<Resultado<bool>> Reemplazar(int id, Universidad entidad) =>
+        _api.Enviar(HttpMethod.Put, $"/api/universidad/{id}", new { nombre = entidad.Nombre, tipo = entidad.Tipo, ciudad = entidad.Ciudad });
 
     // RF5 — Actualizar: «guardar solo lo que cambié». Solo viaja lo diligenciado.
-    public async Task<Resultado<bool>> Actualizar(
-        int id,
-        string? nombre, string? tipo, string? ciudad)
+    public Task<Resultado<bool>> Actualizar(int id, string? nombre, string? tipo, string? ciudad)
     {
         var cuerpo = new Dictionary<string, object?>();
         if (!string.IsNullOrWhiteSpace(nombre)) cuerpo["nombre"] = nombre;
         if (!string.IsNullOrWhiteSpace(tipo)) cuerpo["tipo"] = tipo;
         if (!string.IsNullOrWhiteSpace(ciudad)) cuerpo["ciudad"] = ciudad;
 
-        return await Enviar(HttpMethod.Patch, $"/api/universidad/{id}", cuerpo);
+        return _api.Enviar(HttpMethod.Patch, $"/api/universidad/{id}", cuerpo);
     }
 
     // RF6 — Retirar del uso (la API lo hace lógico: la fila no se borra)
-    public async Task<Resultado<bool>> Eliminar(int id)
-    {
-        return await Enviar(HttpMethod.Delete, $"/api/universidad/{id}", null);
-    }
-
-    private async Task<Resultado<bool>> Enviar(HttpMethod metodo, string ruta, object? cuerpo)
-    {
-        try
-        {
-            var peticion = new HttpRequestMessage(metodo, ruta);
-            if (cuerpo != null)
-            {
-                peticion.Content = JsonContent.Create(cuerpo);
-            }
-
-            var r = await _http.SendAsync(peticion);
-            return r.IsSuccessStatusCode
-                ? Resultado<bool>.Bien(true)
-                : Resultado<bool>.Mal(await Mensajes(r));
-        }
-        catch (Exception e) when (e is HttpRequestException or TaskCanceledException)
-        {
-            return Resultado<bool>.Mal(NoDisponible);
-        }
-    }
-
-    /// <summary>Traduce a texto los errores que produce esta API para universidad.</summary>
-    private static async Task<List<string>> Mensajes(HttpResponseMessage r)
-    {
-        try
-        {
-            var sobre = await r.Content.ReadFromJsonAsync<JsonElement>();
-
-            if (sobre.TryGetProperty("errores", out var errores)
-                && errores.ValueKind == JsonValueKind.Array
-                && errores.GetArrayLength() > 0)
-            {
-                return errores.EnumerateArray()
-                    .Select(x => x.GetString() ?? "")
-                    .Where(x => x.Length > 0)
-                    .ToList();
-            }
-
-            var partes = new List<string>();
-            if (sobre.TryGetProperty("mensaje", out var m)) partes.Add(m.GetString() ?? "");
-            if (sobre.TryGetProperty("detalle", out var dt)) partes.Add(dt.GetString() ?? "");
-            partes.RemoveAll(string.IsNullOrWhiteSpace);
-
-            return partes.Count > 0
-                ? partes
-                : new List<string> { "No se pudo completar la operación." };
-        }
-        catch
-        {
-            return new List<string> { "No se pudo completar la operación." };
-        }
-    }
+    public Task<Resultado<bool>> Eliminar(int id) =>
+        _api.Enviar(HttpMethod.Delete, $"/api/universidad/{id}", null);
 }

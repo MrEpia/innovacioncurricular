@@ -1,6 +1,3 @@
-using System.Net.Http.Json;
-using System.Text.Json;
-
 namespace FrontInnovacion.Servicios;
 
 /// <summary>
@@ -23,158 +20,45 @@ public class AreaConocimiento
 /// </summary>
 public class ServicioAreaConocimiento
 {
-    private readonly HttpClient _http;
+    // El transporte HTTP (sobres, 204, errores, API caída) vive en ClienteApi
+    // desde la v2. Este servicio sigue siendo el que sabe QUÉ recurso es, qué
+    // ruta lleva y qué campos tiene.
+    private readonly ClienteApi _api;
 
-    private static readonly JsonSerializerOptions _opciones = new()
+    public ServicioAreaConocimiento(ClienteApi api)
     {
-        PropertyNameCaseInsensitive = true
-    };
-
-    private static readonly List<string> NoDisponible = new()
-    {
-        "El servicio no está disponible. ¿Está arriba la API?"
-    };
-
-    public ServicioAreaConocimiento(HttpClient http)
-    {
-        _http = http;
+        _api = api;
     }
 
     // RF1 — Listar
-    public async Task<Resultado<List<AreaConocimiento>>> Listar(int limite = 1000)
-    {
-        try
-        {
-            var r = await _http.GetAsync($"/api/area_conocimiento?limite={limite}");
-
-            if (r.StatusCode == System.Net.HttpStatusCode.NoContent)
-            {
-                return Resultado<List<AreaConocimiento>>.Bien(new());
-            }
-
-            if (!r.IsSuccessStatusCode)
-            {
-                return Resultado<List<AreaConocimiento>>.Mal(await Mensajes(r));
-            }
-
-            var sobre = await r.Content.ReadFromJsonAsync<JsonElement>();
-            var datos = sobre.GetProperty("datos")
-                .Deserialize<List<AreaConocimiento>>(_opciones) ?? new();
-
-            return Resultado<List<AreaConocimiento>>.Bien(datos);
-        }
-        catch (Exception e) when (e is HttpRequestException or TaskCanceledException)
-        {
-            return Resultado<List<AreaConocimiento>>.Mal(NoDisponible);
-        }
-    }
+    public Task<Resultado<List<AreaConocimiento>>> Listar(int limite = 1000) =>
+        _api.Listar<AreaConocimiento>($"/api/area_conocimiento?limite={limite}");
 
     // RF2 — Obtener uno
-    public async Task<Resultado<AreaConocimiento>> Obtener(string id)
-    {
-        try
-        {
-            var r = await _http.GetAsync($"/api/area_conocimiento/{id}");
-            if (!r.IsSuccessStatusCode)
-            {
-                return Resultado<AreaConocimiento>.Mal(await Mensajes(r));
-            }
-
-            var ficha = await r.Content.ReadFromJsonAsync<AreaConocimiento>(_opciones);
-            return Resultado<AreaConocimiento>.Bien(ficha!);
-        }
-        catch (Exception e) when (e is HttpRequestException or TaskCanceledException)
-        {
-            return Resultado<AreaConocimiento>.Mal(NoDisponible);
-        }
-    }
+    public Task<Resultado<AreaConocimiento>> Obtener(string id) =>
+        _api.Obtener<AreaConocimiento>($"/api/area_conocimiento/{Uri.EscapeDataString(id)}");
 
     // RF3 — Crear
-    public async Task<Resultado<bool>> Crear(AreaConocimiento entidad)
-    {
-        return await Enviar(HttpMethod.Post, "/api/area_conocimiento", entidad);
-    }
+    public Task<Resultado<bool>> Crear(AreaConocimiento entidad) =>
+        _api.Enviar(HttpMethod.Post, "/api/area_conocimiento", entidad);
 
     // RF4 — Reemplazar: «guardar la ficha completa». La llave no va en el
     // cuerpo: identifica la fila y viaja en la ruta.
-    public async Task<Resultado<bool>> Reemplazar(string id, AreaConocimiento entidad)
-    {
-        var cuerpo = new
-        {
-            granArea = entidad.GranArea, area = entidad.Area, disciplina = entidad.Disciplina
-        };
-        return await Enviar(HttpMethod.Put, $"/api/area_conocimiento/{id}", cuerpo);
-    }
+    public Task<Resultado<bool>> Reemplazar(string id, AreaConocimiento entidad) =>
+        _api.Enviar(HttpMethod.Put, $"/api/area_conocimiento/{Uri.EscapeDataString(id)}", new { granArea = entidad.GranArea, area = entidad.Area, disciplina = entidad.Disciplina });
 
     // RF5 — Actualizar: «guardar solo lo que cambié». Solo viaja lo diligenciado.
-    public async Task<Resultado<bool>> Actualizar(
-        string id,
-        string? granArea, string? area, string? disciplina)
+    public Task<Resultado<bool>> Actualizar(string id, string? granArea, string? area, string? disciplina)
     {
         var cuerpo = new Dictionary<string, object?>();
         if (!string.IsNullOrWhiteSpace(granArea)) cuerpo["granArea"] = granArea;
         if (!string.IsNullOrWhiteSpace(area)) cuerpo["area"] = area;
         if (!string.IsNullOrWhiteSpace(disciplina)) cuerpo["disciplina"] = disciplina;
 
-        return await Enviar(HttpMethod.Patch, $"/api/area_conocimiento/{id}", cuerpo);
+        return _api.Enviar(HttpMethod.Patch, $"/api/area_conocimiento/{Uri.EscapeDataString(id)}", cuerpo);
     }
 
     // RF6 — Retirar del uso (la API lo hace lógico: la fila no se borra)
-    public async Task<Resultado<bool>> Eliminar(string id)
-    {
-        return await Enviar(HttpMethod.Delete, $"/api/area_conocimiento/{id}", null);
-    }
-
-    private async Task<Resultado<bool>> Enviar(HttpMethod metodo, string ruta, object? cuerpo)
-    {
-        try
-        {
-            var peticion = new HttpRequestMessage(metodo, ruta);
-            if (cuerpo != null)
-            {
-                peticion.Content = JsonContent.Create(cuerpo);
-            }
-
-            var r = await _http.SendAsync(peticion);
-            return r.IsSuccessStatusCode
-                ? Resultado<bool>.Bien(true)
-                : Resultado<bool>.Mal(await Mensajes(r));
-        }
-        catch (Exception e) when (e is HttpRequestException or TaskCanceledException)
-        {
-            return Resultado<bool>.Mal(NoDisponible);
-        }
-    }
-
-    /// <summary>Traduce a texto los errores que produce esta API para area_conocimiento.</summary>
-    private static async Task<List<string>> Mensajes(HttpResponseMessage r)
-    {
-        try
-        {
-            var sobre = await r.Content.ReadFromJsonAsync<JsonElement>();
-
-            if (sobre.TryGetProperty("errores", out var errores)
-                && errores.ValueKind == JsonValueKind.Array
-                && errores.GetArrayLength() > 0)
-            {
-                return errores.EnumerateArray()
-                    .Select(x => x.GetString() ?? "")
-                    .Where(x => x.Length > 0)
-                    .ToList();
-            }
-
-            var partes = new List<string>();
-            if (sobre.TryGetProperty("mensaje", out var m)) partes.Add(m.GetString() ?? "");
-            if (sobre.TryGetProperty("detalle", out var dt)) partes.Add(dt.GetString() ?? "");
-            partes.RemoveAll(string.IsNullOrWhiteSpace);
-
-            return partes.Count > 0
-                ? partes
-                : new List<string> { "No se pudo completar la operación." };
-        }
-        catch
-        {
-            return new List<string> { "No se pudo completar la operación." };
-        }
-    }
+    public Task<Resultado<bool>> Eliminar(string id) =>
+        _api.Enviar(HttpMethod.Delete, $"/api/area_conocimiento/{Uri.EscapeDataString(id)}", null);
 }

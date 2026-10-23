@@ -451,7 +451,7 @@ sequenceDiagram
     else 200
         API-->>SS: {token, expira, roles}
         I->>CK: SignInAsync(claims + "jwt", ExpiresUtc = expira)
-        CK->>CK: guarda el ticket EN EL SERVIDOR; al navegador solo va una cookie HttpOnly
+        CK->>CK: guarda el ticket EN EL SERVIDOR, al navegador solo va una cookie HttpOnly
         I-->>U: redirige a ReturnUrl (solo direcciones locales)
     end
 ```

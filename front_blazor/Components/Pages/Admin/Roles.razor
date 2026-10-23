@@ -1,0 +1,169 @@
+@page "/admin/roles"
+@rendermode InteractiveServer
+@attribute [Authorize(Roles = "administrador")]
+@inject ServicioRol Servicio
+@inject IJSRuntime JS
+
+@*
+    PANEL DE ADMINISTRACIÓN — ROLES (v3, RF9) — Sebastián Brunal
+
+    Los permisos del sistema están escritos con los tres roles de fábrica
+    (administrador, editor, consulta): por eso no se pueden retirar ni
+    renombrar, y un rol nuevo sirve para clasificar usuarios pero no da
+    permisos por sí solo (2_spec.md de la v3, C9).
+*@
+
+<PageTitle>Roles</PageTitle>
+
+<div class="encabezado">
+    <div>
+        <h1>Roles</h1>
+        <p class="nota">
+            Los permisos los dan los tres roles del sistema: <strong>administrador</strong> (todo),
+            <strong>editor</strong> (consulta, crea y modifica) y <strong>consulta</strong> (solo lee).
+        </p>
+    </div>
+    @if (!mostrandoFormulario)
+    {
+        <button class="boton primario" @onclick="Agregar">Agregar</button>
+    }
+</div>
+
+@foreach (var error in errores)
+{
+    <p class="aviso error">@error</p>
+}
+@if (!string.IsNullOrEmpty(exito))
+{
+    <p class="aviso exito">@exito</p>
+}
+
+@if (mostrandoFormulario)
+{
+    <div class="tarjeta-formulario">
+        <h2>@(editandoId == null ? "Agregar un rol" : "Editar el rol")</h2>
+        <label>Nombre <input type="text" maxlength="100" @bind="campoNombre" /></label>
+        <label>Descripción <input type="text" @bind="campoDescripcion" /></label>
+        <div class="pareja">
+            <button class="boton primario" @onclick="Guardar" disabled="@guardando">Guardar</button>
+            <button class="boton" @onclick="Cancelar" disabled="@guardando">Cancelar</button>
+        </div>
+    </div>
+}
+
+@if (cargando)
+{
+    <p class="nota">Cargando…</p>
+}
+else
+{
+    <div class="tabla-scroll">
+        <table>
+            <thead><tr><th>ID</th><th>Nombre</th><th>Descripción</th><th></th></tr></thead>
+            <tbody>
+                @foreach (var fila in filas)
+                {
+                    <tr>
+                        <td><code>@fila.Id</code></td>
+                        <td>@fila.Nombre @(DelSistema(fila) ? "(del sistema)" : "")</td>
+                        <td>@fila.Descripcion</td>
+                        <td>
+                            <div class="acciones">
+                                <button class="boton" @onclick="() => Editar(fila)">Editar</button>
+                                @if (!DelSistema(fila))
+                                {
+                                    <button class="boton peligro" @onclick="() => Retirar(fila)">Retirar</button>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    private static readonly string[] RolesDelSistema = { "administrador", "editor", "consulta" };
+
+    private List<RolSistema> filas = new();
+    private List<string> errores = new();
+    private string exito = string.Empty;
+    private bool cargando = true, guardando, mostrandoFormulario;
+    private int? editandoId;
+    private string campoNombre = "", campoDescripcion = "";
+
+    private static bool DelSistema(RolSistema rol) => RolesDelSistema.Contains(rol.Nombre);
+
+    protected override async Task OnInitializedAsync() => await Cargar();
+
+    private async Task Cargar()
+    {
+        cargando = true;
+        var r = await Servicio.Listar();
+        cargando = false;
+        if (!r.Ok) errores = r.Errores;
+        filas = r.Ok ? r.Datos! : new();
+    }
+
+    private void Agregar()
+    {
+        editandoId = null;
+        campoNombre = campoDescripcion = "";
+        errores = new();
+        exito = string.Empty;
+        mostrandoFormulario = true;
+    }
+
+    private void Editar(RolSistema fila)
+    {
+        editandoId = fila.Id;
+        campoNombre = fila.Nombre;
+        campoDescripcion = fila.Descripcion ?? "";
+        errores = new();
+        exito = string.Empty;
+        mostrandoFormulario = true;
+    }
+
+    private void Cancelar() => mostrandoFormulario = false;
+
+    private async Task Guardar()
+    {
+        guardando = true;
+        var descripcion = string.IsNullOrWhiteSpace(campoDescripcion) ? null : campoDescripcion.Trim();
+        var r = editandoId == null
+            ? await Servicio.Crear(campoNombre.Trim(), descripcion)
+            : await Servicio.Reemplazar(editandoId.Value, campoNombre.Trim(), descripcion);
+        guardando = false;
+
+        if (r.Ok)
+        {
+            exito = $"Se guardó el rol {campoNombre}.";
+            mostrandoFormulario = false;
+            errores = new();
+            await Cargar();
+        }
+        else
+        {
+            errores = r.Errores;
+        }
+    }
+
+    private async Task Retirar(RolSistema fila)
+    {
+        if (!await JS.InvokeAsync<bool>("confirm", $"¿Retirar el rol {fila.Nombre}?")) return;
+
+        var r = await Servicio.Eliminar(fila.Id);
+        if (r.Ok)
+        {
+            exito = $"Se retiró el rol {fila.Nombre}.";
+            errores = new();
+            await Cargar();
+        }
+        else
+        {
+            errores = r.Errores;   // por ejemplo: «lo tienen 2 usuario(s) activo(s)»
+            exito = string.Empty;
+        }
+    }
+}

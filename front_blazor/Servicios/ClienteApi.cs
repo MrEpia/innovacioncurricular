@@ -1,6 +1,8 @@
 using System.Net;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
+using Microsoft.AspNetCore.Components;
 
 namespace FrontInnovacion.Servicios;
 
@@ -23,10 +25,18 @@ namespace FrontInnovacion.Servicios;
 /// HttpClient es a cualquier programa.
 ///
 /// Sigue sin saber que detrás hay SQL Server, ni siquiera que la API está en C#.
+///
+/// v3 (David Epia): este es el ÚNICO lugar que tuvo que cambiar para que los
+/// 22 servicios manden el token. Cada petición sale con
+/// Authorization: Bearer &lt;token de la sesión&gt;; si la API responde 401 (el
+/// token venció), se cierra la sesión y se lleva al usuario a ingresar; si
+/// responde 403, se le dice que su rol no lo permite.
 /// </summary>
 public class ClienteApi
 {
     private readonly HttpClient _http;
+    private readonly ProveedorToken _token;
+    private readonly NavigationManager _navegacion;
 
     private static readonly JsonSerializerOptions _opciones = new()
     {
@@ -38,9 +48,37 @@ public class ClienteApi
         "El servicio no está disponible. ¿Está arriba la API?"
     };
 
-    public ClienteApi(HttpClient http)
+    private static readonly List<string> SinPermiso = new()
+    {
+        "Su rol no permite esta operación."
+    };
+
+    public ClienteApi(HttpClient http, ProveedorToken token, NavigationManager navegacion)
     {
         _http = http;
+        _token = token;
+        _navegacion = navegacion;
+    }
+
+    /// <summary>Envía la petición con el token de la sesión.</summary>
+    private async Task<HttpResponseMessage> EnviarConToken(HttpRequestMessage peticion)
+    {
+        var token = await _token.Obtener();
+        if (!string.IsNullOrEmpty(token))
+        {
+            peticion.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        }
+
+        var r = await _http.SendAsync(peticion);
+
+        if (r.StatusCode == HttpStatusCode.Unauthorized)
+        {
+            // El token venció (o la API ya no lo reconoce): se cierra la sesión
+            // del servidor y se pide ingresar de nuevo, con el aviso.
+            _navegacion.NavigateTo("/sesion/expirada", forceLoad: true);
+        }
+
+        return r;
     }
 
     /// <summary>
@@ -51,7 +89,7 @@ public class ClienteApi
     {
         try
         {
-            var r = await _http.SendAsync(new HttpRequestMessage(HttpMethod.Get, ruta));
+            var r = await EnviarConToken(new HttpRequestMessage(HttpMethod.Get, ruta));
 
             if (r.StatusCode == HttpStatusCode.NoContent)
             {
@@ -79,7 +117,7 @@ public class ClienteApi
     {
         try
         {
-            var r = await _http.SendAsync(new HttpRequestMessage(HttpMethod.Get, ruta));
+            var r = await EnviarConToken(new HttpRequestMessage(HttpMethod.Get, ruta));
             if (!r.IsSuccessStatusCode)
             {
                 return Resultado<T>.Mal(await Mensajes(r));
@@ -105,7 +143,7 @@ public class ClienteApi
                 peticion.Content = JsonContent.Create(cuerpo);
             }
 
-            var r = await _http.SendAsync(peticion);
+            var r = await EnviarConToken(peticion);
             return r.IsSuccessStatusCode
                 ? Resultado<bool>.Bien(true)
                 : Resultado<bool>.Mal(await Mensajes(r));
@@ -122,6 +160,11 @@ public class ClienteApi
     /// </summary>
     private static async Task<List<string>> Mensajes(HttpResponseMessage r)
     {
+        if (r.StatusCode == HttpStatusCode.Forbidden)
+        {
+            return SinPermiso;
+        }
+
         try
         {
             var sobre = await r.Content.ReadFromJsonAsync<JsonElement>();

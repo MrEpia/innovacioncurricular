@@ -109,9 +109,12 @@ HTTP → Controller (valida el body contra la PETICIÓN del verbo → 422)
 - El controlador no toca SQL; el servicio no conoce HTTP ni el motor; el
   repositorio no conoce HTTP. Los contratos entre capas son `interface`
   de C#.
-- **Solo el ensamblador** (el registro de dependencias en `Program.cs`)
-  conoce clases concretas. Todo lo demás recibe interfaces por
-  constructor.
+- **Solo el ensamblador** conoce clases concretas. Todo lo demás recibe
+  interfaces por constructor. *(Enmienda 1.1.0)* El ensamblador puede
+  repartirse en archivos de `Ensamblador/` —uno por bloque de trabajo, en la
+  API y en el front— que `Program.cs` solo invoca. Sigue siendo **un**
+  ensamblador: repartido en archivos para que tres personas no editen
+  `Program.cs` en la misma ronda, no en responsabilidades.
 - El negocio comunica problemas con **excepciones**
   (`ArgumentException` → 400 · `NoEncontradoExcepcion` → 404) y el
   controlador las traduce a HTTP.
@@ -167,34 +170,27 @@ ni en archivos versionados. Van en **variables de entorno**, con el `.env`
 fuera de git y un `.env.example` adentro. En la rúbrica, un secreto
 quemado **anula el criterio de seguridad de la versión**.
 
-**Y este proyecto es la excepción, declarada.** Aquí la contraseña de SQL
-Server está escrita en **dos archivos versionados**, a propósito:
+**La excepción de la plantilla ya no aplica** *(enmienda 1.1.0)*. El ejemplo
+de referencia del curso dejaba la contraseña de SQL Server escrita en el
+`docker-compose.yml` y en el `appsettings.json` por didáctica, y el propio
+artículo advertía que *esa parte no se copia*. Este repositorio es el
+proyecto de aula del equipo —se publica en la v4— y desde la v2 cumple la
+regla completa:
 
-- el `docker-compose.yml`, que se la entrega a los contenedores;
-- el `appsettings.json`, en la cadena de desarrollo — la que permite
-  correr la API sin Docker. En Docker esa cadena la sobreescribe la
-  variable de entorno, así que el valor del archivo solo sirve fuera.
+- Todos los secretos (contraseña de `sa`, y desde la v3 la llave de firma del
+  JWT y la clave del administrador inicial) viven en `.env`, que está en el
+  `.gitignore`.
+- El repositorio trae `.env.example` con las mismas variables y valores de
+  mentira.
+- `docker-compose.yml` los lee con `${VARIABLE:?mensaje}`: si falta uno,
+  compose se niega a arrancar y dice cuál, en vez de levantar un sistema sin
+  clave.
+- `appsettings.json` no trae cadena de conexión con contraseña: la API la
+  recibe por la variable `ConnectionStrings__SqlServer`.
 
-Está así porque este repositorio es una **plantilla didáctica**: corre en
-contenedores de juguete que se borran con `docker compose down -v`, nunca
-se despliega, y su gracia es que un `git clone` y **un solo comando**
-basten sin configurar nada antes.
-
-Y conviene ver el precio de la excepción: **una contraseña repartida en dos
-archivos es una contraseña que ya nadie sabe dónde está.** Con dos son
-cuatro sitios donde cambiarla; con un `.env`, uno solo. Eso es
-exactamente lo que se gana al hacerlo bien.
-
-**¿Y cómo sabe la contraseña quien clone esto?** Para *correr* el sistema
-no la necesita: el compose se la entrega a los contenedores y basta con
-`docker compose up -d --build`. Solo hace falta para conectarse **por
-fuera** —con SSMS o SQLTools contra `localhost:11471`— y entonces se lee
-del `docker-compose.yml`, que está en el repositorio. El
-`7_quickstart.md` y el `README.md` señalan dónde.
-
-> **Esa parte NO se copia.** El proyecto de aula se publica en un servidor
-> real en la v4: ahí la regla va completa desde la v1. De este ejemplo se
-> copia el método, no las credenciales.
+El precio, que también se dice: «un solo comando» pasa a ser **uno más uno**
+—copiar el `.env.example` la primera vez—. Es el precio de que la contraseña
+esté en un solo sitio y fuera de git.
 
 ## Artículo 8 — Todo en español, y el código sustenta sus decisiones
 
@@ -224,8 +220,9 @@ un 404 o un 422 tienen su formato exacto documentado.
 | Rutas | `/` (diagnóstico) · `/swagger` (documentación interactiva) · `/api/{tabla}` |
 | Nombres | PascalCase en español; interfaces con prefijo `I`; carpetas `Controllers/ Modelos/ Peticiones/ Servicios/ Repositorios/ Excepciones/ pruebas/` (`Modelos/` = clases entidad; `Peticiones/` = el cuerpo de cada verbo) |
 | Sobre de respuesta | Lecturas: `{tabla, limite, total, datos}` · Errores: `{estado, mensaje, detalle}` (+ `errores:[…]` en el 422) |
-| Errores | Cuerpo inválido (la petición) → **422** · `ArgumentException` → **400** · `NoEncontradoExcepcion` → **404** · `SqlException` y demás → **500** · lectura sin filas → **204** |
-| Credenciales | Usuario `sa`. **La contraseña no se escribe en este documento:** en esta plantilla vive en el `docker-compose.yml` y en un proyecto real, en el `.env` (Artículo 7) |
+| Errores | Cuerpo inválido (la petición) → **422** · `ArgumentException` → **400** (incluye `ReferenciaInvalidaExcepcion`: una clave foránea que no apunta a un registro activo) · `NoEncontradoExcepcion` → **404** · `LlaveDuplicadaExcepcion` y `DependenciasActivasExcepcion` → **409** *(enmienda 1.1.0)* · `SqlException` y demás → **500** · lectura sin filas → **204** |
+| Creación | v1: **200** (versión cerrada, no se toca) · desde la v2: **201** con la llave creada *(enmienda 1.1.0)* |
+| Credenciales | Usuario `sa`. **La contraseña no se escribe en este documento ni en ningún archivo versionado:** vive en el `.env` (Artículo 7) |
 
 ## Artículo 10.1 — Una ruta y un servicio por recurso, nunca genéricos
 
@@ -242,6 +239,13 @@ Lo genérico es más corto de escribir y más caro de vivir:
 | **Apaga el compilador** | `Listar("aliadoo")` compila. `ServicioAliado.Listar()` no deja escribir el error |
 | **Vuelve el esquema un contrato** | Renombrar una columna deja de ser un cambio interno y pasa a romper a quien consume, en silencio |
 
+*(Enmienda 1.1.0)* Lo que sí se comparte en el front es el **transporte**:
+`ClienteApi` sabe enviar una petición, reconocer el 204 y traducir el sobre de
+error, y nada más. Ninguna pantalla lo usa directamente: las pantallas
+siguen hablando con `ServicioAliado`, `ServicioFacultad`…, que son los que
+saben qué recurso existe, qué ruta lleva y qué campos tiene. Es al front lo
+que `HttpClient` es a cualquier programa, no un `ApiService.Listar("aliado")`.
+
 Cuando el módulo tenga más recursos habrá **un controlador, un servicio y una
 pantalla por cada uno**. Se van a parecer mucho, y esa repetición es el precio
 —consciente— de que cada recurso pueda decir lo suyo.
@@ -257,7 +261,13 @@ o se corrige el plan, o se enmienda esto.
 
 ---
 
-*Versión 1.0.0 · Ratificada el 2026-08-29 · Última enmienda: ninguna*
+*Versión 1.1.0 · Ratificada el 2026-08-29 · Última enmienda: 2026-10-22*
+
+### Registro de enmiendas
+
+| Versión | Fecha | Artículos | Qué cambió y por qué | Dónde se propuso |
+|---|---|---|---|---|
+| 1.1.0 | 2026-10-22 | 3, 7, 10, 10.1 | El ensamblador se reparte en `Ensamblador/` por bloque (tres estudiantes en paralelo) · se elimina la excepción de secretos de la plantilla: todo va en `.env` · se agregan los códigos 409 (llave duplicada, dependencias activas) y 201 (creación) para la v2 · el front comparte el transporte (`ClienteApi`), no los recursos | [v2_entrega2/4_research.md](versiones/v2_entrega2/4_research.md), D-v2-1 a D-v2-4 |
 
 ## Artículo 12 — La identidad visual es ARTEFACTO DADO
 

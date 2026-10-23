@@ -19,7 +19,7 @@
 | Versión | Qué agrega (acumulativo) | Estado |
 |---|---|---|
 | **v1** | CRUD completo de las **tablas sin clave foránea**, con los catálogos del Excel cargados | **Entregada** ([ejemplo de referencia: `aliado`](v1_aliado/2_spec.md) · [spec completa de las 7 tablas](v1_entrega1/2_spec.md)) |
-| v2 | CRUD de las **15 tablas con clave foránea**: las FK como listas desplegables cargadas desde la API, y validación de integridad referencial | Sin especificar |
+| **v2** | CRUD de las **15 tablas con clave foránea**: las FK como listas desplegables cargadas desde la API, y validación de integridad referencial | **En curso** ([spec](v2_entrega2/2_spec.md) · [reparto en tres bloques](v2_entrega2/8_tasks.md)) |
 | v3 | **JWT**, sesiones y control de acceso por roles; CRUD de `usuario`, `rol` y `rol_usuario` solo para administradores | Sin especificar |
 | v4 | **10 consultas multitabla** (4+ tablas cada una), dashboard con gráficos, páginas corporativas, responsive/PWA y **publicación** en un servidor | Sin especificar |
 

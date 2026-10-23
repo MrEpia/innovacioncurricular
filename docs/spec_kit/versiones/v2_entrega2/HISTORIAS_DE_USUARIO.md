@@ -118,7 +118,7 @@ tiene cada programa **para** poder consultarlo por cualquiera de esos lados.
 
 | Usuario | Prioridad | Riesgo | Puntos | Bloque |
 |---|---|---|---|---|
-| Coordinación curricular | Alta | Medio | 3 | Puentes (Brunal) |
+| Coordinación curricular | Alta | Medio | 3 | `enfoque_rc`: Puentes (Brunal) · `aa_rc`: Actividades (Epia) |
 
 **Yo**, como coordinación curricular, **quiero** indicar qué enfoques declara
 cada registro calificado y qué actividades incluye, en qué componente y
@@ -134,5 +134,5 @@ semestre, **para** reconstruir el plan de estudios aprobado.
 | Bloque | Historias | Puntos |
 |---|---|---|
 | Académico (Calvo) | 11, 12, 13 | 13 |
-| Actividades (Epia) | 14, 15, 16 | 13 |
-| Puentes (Brunal) | 17, 18 | 8 + montaje de pruebas de su bloque |
+| Actividades (Epia) | 14, 15, 16, 18 (`aa_rc`) | 15 |
+| Puentes (Brunal) | 17, 18 (`enfoque_rc`) | 7 |

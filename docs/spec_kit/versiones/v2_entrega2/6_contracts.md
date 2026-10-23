@@ -375,7 +375,7 @@ POST /api/enfoque_rc
 }
 ```
 
-### `aa_rc` — bloque Puentes
+### `aa_rc` — bloque Actividades
 
 | Verbo | Ruta | Respuestas |
 |---|---|---|

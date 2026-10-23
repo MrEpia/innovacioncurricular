@@ -110,7 +110,7 @@ Cada tabla expone los endpoints de la v1 (RF1–RF6), con estas diferencias:
 | Puentes | `programa_ci` | `/api/programa_ci/{programa}/{carInnovacion}` | compuesta | → programa · → car_innovacion | sin PUT/PATCH |
 | Puentes | `an_programa` | `/api/an_programa/{aspectoNormativo}/{programa}` | compuesta | → aspecto_normativo · → programa | sin PUT/PATCH |
 | Puentes | `enfoque_rc` | `/api/enfoque_rc/{enfoque}/{registroCalificado}` | compuesta | → enfoque · → registro_calificado | sin PUT/PATCH |
-| Puentes | `aa_rc` | `/api/aa_rc/{activAcademicasIdcurso}/{registroCalificadoCodigo}` | compuesta | → activ_academica · → registro_calificado | — |
+| Actividades | `aa_rc` | `/api/aa_rc/{activAcademicasIdcurso}/{registroCalificadoCodigo}` | compuesta | → activ_academica · → registro_calificado | — |
 
 El detalle campo por campo está en [5_data_model.md](5_data_model.md) y los
 contratos exactos en [6_contracts.md](6_contracts.md).

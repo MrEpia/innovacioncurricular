@@ -32,6 +32,14 @@ python pruebas_humo/humo_puentes.py
 python pruebas_humo/humo_front.py          # (actualizado por Epia en la ronda 4)
 ```
 
+## 2.1 Front por rol y logout (criterios 9 a 11, automatizados)
+
+```powershell
+# Menú y botones según el rol, panel de administración solo para el
+# administrador, y la cookie de antes del logout ya no abre nada (30 comprobaciones)
+python pruebas_humo/humo_roles_front.py
+```
+
 ## 3. Recorrido manual (criterios 9 a 11)
 
 1. Sin sesión, abrir <http://localhost:8073/programas> → lleva a `/ingresar`.

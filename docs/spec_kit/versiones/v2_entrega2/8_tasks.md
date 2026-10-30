@@ -1,30 +1,32 @@
 # Tareas — Versión 2
 
-> Tres estudiantes, tres bloques, sin editar los mismos archivos en la misma
+> Dos estudiantes, tres bloques, sin editar los mismos archivos en la misma
 > ronda. El método es el del tutorial del curso: **ronda 0 de montaje** con
 > archivos vacíos (*stubs*) para que nadie más toque los archivos
 > compartidos, y después cada uno trabaja solo en los suyos.
 
 ## 0. El reparto
 
+> **Equipo de dos.** Sebastián Brunal salió del grupo antes de la entrega 2. El reparto quedó entre Sebastián Calvo y David Epia: David tomó también el bloque que estaba pensado para un tercer estudiante. Las ramas `feature/sebastian-brunal-…` conservan el nombre del reparto inicial, pero su trabajo lo hizo y lo subió David (los commits están a su nombre).
+
 | Estudiante | Rol | Bloque de la v2 | Tablas |
 |---|---|---|---|
 | Sebastián Calvo | Encargado del `main` | Ronda 0 + **Académico** | `facultad`, `programa`, `acreditacion`, `registro_calificado` + protección de los padres de la v1 |
 | David Epia | Desarrollador | **Actividades** | `activ_academica`, `pasantia`, `premio`, `docente_departamento`, `alianza`, `aa_rc` |
-| Sebastián Brunal | Desarrollador | **Puentes** | `programa_ac`, `programa_pe`, `programa_ci`, `an_programa`, `enfoque_rc` |
+| David Epia | Desarrollador | **Puentes** | `programa_ac`, `programa_pe`, `programa_ci`, `an_programa`, `enfoque_rc` |
 
 ¿Por qué así? El bloque Académico es la columna vertebral (`programa` es padre
 de casi todo) y va con quien integra. En la API, Actividades y Puentes no
 dependen de su código —dependen de `IRepositorioReferencias`, completo desde la
 ronda 0—, pero **sus pantallas sí**: las listas desplegables de «Programa» usan
 `ServicioPrograma`. Por eso el bloque Académico va primero (ronda 1) y los otros
-dos van **en paralelo** en la ronda 2.
+dos van en la ronda 2, en dos ramas separadas: David hace primero Actividades
+y después Puentes.
 
 `aa_rc` va con Actividades y no con Puentes porque su pantalla necesita la
 lista de actividades académicas (`ServicioActivAcademica`): si quedara en
-Puentes, la rama de Brunal no compilaría sin la de Epia, y la ronda 2 dejaría de
-ser paralela. Así, Epia y Brunal no comparten **ningún** archivo ni dependen el
-uno del otro.
+Puentes, la rama de Puentes no compilaría sin la de Actividades. Así, las dos
+ramas no comparten **ningún** archivo ni dependen la una de la otra.
 
 ## 1. El orden, con sus compuertas
 
@@ -36,7 +38,7 @@ flowchart TD
     A --> GA{"compila + prueba<br/>de capas + humo"}
     GA --> M1["merge a main"]
     M1 --> B["Ronda 2 — Epia<br/>Actividades + aa_rc"]
-    M1 --> C["Ronda 2 — Brunal<br/>Puentes"]
+    M1 --> C["Ronda 2 — Epia<br/>Puentes"]
     B --> GB{"compila + prueba<br/>de capas + humo"}
     C --> GC{"compila + prueba<br/>de capas + humo"}
     GB --> I["Integración en main<br/>Actividades → Puentes"]
@@ -94,7 +96,7 @@ bloque Académico. Entre ellas no hay orden obligatorio: no comparten archivos.
 - [ ] `PruebasActividades.cs` y `pruebas_humo/humo_actividades.py`
 - [ ] **Compuerta:** compila, prueba de capas, humo del bloque
 
-## 6. Ronda 2 — Puentes (Brunal)
+## 6. Ronda 2 — Puentes (Epia)
 
 - [ ] API de las 5 tablas puente puras (sin PUT/PATCH)
 - [ ] Front: 5 servicios + 5 pantallas (sin «Editar»)
@@ -108,5 +110,5 @@ bloque Académico. Entre ellas no hay orden obligatorio: no comparten archivos.
 - [ ] [9_checklist.md](9_checklist.md) firmado
 - [ ] `git tag v2` y `git push origin v2`
 
-> El estado de las casillas de las rondas 1 de Epia y Brunal lo marcan ellos
-> en sus ramas, cuando su compuerta pasa.
+> El estado de las casillas de las rondas de Epia lo marca él en sus ramas,
+> cuando su compuerta pasa.

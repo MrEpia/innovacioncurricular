@@ -302,7 +302,7 @@ Si una operación requiere permisos, acceso a GitHub o intervención de otra per
 | «No empieces desde cero… Conserva la arquitectura» | Que la IA reescribiera la v1 en otro estilo. Se reutilizaron las capas, el ensamblador y el front de la v1 |
 | «Auditoría obligatoria» antes de modificar | Encontró ramas `feature/v2-*` que no compilaban y firmadas por una cuenta ajena. No se integraron |
 | «No modifiques la constitución… solo para que el código parezca cumplirlos» | Cada cambio de regla pasó por el Artículo 11: enmiendas 1.1.0 y 1.2.0, con su decisión en el `4_research.md` |
-| «No suplantes a los otros dos estudiantes» | La IA solo hizo commits con la identidad del encargado. El trabajo de David y de Brunal se les entregó como parches y comandos, para que lo subieran con su propia identidad |
+| «No suplantes a los otros dos estudiantes» | La IA solo hizo commits con la identidad del encargado. El trabajo de David se le entregó como parches y comandos, para que lo subiera con su propia identidad. *(El prompt habla de tres estudiantes porque se escribió con el reparto inicial; Sebastián Brunal salió del grupo antes de la entrega 2 y sus bloques los hizo David.)* |
 | «Entrégame esa información en tu respuesta final, no… dentro del proyecto» | Las instrucciones de cada compañero quedaron fuera del repositorio |
 | «No afirmes que una prueba fue exitosa si no la ejecutaste» | Cada fase se cerró con la salida real de la prueba de capas y de las pruebas de humo |
 | «No introduzcas secretos» | Todos los valores van en `.env`; `.env.example` solo tiene valores de mentira (Artículo 7) |
@@ -321,7 +321,7 @@ Si una operación requiere permisos, acceso a GitHub o intervención de otra per
 4. **Evidencia en cada fase**: la prueba de capas sin base de datos (165
    comprobaciones) y las pruebas de humo contra el sistema levantado.
 5. **Orden de integración probado** antes de fusionar: montaje → académico
-   → (David R2 ∥ Brunal R2) → David R4 → Brunal R5.
+   → David R2 (Actividades) → David R2 (Puentes) → David R4 (sesión) → David R5 (panel).
 
 ## 4. Lo que la IA rompió y a dónde fue cada corrección
 

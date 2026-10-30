@@ -19,7 +19,7 @@ agrega paquetes: la autenticación por cookie viene en ASP.NET Core.
 | Base | `db/migraciones/v3_001_seguridad.sql` | Tres roles, `activo` NOT NULL en rol/usuario, `activo` en rol_usuario |
 | Docker | `docker-compose.yml`, `.env.example` | `JWT_SECRETO`, `JWT_MINUTOS`, `ADMIN_*` |
 | Front (Epia) | `Components/Cuenta/`, `Servicios/ProveedorToken.cs`, `Ensamblador/EnsambladorSesion.cs`, `ClienteApi`, menú, 22 pantallas | Sesión y permisos en pantalla |
-| Front (Brunal) | `Components/Pages/Admin/`, servicios de administración | Panel del administrador |
+| Front (Epia) | `Components/Pages/Admin/`, servicios de administración | Panel del administrador |
 
 ## 3. La tubería de una petición
 

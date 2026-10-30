@@ -5,7 +5,12 @@ Curricular** del Sistema de Gestión de Información del Conocimiento
 Universitario, para la *Universidad Monte Verde* (institución ficticia del
 curso).
 
-**Equipo:** Sebastián Calvo (encargado del `main`) · David Epia · Sebastián Brunal
+**Equipo:** Sebastián Calvo (encargado del `main`) · David Epia
+
+> Sebastián Brunal salió del grupo antes de la entrega 2: desde entonces el
+> trabajo se reparte entre los dos. Las ramas `feature/sebastian-brunal-…` de
+> GitHub conservan el nombre del reparto inicial, pero su trabajo lo hizo y lo
+> subió David.
 
 | Entrega | Qué agrega | Spec kit |
 |---|---|---|

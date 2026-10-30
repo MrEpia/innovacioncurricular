@@ -188,7 +188,7 @@ Qué actividades académicas incluye cada registro calificado, con su componente
 | `componente` | `VARCHAR(45)` | sí |  |  | `componente` |
 | `semestre` | `VARCHAR(45)` | sí |  |  | `semestre` |
 
-### Bloque Puentes — responsable: Sebastián Brunal
+### Bloque Puentes — responsable: David Epia
 
 #### `programa_ac`
 

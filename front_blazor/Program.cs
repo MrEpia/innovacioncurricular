@@ -19,9 +19,9 @@ var urlApi = builder.Configuration["UrlApi"] ?? "http://localhost:8072";
 builder.Services.AgregarServiciosV1(urlApi);
 builder.Services.AgregarServiciosAcademico();     // v2 — Sebastián Calvo
 builder.Services.AgregarServiciosActividades();   // v2 — David Epia
-builder.Services.AgregarServiciosPuentes();       // v2 — Sebastián Brunal
+builder.Services.AgregarServiciosPuentes();       // v2 — David Epia
 builder.Services.AgregarSesion(urlApi);           // v3 — David Epia: ingreso y sesión
-builder.Services.AgregarAdministracion();         // v3 — Sebastián Brunal: usuarios y roles
+builder.Services.AgregarAdministracion();         // v3 — David Epia: usuarios y roles
 builder.Services.AgregarMaestroDetalle();          // v3 — maestro-detalle
 
 var app = builder.Build();

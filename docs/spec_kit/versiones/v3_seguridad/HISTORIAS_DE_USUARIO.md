@@ -35,7 +35,7 @@ nadie borre por error lo que otros registraron.
 
 | Usuario | Prioridad | Riesgo | Puntos | Responsable |
 |---|---|---|---|---|
-| Administrador | Alta | Medio | 8 | API: Calvo · Front: Brunal |
+| Administrador | Alta | Medio | 8 | API: Calvo · Front: Epia |
 
 **Yo**, como administrador, **quiero** crear usuarios, asignarles y quitarles
 roles y retirarlos **para** controlar quién tiene acceso y a qué.

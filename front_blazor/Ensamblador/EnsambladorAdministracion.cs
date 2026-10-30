@@ -3,7 +3,7 @@ using FrontInnovacion.Servicios;
 namespace FrontInnovacion.Ensamblador;
 
 /// <summary>
-/// Los servicios del panel de administración (v3) — Sebastián Brunal: usuario,
+/// Los servicios del panel de administración (v3) — David Epia: usuario,
 /// rol y rol_usuario. Usan el ClienteApi de EnsambladorV1, que ya les pone el
 /// token de la sesión.
 /// </summary>

@@ -92,6 +92,7 @@ python pruebas_humo/humo_actividades.py
 python pruebas_humo/humo_puentes.py
 python pruebas_humo/humo_maestro_detalle.py
 python pruebas_humo/humo_front.py
+python pruebas_humo/humo_roles_front.py
 ```
 
 ## 4. Estructura

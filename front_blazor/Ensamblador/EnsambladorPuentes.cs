@@ -4,7 +4,7 @@ namespace FrontInnovacion.Ensamblador;
 
 /// <summary>
 /// Los servicios del front del bloque «Puentes» de la v2: programa_ac, programa_pe, programa_ci, an_programa, enfoque_rc.
-/// Responsable: Sebastián Brunal. Solo su responsable edita este archivo.
+/// Responsable: David Epia. Solo su responsable edita este archivo.
 ///
 /// Todos usan por dentro el ClienteApi que registra EnsambladorV1: aquí solo
 /// se declara que cada recurso tiene su servicio (Artículo 10.1).

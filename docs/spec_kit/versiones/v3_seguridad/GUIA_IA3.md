@@ -40,7 +40,7 @@ en cada caso, están en [4_research.md](4_research.md) (D-v3-1 a D-v3-9).
 | # | Prompt (tal cual) | Qué produjo | Evidencia |
 |---|---|---|---|
 | 1 | «verifica rapidamente si se cumple con los métodos solid» | Revisión de los cinco principios SOLID sobre las capas: una clase por responsabilidad, interfaces por tabla e inyección de dependencias | Revisión en el chat; no cambió código |
-| 2 | «puedes dejar todo esto listo y que ellos solo tengan que hacer commits?» | Los bloques de David y Brunal como parches con un script por ronda, **fuera del repositorio**, para que cada uno los subiera con su propia identidad | Ramas de los compañeros en GitHub |
+| 2 | «puedes dejar todo esto listo y que ellos solo tengan que hacer commits?» | Los bloques de David (incluidos Puentes y el panel de administración) como parches con un script por ronda, **fuera del repositorio**, para que los subiera con su propia identidad | Ramas de los compañeros en GitHub |
 | 3 | «ya los otros compañeros subieron sus partes, no hay un archiivo que tenga todo para verificar que todo este funcionando bien?» | `verificar_todo.py`: levanta el sistema y corre la prueba de capas y las cinco pruebas de humo | Commit `7cc225d` |
 | 4 | «agrega los tags y abre donde está todo el proyecto» | Tags `v1`, `v2` y `v3` en GitHub | `git tag` |
 | 5 | «explicame donde esta la documentacion del contrato y las capas con las que estamos trabajando, recuerda que cada metodo debe tener tambien un diagrama de secuencia que dice lo que hace» | [DIAGRAMAS_DE_SECUENCIA.md](../../DIAGRAMAS_DE_SECUENCIA.md): 17 diagramas Mermaid, uno por método, recorriendo Controller → Servicio → Repositorio → BD | Commits `effbd91` y `50ca186` |

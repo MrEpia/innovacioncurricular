@@ -7,7 +7,7 @@ namespace ApiInnovacion.Pruebas;
 
 /// <summary>
 /// Prueba de capas del bloque «Puentes» de la v2: programa_ac, programa_pe, programa_ci, an_programa, enfoque_rc.
-/// Responsable: Sebastián Brunal. Solo su responsable edita este archivo.
+/// Responsable: David Epia. Solo su responsable edita este archivo.
 ///
 /// Cada servicio corre contra su repositorio de mentiras y contra
 /// RepositorioReferenciasFalso, donde cada prueba decide qué padres «existen»

@@ -1,7 +1,7 @@
 """Prueba de humo del bloque PUENTES de la v2 — programa_ac, programa_pe,
 programa_ci, an_programa y enfoque_rc — contra la API real.
 
-Responsable: Sebastián Brunal.
+Responsable: David Epia.
 
 Necesita que el bloque Académico ya esté integrado. Crea por la API un
 programa y un registro calificado, y por los endpoints de la v1 una práctica,

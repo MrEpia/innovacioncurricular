@@ -37,4 +37,3 @@
 |---|---|---|
 | Sebastián Calvo (encargado del `main`) | | |
 | David Epia | | |
-| Sebastián Brunal | | |

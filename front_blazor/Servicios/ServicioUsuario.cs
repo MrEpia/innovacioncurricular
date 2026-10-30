@@ -1,6 +1,6 @@
 namespace FrontInnovacion.Servicios;
 
-// Panel de administración (v3) — Sebastián Brunal. Habla con la API por
+// Panel de administración (v3) — David Epia. Habla con la API por
 // ClienteApi, que ya le pone el token; si quien lo usa no es administrador,
 // la API responde 403 aunque alguien llegue a la pantalla saltándose el menú.
 

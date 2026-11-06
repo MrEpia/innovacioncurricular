@@ -18,3 +18,7 @@ Thumbs.db
 
 # Python (pruebas de humo)
 __pycache__/
+
+# Publicación (entrega 4): los secretos del hosting y lo que se compila para subir
+publicacion/.env.produccion
+publicacion/salida/

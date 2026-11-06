@@ -38,6 +38,11 @@
 | 19 | Maestro-detalle: `ObtenerCompleto` (registro y programa) | `…CompletoController.ObtenerCompleto` | v3 · MD |
 | 20 | Maestro-detalle: `ServicioProgramaCompleto.Crear` | `ProgramaCompletoController.Crear` | v3 · MD |
 | 21 | Maestro-detalle en el front: «Guardar todo» | `RegistrosCalificadosCompleto.razor` / `ProgramasCompleto.razor` | v3 · MD |
+| 22 | Los 10 reportes: `ReportesController.<Reporte>` | `ReportesController` | v4 |
+| 23 | Módulo de reportes en el front: elegir, ver, CSV | `Reportes.razor` | v4 |
+| 24 | Dashboard: `Resumen` y las series (con la regla «Otras») | `DashboardController` | v4 |
+| 25 | Página corporativa pública y paso a la aplicación | `Inicio.razor` | v4 |
+| 26 | PWA: el service worker ante cada petición | `service-worker.js` | v4 |
 
 ---
 
@@ -609,6 +614,143 @@ sequenceDiagram
     else 400 / 409 / 422
         CA-->>P: Resultado.Mal(errores)
         P-->>U: aviso en rojo, el formulario queda lleno para corregir (no se guardó nada)
+    end
+```
+
+---
+
+## 22. Los 10 reportes: `ReportesController.<Reporte>`
+
+```mermaid
+sequenceDiagram
+    participant CA as ClienteApi
+    participant C as ReportesController
+    participant S as ServicioReportes
+    participant R as RepositorioReportesSqlServer
+    participant B as SQL Server
+    CA->>C: GET /api/reportes/programas-acreditados (Bearer)
+    Note over C: filtro global: token válido y GET permitido a los tres roles
+    C->>S: ProgramasAcreditados()
+    S->>R: ProgramasAcreditados()
+    R->>B: acreditacion ⋈ programa ⋈ facultad ⋈ universidad (activo = 1 en las cuatro)
+    B-->>R: filas
+    R-->>S: IEnumerable<ProgramaAcreditado>
+    S-->>C: List<ProgramaAcreditado>
+    alt lista vacía
+        C-->>CA: 204
+    else
+        C->>S: Describir("programas-acreditados")
+        S-->>C: título y tablas (del catálogo)
+        C-->>CA: 200 {reporte, titulo, tablas, total, datos}
+    end
+```
+
+Los diez reportes tienen exactamente este recorrido. Solo cambian la ruta, la clase de fila y la consulta (ver la tabla de [v4_publicacion/2_spec.md](versiones/v4_publicacion/2_spec.md)).
+
+## 23. Módulo de reportes en el front
+
+```mermaid
+sequenceDiagram
+    actor U as Usuario
+    participant P as Reportes.razor
+    participant SF as ServicioReportes (front)
+    participant CA as ClienteApi
+    U->>P: abre /reportes
+    P->>SF: Catalogo()
+    SF->>CA: GET /api/reportes
+    CA-->>P: 10 fichas
+    U->>P: elige «Plan de estudios por registro»
+    P->>SF: MetodoDe("plan-de-estudios")
+    SF-->>P: PlanDeEstudios (método escrito, no una ruta armada)
+    P->>SF: PlanDeEstudios()
+    SF->>CA: Listar(GET /api/reportes/plan-de-estudios)
+    CA-->>SF: filas JSON
+    SF->>SF: encabezados en español, fechas yyyy-MM-dd, nulos «—»
+    SF-->>P: TablaReporte
+    P-->>U: tabla + «Descargar CSV» + «Imprimir»
+    U->>P: «Descargar CSV»
+    P-->>U: archivo .csv (separador punto y coma, con BOM para Excel)
+```
+
+## 24. Dashboard: `Resumen` y las series
+
+```mermaid
+sequenceDiagram
+    participant P as Dashboard.razor
+    participant SF as ServicioDashboard (front)
+    participant C as DashboardController
+    participant S as ServicioDashboard
+    participant R as RepositorioDashboardSqlServer
+    participant B as SQL Server
+    P->>SF: Resumen()
+    SF->>C: GET /api/dashboard/resumen
+    C->>S: Resumen()
+    S->>R: Resumen()
+    R->>B: un SELECT con un COUNT/SUM por cifra (activo = 1)
+    C-->>P: 200 {facultades, programas, …, graduados}
+    P->>SF: GraduadosPorFacultad()
+    SF->>C: GET /api/dashboard/graduados-por-facultad?maximo=6
+    C->>S: GraduadosPorFacultad(6)
+    alt maximo < 1
+        S-->>C: ArgumentException → 400
+    else
+        S->>R: GraduadosPorFacultad()
+        R->>B: SUM(cant_graduados) GROUP BY facultad
+        S->>S: ordena de mayor a menor · las 6 primeras · el resto suma «Otras»
+        C-->>P: 200 {grafico, total, datos:[{etiqueta, valor}]}
+    end
+    P-->>P: GraficoBarras: barras proporcionales al máximo, valor al final, tabla «Ver los datos»
+```
+
+Las otras cinco series hacen lo mismo sin la regla «Otras».
+
+## 25. Página corporativa pública y paso a la aplicación
+
+```mermaid
+sequenceDiagram
+    actor V as Visitante
+    participant R as Routes (AuthorizeRouteView)
+    participant I as Inicio.razor [AllowAnonymous]
+    participant G as Ingresar.razor
+    participant A as /aplicacion [Authorize]
+    V->>R: GET /
+    R->>I: es pública: no pide sesión ni llama a la API
+    I-->>V: portada con la marca + «Ingresar al sistema»
+    V->>G: «Ingresar al sistema»
+    G->>G: POST /api/login, sesión en el servidor (diagrama 15)
+    G-->>V: redirige a /aplicacion (o al ReturnUrl local)
+    V->>R: GET /dashboard sin sesión
+    R-->>V: 302 → /ingresar?ReturnUrl=/dashboard
+```
+
+## 26. PWA: el service worker ante cada petición
+
+```mermaid
+sequenceDiagram
+    participant N as Navegador
+    participant SW as service-worker.js
+    participant Cache as Caché (umv-v4-1)
+    participant F as Front
+    N->>SW: install
+    SW->>Cache: guarda offline.html, app.css, marca.css, logos e íconos
+    N->>SW: fetch(pedido)
+    alt /_blazor, /_framework, /ingresar, /sesion, POST u otro dominio
+        SW-->>N: no interviene (va directo a la red)
+    else navegación a una página
+        SW->>F: fetch
+        alt hay red
+            F-->>N: la página
+        else sin red
+            SW->>Cache: offline.html
+            Cache-->>N: «Sin conexión»
+        end
+    else estático de la marca (.css, .png…)
+        SW->>Cache: ¿lo tengo?
+        alt sí
+            Cache-->>N: desde la caché
+        else
+            SW->>F: fetch
+        end
     end
 ```
 

@@ -235,12 +235,13 @@ un 404 o un 422 tienen su formato exacto documentado.
 |---|---|
 | Puertos del proyecto | API **8072** · **front 8073** · SQL Server **11471** |
 | Base de datos | `innovacion_local` |
-| Rutas | `/` (diagnóstico) · `/swagger` (documentación interactiva) · `/api/{tabla}` · *(enmienda 1.4.0)* maestro-detalle: `POST /api/{tabla}/completo` y `GET /api/{tabla}/{llave}/completo`, escritas con el nombre real de la tabla |
+| Rutas | `/` (diagnóstico) · `/swagger` (documentación interactiva) · `/api/{tabla}` · *(enmienda 1.4.0)* maestro-detalle: `POST /api/{tabla}/completo` y `GET /api/{tabla}/{llave}/completo`, escritas con el nombre real de la tabla · *(enmienda 1.5.0)* reportes: `GET /api/reportes/<nombre-del-reporte>` y dashboard: `GET /api/dashboard/<nombre-del-grafico>`, una ruta escrita por reporte y por gráfico (nunca `/api/reportes/{n}`) |
 | Nombres | PascalCase en español; interfaces con prefijo `I`; carpetas `Controllers/ Modelos/ Peticiones/ Servicios/ Repositorios/ Excepciones/ pruebas/` (`Modelos/` = clases entidad; `Peticiones/` = el cuerpo de cada verbo) |
 | Sobre de respuesta | Lecturas: `{tabla, limite, total, datos}` · Errores: `{estado, mensaje, detalle}` (+ `errores:[…]` en el 422) |
 | Errores | Cuerpo inválido (la petición) → **422** · `ArgumentException` → **400** (incluye `ReferenciaInvalidaExcepcion`: una clave foránea que no apunta a un registro activo) · `NoEncontradoExcepcion` → **404** · `LlaveDuplicadaExcepcion` y `DependenciasActivasExcepcion` → **409** *(enmienda 1.1.0)* · `SqlException` y demás → **500** · lectura sin filas → **204** |
 | Creación | v1: **200** (versión cerrada, no se toca) · desde la v2: **201** con la llave creada *(enmienda 1.1.0)* |
 | Seguridad | *(Enmienda 1.2.0)* Sin token, token inválido o vencido → **401** · rol insuficiente → **403**, ambos con el sobre `{estado, mensaje, detalle}`. Permisos por verbo: GET los tres roles · POST/PUT/PATCH administrador y editor · DELETE administrador. `usuario`, `rol` y `rol_usuario`, solo administrador |
+| Páginas públicas | *(Enmienda 1.5.0)* Solo las corporativas (`/`, `/servicios`, `/nosotros`, `/soporte`, `/contacto`) e `/ingresar` se ven sin sesión, y son estáticas: no llaman a la API. Toda pantalla con datos sigue exigiendo sesión |
 | Credenciales | Usuario `sa`. **La contraseña no se escribe en este documento ni en ningún archivo versionado:** vive en el `.env` (Artículo 7) |
 
 ## Artículo 10.1 — Una ruta y un servicio por recurso, nunca genéricos
@@ -280,12 +281,13 @@ o se corrige el plan, o se enmienda esto.
 
 ---
 
-*Versión 1.4.0 · Ratificada el 2026-08-29 · Última enmienda: 2026-10-23*
+*Versión 1.5.0 · Ratificada el 2026-08-29 · Última enmienda: 2026-11-05*
 
 ### Registro de enmiendas
 
 | Versión | Fecha | Artículos | Qué cambió y por qué | Dónde se propuso |
 |---|---|---|---|---|
+| 1.5.0 | 2026-11-05 | 10 | Rutas de los 10 reportes y del dashboard, una por reporte y por gráfico · páginas corporativas públicas y estáticas | [v4_publicacion/4_research.md](versiones/v4_publicacion/4_research.md), D-v4-1 y D-v4-4 |
 | 1.4.0 | 2026-10-23 | 2, 10 | El maestro-detalle (registro calificado y programa con sus hijos) se guarda en un procedimiento, todo o nada, con el detalle como parámetro JSON · rutas `/api/{tabla}/completo` y `/api/{tabla}/{llave}/completo` | [v3_maestro_detalle/4_research.md](versiones/v3_maestro_detalle/4_research.md), D-MD-1 |
 | 1.3.0 | 2026-10-23 | 2 | Se permiten procedimientos almacenados para las operaciones atómicas de comprobar y escribir (27, en la migración `v3_002`) | [v3_seguridad/4_research.md](versiones/v3_seguridad/4_research.md), D-v3-10 |
 | 1.2.0 | 2026-10-22 | 2, 10 | Se permite el paquete JwtBearer y se agregan 401/403 y la tabla de permisos por verbo | [v3_seguridad/4_research.md](versiones/v3_seguridad/4_research.md), D-v3-1 y D-v3-4 |

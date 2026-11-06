@@ -37,7 +37,7 @@ def activo_en_base(tabla, columna, llave):
 print("=== Humo v2 · bloque Académico ===")
 
 _, diag = api("GET", "/")
-revisar(diag and diag.get("version") in ("v2", "v3"), "GET / responde la v2 (o posterior)", diag)
+revisar(diag and diag.get("version") in ("v2", "v3", "v4"), "GET / responde la v2 (o posterior)", diag)
 esperar(200, "GET", "/api/universidad/1", descripcion="la universidad 1 del Excel existe")
 
 F, F2, P, A, R = (llave_aleatoria(6), llave_aleatoria(6), llave_aleatoria(5),

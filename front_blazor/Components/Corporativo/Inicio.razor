@@ -1,0 +1,51 @@
+@page "/"
+@attribute [AllowAnonymous]
+
+@*
+    PÁGINA CORPORATIVA — INICIO (v4)
+
+    Pública: la ve cualquiera, con o sin sesión. Desde aquí se llega al
+    ingreso (entrega 3: «login visible desde la página principal»). Estática
+    (sin @rendermode): carga rápido y no necesita la conexión de Blazor.
+*@
+
+<PageTitle>Innovación curricular — Universidad Monte Verde</PageTitle>
+
+<section class="portada">
+    <div class="portada-texto">
+        <p class="portada-antetitulo">Universidad Monte Verde · Vicerrectoría Académica</p>
+        <h1>Sistema de innovación curricular</h1>
+        <p class="portada-lema">
+            Toda la oferta académica de la Universidad en un solo lugar: facultades, programas,
+            registros calificados, acreditaciones y lo que renueva su currículo.
+        </p>
+        <div class="pareja">
+            <AuthorizeView>
+                <NotAuthorized>
+                    <a class="boton primario" href="ingresar">Ingresar al sistema</a>
+                </NotAuthorized>
+                <Authorized>
+                    <a class="boton primario" href="aplicacion">Ir a la aplicación</a>
+                </Authorized>
+            </AuthorizeView>
+            <a class="boton" href="servicios">Conocer los servicios</a>
+        </div>
+    </div>
+    <img class="portada-logo" src="marca/logo-vertical.png" alt="Universidad Monte Verde" />
+</section>
+
+<h2 class="seccion-titulo">Qué puede hacer con el sistema</h2>
+<div class="tarjetas">
+    <a class="tarjeta" href="servicios#gestion"><strong>Gestionar la oferta académica</strong><span class="nota">Facultades, programas y sus registros calificados, al día y en un solo sitio.</span></a>
+    <a class="tarjeta" href="servicios#calidad"><strong>Seguir la calidad</strong><span class="nota">Acreditaciones, vigencias y la normatividad que rige cada programa.</span></a>
+    <a class="tarjeta" href="servicios#innovacion"><strong>Medir la innovación</strong><span class="nota">Enfoques, prácticas pedagógicas, cursos espejo y características de innovación.</span></a>
+    <a class="tarjeta" href="servicios#reportes"><strong>Decidir con datos</strong><span class="nota">Diez reportes que cruzan la información y un dashboard con las cifras clave.</span></a>
+</div>
+
+<section class="franja">
+    <div>
+        <h2>¿Primera vez?</h2>
+        <p>Pida su usuario a la coordinación académica de su facultad. Si ya lo tiene y no puede ingresar, el equipo de soporte le ayuda.</p>
+    </div>
+    <a class="boton" href="soporte">Ir a soporte</a>
+</section>

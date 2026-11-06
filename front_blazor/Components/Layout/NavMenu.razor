@@ -13,15 +13,44 @@
     Con sesión, los catálogos para todos y «Administración» SOLO para el rol
     administrador. Esconder un enlace no protege nada —eso lo hace la API—: es
     para no ofrecerle a nadie una puerta que no puede usar.
+
+    v4: las páginas corporativas (Inicio, Servicios, Nosotros, Soporte,
+    Contacto) son públicas. Sin sesión van sueltas junto a «Ingresar»; con
+    sesión se agrupan en «La Universidad» para dejar sitio a la aplicación.
+    En el celular todo el menú se pliega tras el botón «Menú»: es una casilla
+    de HTML con CSS (sin JavaScript), así que funciona antes de que Blazor cargue.
 *@
 <nav class="menu">
-    <div class="contenedor menu-interno">
+    <div class="contenedor">
+    <input type="checkbox" id="menu-abierto" class="menu-interruptor" />
+    <label for="menu-abierto" class="menu-boton">☰ Menú</label>
+    <div class="menu-interno">
     <AuthorizeView>
     <NotAuthorized>
-        <NavLink class="enlace" href="ingresar">Ingresar</NavLink>
+        <NavLink class="enlace" href="" Match="NavLinkMatch.All">Inicio</NavLink>
+        <NavLink class="enlace" href="servicios">Servicios</NavLink>
+        <NavLink class="enlace" href="nosotros">Sobre nosotros</NavLink>
+        <NavLink class="enlace" href="soporte">Soporte</NavLink>
+        <NavLink class="enlace" href="contacto">Contacto</NavLink>
+        <span class="sesion">
+            <a class="boton primario" href="ingresar">Ingresar</a>
+        </span>
     </NotAuthorized>
     <Authorized>
-        <NavLink class="enlace" href="" Match="NavLinkMatch.All">Inicio</NavLink>
+        <details class="grupo-menu">
+            <summary class="enlace">La Universidad</summary>
+            <div class="submenu">
+                <NavLink class="enlace" href="" Match="NavLinkMatch.All">Inicio</NavLink>
+                <NavLink class="enlace" href="servicios">Servicios</NavLink>
+                <NavLink class="enlace" href="nosotros">Sobre nosotros</NavLink>
+                <NavLink class="enlace" href="soporte">Soporte</NavLink>
+                <NavLink class="enlace" href="contacto">Contacto</NavLink>
+            </div>
+        </details>
+
+        <NavLink class="enlace" href="aplicacion">Aplicación</NavLink>
+        <NavLink class="enlace" href="dashboard">Dashboard</NavLink>
+        <NavLink class="enlace" href="reportes">Reportes</NavLink>
 
         <details class="grupo-menu">
             <summary class="enlace">Catálogos</summary>
@@ -98,5 +127,6 @@
         </span>
     </Authorized>
     </AuthorizeView>
+    </div>
     </div>
 </nav>

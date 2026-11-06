@@ -18,6 +18,15 @@ curso).
 | 2 — v2 | CRUD de las 15 tablas con clave foránea, listas desplegables desde la API, integridad referencial | [v2_entrega2](docs/spec_kit/versiones/v2_entrega2/2_spec.md) |
 | 3 — v3 | JWT, sesión del servidor, permisos por rol, administración de usuarios y roles | [v3_seguridad](docs/spec_kit/versiones/v3_seguridad/2_spec.md) |
 | 3 — maestro-detalle | Registro calificado y programa guardados con todo su detalle (todo o nada) | [v3_maestro_detalle](docs/spec_kit/versiones/v3_maestro_detalle/2_spec.md) |
+| 4 — v4 | 10 consultas multitabla, dashboard, sitio corporativo con la imagen del manual, responsive, PWA y publicación | [v4_publicacion](docs/spec_kit/versiones/v4_publicacion/2_spec.md) |
+
+## Sitio publicado
+
+| | URL |
+|---|---|
+| Sitio (front) | *pendiente: se publica siguiendo [v4_publicacion/7_quickstart.md](docs/spec_kit/versiones/v4_publicacion/7_quickstart.md) §2* |
+| API y documentación | *pendiente* (`…/swagger`) |
+| Repositorio | <https://github.com/MrEpia/innovacioncurricular> |
 
 Las reglas que rigen todo están en la [constitución](docs/spec_kit/1_constitution.md)
 y la ruta completa en el [mapa de versiones](docs/spec_kit/versiones/0_mapa_versiones.md).
@@ -37,7 +46,8 @@ docker compose up -d --build
 
 | Qué | Dónde |
 |---|---|
-| **La aplicación** | <http://localhost:8073> — ingrese con `ADMIN_USUARIO` / `ADMIN_CLAVE` de su `.env` |
+| **El sitio** | <http://localhost:8073> — páginas públicas; «Ingresar» con `ADMIN_USUARIO` / `ADMIN_CLAVE` de su `.env` |
+| Reportes · Dashboard | <http://localhost:8073/reportes> · <http://localhost:8073/dashboard> (con sesión) |
 | API · diagnóstico | <http://localhost:8072/> |
 | Swagger | <http://localhost:8072/swagger> — `POST /api/login`, copie el `token`, botón **Authorize** |
 | SQL Server (opcional) | `localhost,11471` · usuario `sa` · clave: `MSSQL_SA_PASSWORD` de su `.env` |
@@ -98,6 +108,7 @@ python pruebas_humo/humo_puentes.py
 python pruebas_humo/humo_maestro_detalle.py
 python pruebas_humo/humo_front.py
 python pruebas_humo/humo_roles_front.py
+python pruebas_humo/humo_reportes.py
 ```
 
 ## 4. Estructura
@@ -112,6 +123,7 @@ front_blazor/            Blazor Server: solo habla con la API por HTTP
 db/                      script de la base + migraciones idempotentes
 docs/spec_kit/           constitución y spec kit de cada versión
 pruebas_humo/            pruebas contra el sistema levantado
+publicacion/             publicar.py: base, API y front para el hosting (MonsterASP)
 ```
 
 ## 5. Cómo trabaja el equipo

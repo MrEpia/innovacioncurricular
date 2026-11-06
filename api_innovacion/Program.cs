@@ -19,6 +19,7 @@ builder.Services.AgregarBloqueActividades();    // v2 — David Epia
 builder.Services.AgregarBloquePuentes();        // v2 — David Epia
 builder.Services.AgregarSeguridad(builder.Configuration);   // v3 — JWT, roles, usuarios
 builder.Services.AgregarMaestroDetalle();         // v3 — maestro-detalle (registro calificado y programa)
+builder.Services.AgregarReportes();              // v4 — 10 consultas multitabla y dashboard
 
 builder.Services.AddControllers();
 
@@ -77,7 +78,24 @@ builder.Services.Configure<ApiBehaviorOptions>(opciones =>
 });
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+// v4: la API queda DOCUMENTADA en Swagger con los comentarios /// de cada
+// controlador y cada modelo (el XML lo genera el compilador: ver el .csproj).
+builder.Services.AddSwaggerGen(swagger =>
+{
+    swagger.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    {
+        Title = "API Innovación Curricular — Universidad Monte Verde",
+        Version = "v4",
+        Description = "CRUD de las 25 tablas del módulo, login con JWT, maestro-detalle, " +
+                      "10 consultas multitabla (/api/reportes) y datos del dashboard (/api/dashboard). " +
+                      "Para probar: POST /api/login, copie el token y use el botón Authorize."
+    });
+    var xml = Path.Combine(AppContext.BaseDirectory, "ApiInnovacion.xml");
+    if (File.Exists(xml))
+    {
+        swagger.IncludeXmlComments(xml);
+    }
+});
 
 var app = builder.Build();
 
@@ -88,8 +106,8 @@ app.UseSwaggerUI();
 // Si esto no responde, el problema no es de contrato: la API no está arriba.
 app.MapGet("/", () => Results.Ok(new
 {
-    mensaje = "API Innovación Curricular — v3: las 22 tablas con JWT y roles",
-    version = "v3",
+    mensaje = "API Innovación Curricular — v4: CRUD, JWT y roles, reportes multitabla y dashboard",
+    version = "v4",
     contratos = "/swagger"
 }));
 

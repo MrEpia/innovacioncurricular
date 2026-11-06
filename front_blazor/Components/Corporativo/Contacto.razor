@@ -1,0 +1,60 @@
+@page "/contacto"
+@attribute [AllowAnonymous]
+
+@*
+    PÁGINA CORPORATIVA — CONTACTO (v4). Pública y estática.
+
+    El formulario abre el programa de correo de quien lo usa (mailto): el
+    sistema no guarda mensajes ni datos personales de visitantes. La Universidad
+    Monte Verde es inventada, y por eso los correos usan el dominio reservado
+    .test, que no existe.
+*@
+
+<PageTitle>Contacto — Innovación curricular</PageTitle>
+
+<div class="encabezado">
+    <div>
+        <h1>Contacto</h1>
+        <p class="nota">Escríbanos o visítenos en cualquiera de nuestras sedes.</p>
+    </div>
+</div>
+
+<div class="contacto">
+    <section class="tarjeta-formulario">
+        <h2>Escríbanos</h2>
+        <form action="mailto:innovacion@montverde.test" method="post" enctype="text/plain">
+            <label>Nombre <input type="text" name="nombre" maxlength="80" required /></label>
+            <label>Correo <input type="email" name="correo" maxlength="120" required /></label>
+            <label>
+                Asunto
+                <select name="asunto">
+                    <option>Solicitud de usuario</option>
+                    <option>Problema con el sistema</option>
+                    <option>Sugerencia</option>
+                    <option>Otro</option>
+                </select>
+            </label>
+            <label>Mensaje <textarea name="mensaje" rows="5" maxlength="1000" required></textarea></label>
+            <button class="boton primario" type="submit">Enviar</button>
+            <span class="ayuda">Se abrirá su programa de correo con el mensaje listo para enviar.</span>
+        </form>
+    </section>
+
+    <section>
+        <h2>Canales</h2>
+        <ul class="canales">
+            <li><strong>Correo:</strong> <a href="mailto:innovacion@montverde.test">innovacion@montverde.test</a></li>
+            <li><strong>Mesa de ayuda:</strong> <a href="mailto:soporte@montverde.test">soporte@montverde.test</a></li>
+            <li><strong>Teléfono:</strong> (601) 555 0100, ext. 2040</li>
+            <li><strong>Horario:</strong> lunes a viernes, 7:00 a. m. – 6:00 p. m.</li>
+        </ul>
+
+        <h2>Sedes</h2>
+        <div class="tarjetas sedes">
+            <div class="tarjeta"><strong>Bogotá</strong><span class="nota">Sede principal · Vicerrectoría Académica</span></div>
+            <div class="tarjeta"><strong>Medellín</strong><span class="nota">Seccional · Extensiones en Armenia e Ibagué</span></div>
+            <div class="tarjeta"><strong>Cali</strong><span class="nota">Seccional</span></div>
+            <div class="tarjeta"><strong>Cartagena</strong><span class="nota">Seccional</span></div>
+        </div>
+    </section>
+</div>

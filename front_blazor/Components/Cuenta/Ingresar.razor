@@ -106,7 +106,7 @@
         // dominio sería una redirección abierta para quien armó el enlace.
         var destino = !string.IsNullOrEmpty(ReturnUrl) && ReturnUrl.StartsWith('/') && !ReturnUrl.StartsWith("//")
             ? ReturnUrl
-            : "/";
+            : "/aplicacion";   // v4: «/» es la página corporativa pública
         Navegacion.NavigateTo(destino, forceLoad: true);
     }
 

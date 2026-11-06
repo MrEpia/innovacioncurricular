@@ -55,7 +55,7 @@ print("=== Humo v3 · seguridad ===")
 
 print("\n-- sin token")
 _, diag = api("GET", "/", token=None)
-revisar(diag and diag.get("version") == "v3", "GET / responde v3 sin token (diagnóstico)", diag)
+revisar(diag and diag.get("version") in ("v3", "v4"), "GET / responde la v3 (o posterior) sin token (diagnóstico)", diag)
 cuerpo = esperar(401, "GET", "/api/universidad", token=None, descripcion="un recurso sin token → 401")
 revisar(cuerpo and "Falta el token" in cuerpo.get("detalle", ""), "el 401 dice que falta el token", cuerpo)
 

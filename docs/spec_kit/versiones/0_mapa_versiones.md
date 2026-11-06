@@ -22,7 +22,7 @@
 | **v2** | CRUD de las **15 tablas con clave foránea**: las FK como listas desplegables cargadas desde la API, y validación de integridad referencial | **En curso** ([spec](v2_entrega2/2_spec.md) · [reparto en tres bloques](v2_entrega2/8_tasks.md)) |
 | **v3** | **JWT**, sesiones y control de acceso por roles; CRUD de `usuario`, `rol` y `rol_usuario` solo para administradores | **En curso** ([spec](v3_seguridad/2_spec.md) · [reparto](v3_seguridad/8_tasks.md)) |
 | **v3 · maestro-detalle** | `registro_calificado` y `programa` guardados **con todo su detalle** en una sola operación (todo o nada), con su pantalla de maestro arriba y detalle editable abajo | **Hecho** ([spec](v3_maestro_detalle/2_spec.md) · [contratos](v3_maestro_detalle/6_contracts.md)) |
-| v4 | **10 consultas multitabla** (4+ tablas cada una), dashboard con gráficos, páginas corporativas, responsive/PWA y **publicación** en un servidor | Sin especificar |
+| **v4** | **10 consultas multitabla** (4+ tablas cada una), dashboard con gráficos, páginas corporativas con la imagen del manual, responsive y PWA, y **publicación** en un servidor gratuito | **Construida; publicación por hacer** ([spec](v4_publicacion/2_spec.md) · [contratos](v4_publicacion/6_contracts.md) · [cómo publicar](v4_publicacion/7_quickstart.md)) |
 
 ## Qué tabla entra en qué versión
 

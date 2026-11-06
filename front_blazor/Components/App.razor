@@ -4,18 +4,37 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Sistema de innovación curricular de la Universidad Monte Verde." />
     <base href="/" />
+
+    @* v4: la tipografía del manual de marca (punto 4): Merriweather para
+       títulos, Inter para texto. Si no hay red, marca.css cae a las genéricas. *@
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Merriweather:wght@700&display=swap" />
     <link rel="stylesheet" href="@Assets["app.css"]" />
+
+    @* v4: PWA — se instala como aplicación y tiene página sin conexión. *@
+    <link rel="manifest" href="manifest.webmanifest" />
+    <meta name="theme-color" content="#1F5E4C" />
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="apple-touch-icon" href="iconos/apple-touch-icon.png" />
+
     <ImportMap />
     <HeadOutlet />
 </head>
 
 <body>
     @* v3: sin modo global. Cada pantalla de datos declara @rendermode
-       InteractiveServer; /ingresar queda ESTÁTICA porque necesita la respuesta
-       HTTP para dejar la cookie de sesión. *@
+       InteractiveServer; /ingresar y las páginas corporativas quedan
+       ESTÁTICAS. *@
     <Routes />
     <script src="_framework/blazor.web.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('service-worker.js');
+        }
+    </script>
 </body>
 
 </html>

@@ -24,6 +24,7 @@ public class PruebaDeCapas
         await PruebasPuentes.Ejecutar();
         await PruebasSeguridad.Ejecutar();      // v3 — Sebastián Calvo
         await PruebasMaestroDetalle.Ejecutar(); // v3 — maestro-detalle
+        await PruebasReportes.Ejecutar();       // v4 — reportes y dashboard
 
         Console.WriteLine();
         Console.WriteLine(Verificador.TodoBien

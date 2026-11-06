@@ -1,0 +1,102 @@
+@page "/dashboard"
+@rendermode InteractiveServer
+@inject ServicioDashboard Servicio
+@using FrontInnovacion.Components.Graficos
+
+@*
+    DASHBOARD (v4)
+
+    Arriba, las cifras principales como tarjetas: un número solo no necesita un
+    gráfico. Abajo, seis gráficos de barras alimentados por /api/dashboard/*.
+    Todos los datos los agrega el motor; la pantalla solo los dibuja.
+*@
+
+<PageTitle>Dashboard — Innovación curricular</PageTitle>
+
+<div class="encabezado">
+    <div>
+        <h1>Dashboard</h1>
+        <p class="nota">La oferta académica de la Universidad Monte Verde en cifras. Solo cuentan los registros activos.</p>
+    </div>
+    <button class="boton" @onclick="Cargar" disabled="@cargando">Actualizar</button>
+</div>
+
+@foreach (var error in errores)
+{
+    <p class="aviso error">@error</p>
+}
+
+@if (cargando && resumen == null)
+{
+    <p class="nota">Cargando…</p>
+}
+else
+{
+    @if (resumen != null)
+    {
+        <section class="cifras" aria-label="Cifras principales">
+            <div class="cifra"><span class="cifra-valor">@resumen.Programas</span><span class="cifra-nombre">Programas</span></div>
+            <div class="cifra"><span class="cifra-valor">@resumen.Facultades</span><span class="cifra-nombre">Facultades</span></div>
+            <div class="cifra"><span class="cifra-valor">@resumen.Acreditaciones</span><span class="cifra-nombre">Acreditaciones</span></div>
+            <div class="cifra"><span class="cifra-valor">@resumen.RegistrosCalificados</span><span class="cifra-nombre">Registros calificados</span></div>
+            <div class="cifra"><span class="cifra-valor">@resumen.ActividadesAcademicas</span><span class="cifra-nombre">Actividades académicas</span></div>
+            <div class="cifra"><span class="cifra-valor">@resumen.Docentes</span><span class="cifra-nombre">Docentes</span></div>
+            <div class="cifra"><span class="cifra-valor">@resumen.Alianzas</span><span class="cifra-nombre">Alianzas</span></div>
+            <div class="cifra"><span class="cifra-valor">@resumen.Pasantias</span><span class="cifra-nombre">Pasantías</span></div>
+            <div class="cifra"><span class="cifra-valor">@resumen.Premios</span><span class="cifra-nombre">Premios</span></div>
+            <div class="cifra"><span class="cifra-valor">@resumen.Graduados.ToString("N0")</span><span class="cifra-nombre">Graduados</span></div>
+        </section>
+    }
+
+    <section class="graficos">
+        <GraficoBarras Titulo="Programas por sede" Descripcion="Programas activos según la ciudad de su sede."
+                       Datos="porSede" Categoria="Sede" Unidad="Programas" />
+        <GraficoBarras Titulo="Programas por nivel" Descripcion="Profesional, tecnológico, especialización, maestría y doctorado."
+                       Datos="porNivel" Categoria="Nivel" Unidad="Programas" />
+        <GraficoBarras Titulo="Graduados por facultad" Descripcion="Las facultades con más graduados; el resto suma en «Otras»."
+                       Datos="graduados" Categoria="Facultad" Unidad="Graduados" />
+        <GraficoBarras Titulo="Acreditaciones por calificación" Descripcion="Acreditaciones activas según el concepto recibido."
+                       Datos="acreditaciones" Categoria="Calificación" Unidad="Acreditaciones" />
+        <GraficoBarras Titulo="Registros calificados por metodología" Descripcion="Presencial, virtual o híbrida."
+                       Datos="metodologias" Categoria="Metodología" Unidad="Registros" />
+        <GraficoBarras Titulo="Docentes por dedicación" Descripcion="Vinculaciones docentes activas."
+                       Datos="dedicaciones" Categoria="Dedicación" Unidad="Docentes" />
+    </section>
+}
+
+@code {
+    private ResumenDashboard? resumen;
+    private List<DatoGrafico> porSede = new(), porNivel = new(), graduados = new(),
+                              acreditaciones = new(), metodologias = new(), dedicaciones = new();
+    private List<string> errores = new();
+    private bool cargando = true;
+
+    protected override Task OnInitializedAsync() => Cargar();
+
+    private async Task Cargar()
+    {
+        cargando = true;
+        errores = new();
+
+        var r = await Servicio.Resumen();
+        if (r.Ok) resumen = r.Datos; else errores.AddRange(r.Errores);
+
+        porSede = await Serie(Servicio.ProgramasPorSede());
+        porNivel = await Serie(Servicio.ProgramasPorNivel());
+        graduados = await Serie(Servicio.GraduadosPorFacultad());
+        acreditaciones = await Serie(Servicio.AcreditacionesPorCalificacion());
+        metodologias = await Serie(Servicio.RegistrosPorMetodologia());
+        dedicaciones = await Serie(Servicio.DocentesPorDedicacion());
+
+        // Un mismo error repetido seis veces (la API no responde) se muestra una vez.
+        errores = errores.Distinct().ToList();
+        cargando = false;
+    }
+
+    private async Task<List<DatoGrafico>> Serie(Task<Resultado<List<DatoGrafico>>> pedido)
+    {
+        var r = await pedido;
+        if (!r.Ok) errores.AddRange(r.Errores);
+        return r.Ok ? r.Datos! : new();
+    }
+}

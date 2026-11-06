@@ -34,13 +34,16 @@
    ============================================================== */
 
 :root {
-  --acento:  #1f6feb;
-  --oscuro:  #1d1d1b;
-  --borde:   #d9d5d0;
-  --suave:   #6b6560;
+  /* v4: los alias de la aplicación apuntan a la MARCA (Artículo 12). Antes
+     el acento era un azul ajeno al manual; ahora es el verde institucional,
+     y los estados usan los colores de apoyo del manual. */
+  --acento:  var(--umv-verde);
+  --oscuro:  var(--umv-grafito);
+  --borde:   var(--umv-gris-borde);
+  --suave:   #5f5a55;                 /* gris de texto secundario, 6,6:1 */
   --fondo:   #f7f5f2;
-  --error:   #b3261e;
-  --exito:   #1e6f3f;
+  --error:   var(--umv-alerta);
+  --exito:   var(--umv-correcto);
 }
 
 * { box-sizing: border-box; }
@@ -49,15 +52,15 @@ body {
   margin: 0;
   background: var(--fondo);
   color: var(--oscuro);
-  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  font-family: var(--umv-fuente-texto);
   font-size: 15px;
   line-height: 1.5;
 }
 
-.contenedor { max-width: 1000px; margin: 0 auto; padding: 0 20px; }
+.contenedor { max-width: 1180px; margin: 0 auto; padding: 0 20px; }   /* v4: 1000 → 1180 para las tablas de reportes */
 
 /* --- la barra y el menú --- */
-.barra { background: var(--oscuro); color: #fff; }
+.barra { background: var(--umv-verde); color: #fff; }
 .barra-interna { display: flex; align-items: center; gap: 16px; padding: 12px 20px; }
 .marca { color: #fff; font-weight: 700; font-size: 1.1rem; text-decoration: none; }
 .dependencia { color: #b9b4ae; font-size: .8rem; }
@@ -146,7 +149,7 @@ code { background: #efedea; padding: 1px 6px; border-radius: 4px; font-size: .9e
   padding: 20px; margin: 18px 0; max-width: 620px;
 }
 label { display: block; margin-bottom: 16px; font-weight: 600; font-size: .9rem; }
-input[type=text], input[type=number], input[type=date], input[type=password], input[type=email] {
+input:not([type]), input[type=text], input[type=number], input[type=date], input[type=password], input[type=email] {
   display: block; width: 100%; margin-top: 5px; padding: 9px 11px;
   border: 1px solid var(--borde); border-radius: 6px; font: inherit; background: #fff;
 }
@@ -188,3 +191,128 @@ footer p { color: var(--suave); font-size: .85rem; margin: 0; }
 .form-salir { margin: 0; }
 .ingreso { max-width: 420px; margin: 40px auto; }
 .validation-message { color: var(--error); font-size: .82rem; font-weight: 400; }
+
+/* ==========================================================================
+   v4 — Imagen corporativa, páginas públicas, reportes, dashboard, responsive
+   ========================================================================== */
+h1, h2, .grafico-titulo, .cifra-valor, .marca { font-family: var(--umv-fuente-titulos); }
+h1 { color: var(--umv-verde); }
+a { color: var(--umv-verde); }
+
+/* --- el menú plegable del celular (casilla + CSS, sin JavaScript) --- */
+.menu-interruptor, .menu-boton { display: none; }
+.menu .menu-interno { padding: 0; align-items: center; }
+.menu .sesion .boton.primario { color: #fff; }
+
+/* --- portada y franjas de las páginas corporativas --- */
+.portada {
+  display: grid; grid-template-columns: 1fr auto; gap: 30px; align-items: center;
+  background: #fff; border: 1px solid var(--borde); border-top: 6px solid var(--umv-ocre);
+  border-radius: 10px; padding: 32px; margin: 8px 0 28px;
+}
+.portada h1 { font-size: 2.1rem; line-height: 1.2; margin-bottom: 12px; }
+.portada-antetitulo { color: var(--umv-ocre-oscuro); font-weight: 700; font-size: .85rem;
+  text-transform: uppercase; letter-spacing: .05em; margin: 0 0 8px; }
+.portada-lema { font-size: 1.05rem; color: var(--suave); max-width: 560px; }
+.portada-logo { width: 180px; height: auto; }
+.seccion-titulo { margin-top: 10px; }
+.franja {
+  display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap;
+  background: var(--umv-gris-claro); border-left: 6px solid var(--umv-verde);
+  border-radius: 8px; padding: 18px 22px; margin: 28px 0;
+}
+.franja h2 { margin-bottom: 4px; }
+.franja p { margin: 0; }
+
+.servicios { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); margin-top: 16px; }
+.servicio { background: #fff; border: 1px solid var(--borde); border-top: 4px solid var(--umv-verde);
+  border-radius: 8px; padding: 18px 20px; }
+.servicio ul { padding-left: 18px; margin: 8px 0 0; }
+
+.preguntas details { background: #fff; border: 1px solid var(--borde); border-radius: 8px; padding: 12px 16px; margin-bottom: 10px; }
+.preguntas summary { cursor: pointer; font-weight: 600; }
+.preguntas details p { margin: 10px 0 0; }
+
+.contacto { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+.contacto .tarjeta-formulario { margin-top: 0; }
+textarea { display: block; width: 100%; margin-top: 5px; padding: 9px 11px; border: 1px solid var(--borde);
+  border-radius: 6px; font: inherit; resize: vertical; }
+.canales { padding-left: 18px; }
+.sedes { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+.nosotros section { margin-bottom: 20px; }
+
+/* --- pie de página --- */
+footer { background: #fff; }
+.pie { display: grid; grid-template-columns: 1fr auto; gap: 10px 24px; align-items: center; }
+.pie-logo { height: 34px; width: auto; }
+.pie-enlaces { display: flex; gap: 16px; flex-wrap: wrap; }
+.pie-enlaces a { color: var(--suave); font-size: .88rem; }
+.pie .nota { grid-column: 1 / -1; font-size: .8rem; }
+
+/* --- reportes --- */
+.reportes { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 20px; align-items: start; margin-top: 12px; }
+.reportes-lista { display: flex; flex-direction: column; gap: 6px; }
+.reporte-opcion {
+  display: flex; gap: 10px; align-items: baseline; text-align: left; cursor: pointer;
+  background: #fff; border: 1px solid var(--borde); border-radius: 6px; padding: 9px 12px; font: inherit; font-size: .9rem;
+}
+.reporte-opcion:hover { border-color: var(--umv-verde); }
+.reporte-opcion.elegido { border-color: var(--umv-verde); border-left: 4px solid var(--umv-verde); font-weight: 600; }
+.reporte-numero { color: var(--umv-ocre-oscuro); font-weight: 700; font-size: .8rem; min-width: 26px; }
+.reporte-resultado { background: #fff; border: 1px solid var(--borde); border-radius: 8px; padding: 18px 20px; min-width: 0; }
+.tablas-usadas code { margin-right: 4px; }
+
+/* --- dashboard: tarjetas de cifras --- */
+.cifras { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); margin: 16px 0 24px; }
+.cifra { background: #fff; border: 1px solid var(--borde); border-radius: 8px; padding: 14px 16px; display: flex; flex-direction: column; }
+.cifra-valor { font-size: 1.7rem; font-weight: 700; color: var(--umv-grafito); line-height: 1.1; }
+.cifra-nombre { color: var(--suave); font-size: .85rem; margin-top: 4px; }
+
+/* --- dashboard: gráficos de barras horizontales --- */
+.graficos { display: grid; gap: 18px; grid-template-columns: repeat(auto-fill, minmax(420px, 1fr)); }
+.grafico { background: #fff; border: 1px solid var(--borde); border-radius: 8px; padding: 16px 18px; margin: 0; }
+.grafico-titulo { font-size: 1.02rem; font-weight: 700; color: var(--umv-grafito); }
+.grafico-descripcion { margin: 2px 0 12px; }
+.barras { display: flex; flex-direction: column; gap: 8px; }
+.barra-fila { display: grid; grid-template-columns: minmax(110px, 38%) 1fr; gap: 10px; align-items: center; }
+.barra-fila:hover .barra-relleno { filter: brightness(1.25); }
+.barra-etiqueta { font-size: .85rem; color: var(--umv-grafito); overflow-wrap: anywhere; }
+.barra-pista { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.barra-relleno {
+  height: 14px; background: var(--umv-verde);
+  border-radius: 0 4px 4px 0;          /* redondeada solo en la punta del dato */
+}
+.barra-valor { font-size: .82rem; font-weight: 600; color: var(--umv-grafito); white-space: nowrap; }
+.grafico-tabla { margin-top: 10px; font-size: .85rem; }
+.grafico-tabla summary { cursor: pointer; color: var(--umv-verde); font-weight: 600; }
+.grafico-tabla table { margin-top: 8px; }
+
+/* --- responsive: tableta y celular --- */
+@media (max-width: 860px) {
+  .reportes, .contacto { grid-template-columns: 1fr; }
+  .reportes-lista { flex-direction: row; flex-wrap: wrap; }
+  .graficos { grid-template-columns: 1fr; }
+}
+@media (max-width: 700px) {
+  .menu-boton { display: inline-block; padding: 10px 0; font-weight: 700; cursor: pointer; color: var(--umv-verde); }
+  .menu .menu-interno { display: none; flex-direction: column; align-items: stretch; padding-bottom: 10px; }
+  .menu-interruptor:checked ~ .menu-interno { display: flex; }
+  .menu .sesion { margin-left: 0; padding: 8px 0; }
+  .barra-interna { flex-wrap: wrap; }
+  .portada { grid-template-columns: 1fr; padding: 22px; }
+  .portada h1 { font-size: 1.6rem; }
+  .portada-logo { width: 130px; order: -1; }
+  .pie { grid-template-columns: 1fr; }
+  main { padding: 20px 14px 32px; }
+  .contenedor { padding: 0 14px; }
+  .barra-fila { grid-template-columns: 1fr; gap: 3px; }
+  .graficos { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* --- impresión de reportes: sin menú ni botones --- */
+@media print {
+  header, footer, .reportes-lista, .no-imprimir, #blazor-error-ui { display: none !important; }
+  .reportes { display: block; }
+  .reporte-resultado { border: 0; padding: 0; }
+  body { background: #fff; }
+}

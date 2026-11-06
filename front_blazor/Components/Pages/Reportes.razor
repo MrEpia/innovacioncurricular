@@ -1,0 +1,128 @@
+@page "/reportes"
+@rendermode InteractiveServer
+@inject ServicioReportes Servicio
+
+@*
+    MÓDULO DE REPORTES (v4)
+
+    Los 10 reportes de las consultas multitabla. A la izquierda el catálogo
+    (lo da la API: título, para qué sirve y qué tablas une); a la derecha la
+    tabla del reporte elegido, con descarga en CSV e impresión.
+*@
+
+<PageTitle>Reportes — Innovación curricular</PageTitle>
+
+<div class="encabezado">
+    <div>
+        <h1>Reportes</h1>
+        <p class="nota">Diez consultas que cruzan cuatro tablas o más. Elija un reporte para ver sus resultados.</p>
+    </div>
+</div>
+
+@foreach (var error in errores)
+{
+    <p class="aviso error">@error</p>
+}
+
+<div class="reportes">
+    <nav class="reportes-lista" aria-label="Reportes disponibles">
+        @foreach (var (ficha, i) in catalogo.Select((f, i) => (f, i + 1)))
+        {
+            <button class="reporte-opcion @(ficha.Ruta == elegido?.Ruta ? "elegido" : "")" @onclick="() => Abrir(ficha)">
+                <span class="reporte-numero">R@(i)</span>
+                <span>@ficha.Titulo</span>
+            </button>
+        }
+    </nav>
+
+    <section class="reporte-resultado">
+        @if (elegido == null)
+        {
+            <p class="vacio">Elija un reporte de la lista.</p>
+        }
+        else
+        {
+            <h2>@elegido.Titulo</h2>
+            <p class="nota">@elegido.Descripcion</p>
+            <p class="tablas-usadas">Une @elegido.Tablas.Count tablas: @foreach (var t in elegido.Tablas) { <code>@t</code> }</p>
+
+            @if (cargando)
+            {
+                <p class="nota">Cargando…</p>
+            }
+            else if (tabla != null && tabla.Filas.Count > 0)
+            {
+                <div class="pareja no-imprimir">
+                    <a class="boton" href="@Csv()" download="@($"{elegido.Ruta}.csv")">Descargar CSV</a>
+                    <button class="boton" onclick="window.print()">Imprimir</button>
+                </div>
+                <div class="tabla-scroll">
+                    <table>
+                        <thead><tr>@foreach (var c in tabla.Columnas) { <th>@c</th> }</tr></thead>
+                        <tbody>
+                            @foreach (var fila in tabla.Filas)
+                            {
+                                <tr>@foreach (var celda in fila) { <td>@celda</td> }</tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <p class="nota">@tabla.Filas.Count fila(s).</p>
+            }
+            else if (tabla != null)
+            {
+                <p class="vacio">Este reporte no tiene resultados con los datos actuales.</p>
+            }
+        }
+    </section>
+</div>
+
+@code {
+    private List<FichaReporte> catalogo = new();
+    private FichaReporte? elegido;
+    private TablaReporte? tabla;
+    private List<string> errores = new();
+    private bool cargando;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var r = await Servicio.Catalogo();
+        if (r.Ok)
+        {
+            catalogo = r.Datos!;
+            if (catalogo.Count > 0) await Abrir(catalogo[0]);
+        }
+        else
+        {
+            errores = r.Errores;
+        }
+    }
+
+    private async Task Abrir(FichaReporte ficha)
+    {
+        elegido = ficha;
+        tabla = null;
+        errores = new();
+
+        var metodo = Servicio.MetodoDe(ficha.Ruta);
+        if (metodo == null)
+        {
+            errores = new() { $"El front no conoce el reporte «{ficha.Titulo}»." };
+            return;
+        }
+
+        cargando = true;
+        var r = await metodo();
+        cargando = false;
+        if (r.Ok) tabla = r.Datos; else errores = r.Errores;
+    }
+
+    /// <summary>El reporte en CSV (separador «;», que Excel en español abre bien), como enlace de descarga.</summary>
+    private string Csv()
+    {
+        static string Campo(string v) => "\"" + v.Replace("\"", "\"\"") + "\"";
+        var lineas = new List<string> { string.Join(";", tabla!.Columnas.Select(Campo)) };
+        lineas.AddRange(tabla.Filas.Select(f => string.Join(";", f.Select(Campo))));
+        return "data:text/csv;charset=utf-8,%EF%BB%BF" + Uri.EscapeDataString(string.Join("\r\n", lineas));
+    }
+}

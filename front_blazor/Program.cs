@@ -1,6 +1,11 @@
 using FrontInnovacion.Components;
 using FrontInnovacion.Ensamblador;
 
+// v4: números y fechas como se escriben en Colombia (14.472, no 14,472).
+var cultura = new System.Globalization.CultureInfo("es-CO");
+System.Globalization.CultureInfo.DefaultThreadCurrentCulture = cultura;
+System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = cultura;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Blazor Server: el componente se renderiza en el servidor y el navegador
@@ -23,6 +28,7 @@ builder.Services.AgregarServiciosPuentes();       // v2 — David Epia
 builder.Services.AgregarSesion(urlApi);           // v3 — David Epia: ingreso y sesión
 builder.Services.AgregarAdministracion();         // v3 — David Epia: usuarios y roles
 builder.Services.AgregarMaestroDetalle();          // v3 — maestro-detalle
+builder.Services.AgregarReportes();               // v4 — reportes y dashboard
 
 var app = builder.Build();
 

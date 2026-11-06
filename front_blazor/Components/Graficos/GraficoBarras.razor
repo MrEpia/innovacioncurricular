@@ -1,0 +1,71 @@
+@*
+    GRÁFICO DE BARRAS HORIZONTALES (v4 — dashboard)
+
+    Una sola serie, un solo color: el verde institucional (Artículo 12). Para
+    comparar cantidades entre categorías, la barra horizontal se lee mejor que
+    una dona, y la etiqueta larga («Facultad de Ciencias Empresariales») cabe
+    sin rotarla.
+
+    Hecho en HTML y CSS, sin biblioteca ni JavaScript: se adapta solo al ancho
+    de la pantalla (responsive) y funciona sin conexión (PWA).
+
+    - Barras delgadas, con la punta redondeada al final del dato y anclada a cero.
+    - El valor se escribe al final de cada barra, en tinta, no en el color de la barra.
+    - Al pasar el mouse sobre una fila aparece el dato completo (title).
+    - «Ver los datos» abre la misma información como tabla.
+*@
+
+<figure class="grafico">
+    <figcaption class="grafico-titulo">@Titulo</figcaption>
+    @if (!string.IsNullOrEmpty(Descripcion))
+    {
+        <p class="nota grafico-descripcion">@Descripcion</p>
+    }
+
+    @if (Datos.Count == 0)
+    {
+        <p class="vacio">Todavía no hay datos para este gráfico.</p>
+    }
+    else
+    {
+        <div class="barras" role="list">
+            @foreach (var d in Datos)
+            {
+                var porcentaje = Maximo == 0 ? 0 : Math.Max(1.5, d.Valor * 100.0 / Maximo);
+                <div class="barra-fila" role="listitem" title="@($"{d.Etiqueta}: {d.Valor:N0} {Unidad} ({Parte(d.Valor)} del total)")">
+                    <span class="barra-etiqueta">@d.Etiqueta</span>
+                    <span class="barra-pista">
+                        <span class="barra-relleno" style="width: @(porcentaje.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture))%"></span>
+                        <span class="barra-valor">@d.Valor.ToString("N0")</span>
+                    </span>
+                </div>
+            }
+        </div>
+
+        <details class="grafico-tabla">
+            <summary>Ver los datos</summary>
+            <table>
+                <thead><tr><th>@Categoria</th><th>@Unidad</th><th>% del total</th></tr></thead>
+                <tbody>
+                    @foreach (var d in Datos)
+                    {
+                        <tr><td>@d.Etiqueta</td><td>@d.Valor.ToString("N0")</td><td>@Parte(d.Valor)</td></tr>
+                    }
+                </tbody>
+            </table>
+        </details>
+    }
+</figure>
+
+@code {
+    [Parameter, EditorRequired] public string Titulo { get; set; } = string.Empty;
+    [Parameter] public string? Descripcion { get; set; }
+    [Parameter] public List<DatoGrafico> Datos { get; set; } = new();
+    [Parameter] public string Categoria { get; set; } = "Categoría";
+    [Parameter] public string Unidad { get; set; } = "Cantidad";
+
+    private int Maximo => Datos.Count == 0 ? 0 : Datos.Max(d => d.Valor);
+    private int Total => Datos.Sum(d => d.Valor);
+
+    private string Parte(int valor) => Total == 0 ? "0 %" : $"{valor * 100.0 / Total:0.#} %";
+}

@@ -1,4 +1,4 @@
-"""VERIFICACIÓN COMPLETA del sistema — entregas 1, 2 y 3.
+"""VERIFICACIÓN COMPLETA del sistema — entregas 1, 2, 3 y 4.
 
 Un solo comando que deja el sistema arriba y corre TODAS las pruebas:
 
@@ -35,6 +35,7 @@ HUMOS = [
     ("Maestro-detalle: registro calificado y programa", "humo_maestro_detalle.py"),
     ("Front con sesión (v1 + v3)", "humo_front.py"),
     ("Front por rol y cierre de sesión (v3)", "humo_roles_front.py"),
+    ("Reportes, dashboard, páginas corporativas y PWA (v4)", "humo_reportes.py"),
 ]
 
 resultados = []

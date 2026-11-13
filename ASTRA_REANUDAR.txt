@@ -1,0 +1,9 @@
+CONTINUAR la misión del repositorio privado MrEpia/innovacioncurricular.
+1. Leer ASTRA_ESTADO_TRABAJO.md en work/innovacioncurricular y la misión adjunta de este chat.
+2. Ejecutar git status --short, git branch --show-current, git log -5 --oneline y git fetch origin; revisar diferencias sin reset, clean, force push ni checkout de cambios ajenos.
+3. Mantener deploy/neon-render-spec-kit-v2. Si ya existe, reutilizarla después de inspeccionarla.
+4. Comprobar recursos existentes y despliegues en Neon y Render con sesiones disponibles; no duplicar ni tocar producción MonsterASP.
+5. Ejecutar la próxima acción exacta del estado; continuar tareas pendientes sin repetir las verificadas.
+6. Preservar SQL Server, secretos fuera de Git, migraciones no destructivas, commits por fase y PR sin fusionar.
+7. Actualizar ambos puntos de control al terminar cada fase. No declarar finalización sin comprobar todos los entregables.
+No hay reactivación de cuota confirmada. Basta escribir CONTINUAR en el mismo chat cuando la sesión esté disponible.

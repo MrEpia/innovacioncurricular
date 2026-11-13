@@ -13,6 +13,8 @@ Thumbs.db
 
 # Secretos (Artículo 7): el .env NUNCA se versiona; el .env.example sí.
 .env
+.env.*
+!.env.*.example
 !.env.example
 *.log
 

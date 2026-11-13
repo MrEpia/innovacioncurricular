@@ -12,12 +12,13 @@ retira al final.
 Uso:  python pruebas_humo/humo_reportes.py     (parado en la raíz del proyecto)
 """
 import json
+import os
 import urllib.error
 import urllib.request
 
 from comun import api, esperar, llave_aleatoria, revisar, terminar
 
-FRONT = "http://localhost:8073"
+FRONT = os.environ.get("FRONT_URL", "http://localhost:8073")
 
 COLUMNAS = {
     "programas-acreditados": {"universidad", "facultad", "programa", "resolucion", "calificacion"},
@@ -100,7 +101,7 @@ esperar(401, "GET", "/api/dashboard/resumen", descripcion="dashboard sin token �
 
 print("\n-- documentación: Swagger describe los endpoints nuevos")
 try:
-    with urllib.request.urlopen("http://localhost:8072/swagger/v1/swagger.json", timeout=20) as r:
+    with urllib.request.urlopen(os.environ.get("API_URL", "http://localhost:8072") + "/swagger/v1/swagger.json", timeout=20) as r:
         swagger = json.loads(r.read())
     rutas = swagger.get("paths", {})
     revisar(sum(1 for p in rutas if p.startswith("/api/reportes/")) == 10, "Swagger documenta los 10 reportes")

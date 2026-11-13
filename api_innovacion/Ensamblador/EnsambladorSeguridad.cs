@@ -168,7 +168,7 @@ public static class EnsambladorSeguridad
         {
             // No se tumba la API por esto: el diagnóstico y Swagger siguen
             // respondiendo, y el error queda en el log para corregirlo.
-            app.Logger.LogError(ex, "No se pudo asegurar el administrador inicial.");
+            app.Logger.LogError("No se pudo asegurar el administrador inicial ({Tipo}). Revise conexión y migraciones.", ex.GetType().Name);
         }
     }
 }

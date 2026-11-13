@@ -10,6 +10,7 @@ procedimiento directamente con un hijo malo— y retira todo al final.
 Uso:  python pruebas_humo/humo_maestro_detalle.py     (parado en la raíz del proyecto)
 """
 import subprocess
+import os
 
 from comun import esperar, leer_env, llave_aleatoria, revisar, terminar
 
@@ -17,6 +18,9 @@ from comun import esperar, leer_env, llave_aleatoria, revisar, terminar
 def sql(consulta):
     """Ejecuta SQL en el contenedor de SQL Server con la clave del .env y
     devuelve (código de salida, salida)."""
+    if os.environ.get("PRUEBAS_PG_CONTENEDOR"):
+        from comun import sql_postgres_prueba
+        return sql_postgres_prueba(consulta)
     salida = subprocess.run(
         ["docker", "exec", "innovacion-sqlserver", "/opt/mssql-tools18/bin/sqlcmd",
          "-S", "localhost", "-U", "sa", "-P", leer_env("MSSQL_SA_PASSWORD"), "-C", "-d", "innovacion_local",
@@ -106,13 +110,19 @@ revisar(ficha and [a["areaConocimiento"] for a in ficha["areasConocimiento"]] ==
 # ------------------------------------------------------------------ todo o nada
 print("\n-- TODO O NADA dentro del procedimiento (sin pasar por el servicio)")
 R2 = R + 1
-codigo, salida = sql(
+if os.environ.get("PRUEBAS_PG_CONTENEDOR"):
+    codigo, salida = sql(
+        f"SELECT sp_registro_calificado_completo_crear({R2},'1','1','1','X','2024-01-01','2025-01-01',"
+        f"'1','2','X',{P0},'[{EN1}]','[{{\"id\":{ACT1},\"componente\":\"A\",\"semestre\":\"1\"}},"
+        f"{{\"id\":999999,\"componente\":\"B\",\"semestre\":\"2\"}}]')")
+else:
+    codigo, salida = sql(
     f"EXEC dbo.sp_registro_calificado_completo_crear @Codigo={R2}, @CantCreditos='1', @HoraAcom='1', "
     f"@HoraInd='1', @Metodologia='X', @FechaInicio='2024-01-01', @FechaFin='2025-01-01', "
     f"@DuracionAnios='1', @DuracionSemestres='2', @TipoTitulacion='X', @Programa={P0}, "
     f"@Enfoques=N'[{EN1}]', @Actividades=N'[{{\"id\":{ACT1},\"componente\":\"A\",\"semestre\":\"1\"}},"
     f"{{\"id\":999999,\"componente\":\"B\",\"semestre\":\"2\"}}]'")
-revisar(codigo != 0 and "50400" in salida, "el procedimiento rechaza la segunda actividad (THROW 50400)", salida)
+revisar(codigo != 0 and ("50400" in salida or "P0400" in salida), "la operación atómica rechaza la segunda actividad", salida)
 _, quedo = sql(f"SELECT (SELECT COUNT(*) FROM registro_calificado WHERE codigo={R2}) + "
                f"(SELECT COUNT(*) FROM enfoque_rc WHERE registro_calificado={R2}) + "
                f"(SELECT COUNT(*) FROM aa_rc WHERE registro_calificado_codigo={R2})")

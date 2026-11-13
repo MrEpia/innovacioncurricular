@@ -1,0 +1,15 @@
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+WORKDIR /src
+COPY api_innovacion/ApiInnovacion.csproj api_innovacion/
+RUN dotnet restore api_innovacion/ApiInnovacion.csproj
+COPY api_innovacion/ api_innovacion/
+COPY db/postgres/ db/postgres/
+RUN dotnet publish api_innovacion/ApiInnovacion.csproj -c Release --no-restore -o /publicado
+
+FROM mcr.microsoft.com/dotnet/aspnet:10.0
+WORKDIR /app
+COPY --from=build /publicado .
+ENV ASPNETCORE_ENVIRONMENT=Production
+USER app
+EXPOSE 10000
+ENTRYPOINT ["dotnet", "ApiInnovacion.dll"]

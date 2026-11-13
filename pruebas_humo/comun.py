@@ -13,10 +13,11 @@ import json
 import os
 import random
 import sys
+import subprocess
 import urllib.error
 import urllib.request
 
-API = "http://localhost:8072"
+API = os.environ.get("API_URL", "http://localhost:8072").rstrip("/")
 
 _fallos = []
 _comprobaciones = 0
@@ -32,7 +33,11 @@ _SIN_TOKEN = object()
 
 def leer_env(nombre):
     """Lee una variable del .env de la raíz del proyecto."""
+    if nombre in os.environ:
+        return os.environ[nombre]
     ruta = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".env")
+    if not os.path.exists(ruta):
+        return None
     with open(ruta, encoding="utf-8") as f:
         for linea in f:
             if linea.startswith(nombre + "="):
@@ -44,6 +49,16 @@ def iniciar_sesion(usuario, clave):
     """POST /api/login. Devuelve el token, o None si no se pudo."""
     codigo, cuerpo = _llamar("POST", "/api/login", {"usuario": usuario, "clave": clave}, None)
     return cuerpo.get("token") if codigo == 200 and cuerpo else None
+
+
+def sql_postgres_prueba(consulta):
+    """Solo laboratorio Docker explícito; nunca selecciona un contenedor existente por defecto."""
+    contenedor = os.environ["PRUEBAS_PG_CONTENEDOR"]
+    salida = subprocess.run(
+        ["docker", "exec", "-i", contenedor, "psql", "-U", "astra", "-d", "innovacion_neon_v2",
+         "-X", "-t", "-A", "-v", "ON_ERROR_STOP=1", "-v", "VERBOSITY=verbose"],
+        input=consulta, capture_output=True, text=True, encoding="utf-8", errors="replace")
+    return salida.returncode, (salida.stdout + salida.stderr).strip()
 
 
 def api(metodo, ruta, cuerpo=None, token=_SIN_TOKEN):

@@ -1,0 +1,49 @@
+# Laboratorio aislado. Usar -p astra-neon-v2; nunca reemplaza docker-compose.yml.
+services:
+  pg:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: innovacion_neon_v2
+      POSTGRES_USER: astra
+      POSTGRES_PASSWORD: ${PG_PRUEBA_CLAVE:?Defina PG_PRUEBA_CLAVE}
+    volumes:
+      - postgres_v2:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U astra -d innovacion_neon_v2"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+  migrar:
+    image: astra-innovacion-api:v2
+    command: [--migrar-postgres]
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__Postgres: Host=pg;Database=innovacion_neon_v2;Username=astra;Password=${PG_PRUEBA_CLAVE:?};SSL Mode=Disable
+    depends_on:
+      pg:
+        condition: service_healthy
+  api:
+    image: astra-innovacion-api:v2
+    ports: ["127.0.0.1:18072:10000"]
+    environment:
+      PORT: "10000"
+      ASPNETCORE_ENVIRONMENT: Development
+      BaseDatos__Proveedor: Postgres
+      ConnectionStrings__Postgres: Host=pg;Database=innovacion_neon_v2;Username=astra;Password=${PG_PRUEBA_CLAVE:?};SSL Mode=Disable
+      Jwt__Secreto: ${JWT_SECRETO:?}
+      AdminInicial__Usuario: ${ADMIN_USUARIO:?}
+      AdminInicial__Correo: ${ADMIN_CORREO:?}
+      AdminInicial__Clave: ${ADMIN_CLAVE:?}
+    depends_on:
+      migrar:
+        condition: service_completed_successfully
+  front:
+    image: astra-innovacion-front:v2
+    ports: ["127.0.0.1:18073:10000"]
+    environment:
+      PORT: "10000"
+      ASPNETCORE_ENVIRONMENT: Development
+      UrlApi: http://api:10000
+    depends_on: [api]
+volumes:
+  postgres_v2:

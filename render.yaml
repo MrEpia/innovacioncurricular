@@ -1,0 +1,43 @@
+# Dos Web Services: Blazor Server necesita ASP.NET y WebSocket.
+# Crear recursos separados. Mantener inventario/MonsterASP intactos.
+services:
+  - type: web
+    name: innovacion-curricular-api-v2
+    runtime: docker
+    plan: free
+    region: virginia
+    branch: deploy/neon-render-spec-kit-v2
+    dockerfilePath: ./api_innovacion/Dockerfile.render
+    dockerContext: .
+    healthCheckPath: /health
+    autoDeployTrigger: "off"
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: BaseDatos__Proveedor
+        value: Postgres
+      - key: ConnectionStrings__Postgres
+        sync: false
+      - key: Jwt__Secreto
+        generateValue: true
+      - key: AdminInicial__Usuario
+        sync: false
+      - key: AdminInicial__Correo
+        sync: false
+      - key: AdminInicial__Clave
+        sync: false
+  - type: web
+    name: innovacion-curricular-front-v2
+    runtime: docker
+    plan: free
+    region: virginia
+    branch: deploy/neon-render-spec-kit-v2
+    dockerfilePath: ./front_blazor/Dockerfile.render
+    dockerContext: .
+    healthCheckPath: /health
+    autoDeployTrigger: "off"
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: UrlApi
+        sync: false

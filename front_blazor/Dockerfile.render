@@ -1,0 +1,14 @@
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+WORKDIR /src
+COPY front_blazor/FrontInnovacion.csproj front_blazor/
+RUN dotnet restore front_blazor/FrontInnovacion.csproj
+COPY front_blazor/ front_blazor/
+RUN dotnet publish front_blazor/FrontInnovacion.csproj -c Release --no-restore -o /publicado
+
+FROM mcr.microsoft.com/dotnet/aspnet:10.0
+WORKDIR /app
+COPY --from=build /publicado .
+ENV ASPNETCORE_ENVIRONMENT=Production
+USER app
+EXPOSE 10000
+ENTRYPOINT ["dotnet", "FrontInnovacion.dll"]

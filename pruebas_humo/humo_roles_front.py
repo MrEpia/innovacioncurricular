@@ -16,6 +16,7 @@ con cada uno por el formulario de /ingresar y los retira al final.
 Uso:  python pruebas_humo/humo_roles_front.py     (parado en la raíz del proyecto)
 """
 import html
+import os
 import http.cookiejar
 import random
 import re
@@ -26,7 +27,7 @@ import urllib.request
 
 from comun import api, esperar, revisar, terminar
 
-FRONT = "http://localhost:8073"
+FRONT = os.environ.get("FRONT_URL", "http://localhost:8073")
 
 
 class _SinRedireccion(urllib.request.HTTPRedirectHandler):

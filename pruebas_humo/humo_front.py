@@ -53,9 +53,12 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
-FRONT = "http://localhost:8073"
-API = "http://localhost:8072"
-SERVICIO_API = "api-innovacion"
+FRONT = os.environ.get("FRONT_URL", "http://localhost:8073")
+API = os.environ.get("API_URL", "http://localhost:8072")
+SERVICIO_API = os.environ.get("PRUEBAS_API_SERVICIO", "api-innovacion")
+comando_compose = ["docker", "compose"]
+if os.environ.get("PRUEBAS_COMPOSE_ARCHIVO"):
+    comando_compose += ["-p", os.environ["PRUEBAS_COMPOSE_PROYECTO"], "-f", os.environ["PRUEBAS_COMPOSE_ARCHIVO"], "--env-file", os.environ["PRUEBAS_ENV_ARCHIVO"]]
 fallos = []
 
 # Un sufijo distinto en cada corrida: si una se interrumpe a la mitad deja la
@@ -77,6 +80,8 @@ ETIQUETAS = ("NIT", "Razón social", "Nombre del contacto", "Correo", "Ciudad")
 
 
 def leer_env(nombre):
+    if nombre in os.environ:
+        return os.environ[nombre]
     with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".env"), encoding="utf-8") as f:
         for linea in f:
             if linea.startswith(nombre + "="):
@@ -292,24 +297,27 @@ print("    (la pantalla espera su tiempo de espera, unos diez segundos)")
 # más fiel— que la API esté caída o colgada: en los dos casos el front se
 # queda sin datos y tiene que sostenerse solo.
 # ======================================================================
-subprocess.run(["docker", "compose", "pause", SERVICIO_API],
+subprocess.run(comando_compose + ["pause", SERVICIO_API],
                capture_output=True, text=True)
-time.sleep(2)
+try:
+    time.sleep(2)
 
-c, t = ver(f"{FRONT}/aliados")
-texto = visible(t)
-revisar("la pantalla SIGUE respondiendo con la API sin responder", c == 200)
-revisar("  y muestra el aviso dentro de la aplicación",
-        "no está disponible" in texto)
-revisar("  con su menú y su marco intactos",
-        "Aliados" in texto and "Innovación curricular" in texto)
-# SQL Server sigue encendido y con la ficha adentro. Si el front pudiera
-# llegar a la base por su cuenta, se seguiría viendo. No se ve.
-revisar("  y SIN datos: el front no puede llegar a la base por su cuenta",
-        str(TESTIGO) not in texto)
+    c, t = ver(f"{FRONT}/aliados")
+    texto = visible(t)
+    revisar("la pantalla SIGUE respondiendo con la API sin responder", c == 200)
+    revisar("  y muestra el aviso dentro de la aplicación",
+            "no está disponible" in texto)
+    revisar("  con su menú y su marco intactos",
+            "Aliados" in texto and "Innovación curricular" in texto)
+    # SQL Server sigue encendido y con la ficha adentro. Si el front pudiera
+    # llegar a la base por su cuenta, se seguiría viendo. No se ve.
+    revisar("  y SIN datos: el front no puede llegar a la base por su cuenta",
+            str(TESTIGO) not in texto)
 
-subprocess.run(["docker", "compose", "unpause", SERVICIO_API],
-               capture_output=True, text=True)
+finally:
+    subprocess.run(comando_compose + ["unpause", SERVICIO_API],
+                   capture_output=True, text=True)
+
 print("    API descongelada; responde enseguida")
 esperar_api(60)
 c, t = ver(f"{FRONT}/aliados")

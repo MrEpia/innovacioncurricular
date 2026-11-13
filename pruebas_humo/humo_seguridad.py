@@ -20,6 +20,7 @@ import hmac
 import json
 import subprocess
 import time
+import os
 
 from comun import api, esperar, iniciar_sesion, leer_env, llave_aleatoria, revisar, terminar
 
@@ -42,6 +43,9 @@ def token_a_mano(secreto, minutos_desde_ahora, roles=("administrador",)):
 
 
 def hash_en_base(username):
+    if os.environ.get("PRUEBAS_PG_CONTENEDOR"):
+        from comun import sql_postgres_prueba
+        return sql_postgres_prueba("SELECT password FROM usuario WHERE username = '" + username.replace("'", "''") + "'")[1]
     clave_sa = leer_env("MSSQL_SA_PASSWORD")
     salida = subprocess.run(
         ["docker", "exec", "innovacion-sqlserver", "/opt/mssql-tools18/bin/sqlcmd", "-S", "localhost",

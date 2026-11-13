@@ -27,6 +27,8 @@ public static class EnsambladorSesion
                 cookie.AccessDeniedPath = "/sin-permiso";
                 cookie.Cookie.Name = ".Innovacion.Sesion";
                 cookie.Cookie.HttpOnly = true;             // ningún script de la página la lee
+                if (Environment.GetEnvironmentVariable("RENDER") == "true")
+                    cookie.Cookie.SecurePolicy = CookieSecurePolicy.Always;
                 cookie.Cookie.SameSite = SameSiteMode.Lax;
                 // Dura lo que dura el token y ni un minuto más: no se renueva sola.
                 cookie.SlidingExpiration = false;

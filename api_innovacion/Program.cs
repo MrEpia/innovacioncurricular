@@ -1,11 +1,35 @@
 using ApiInnovacion.Ensamblador;
 using Microsoft.AspNetCore.Mvc;
+using ApiInnovacion.Infraestructura;
+using ApiInnovacion.Repositorios.Postgres;
+using Microsoft.Data.SqlClient;
+using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
 
+if (args.Contains("--migrar-postgres"))
+{
+    try { await MigradorPostgres.Ejecutar(builder.Configuration, args.Contains("--datos-demo")); }
+    catch (PostgresException ex)
+    {
+        Console.Error.WriteLine($"Migración PostgreSQL fallida (SQLSTATE {ex.SqlState}). Revise la migración pendiente; no se publican datos ni credenciales.");
+        Environment.ExitCode = 1;
+    }
+    catch (Exception ex)
+    {
+        // No imprimir excepciones del driver: pueden incluir datos privados.
+        Console.Error.WriteLine(ex is InvalidOperationException ? ex.Message : $"Migración fallida ({ex.GetType().Name}). Revise acceso y esquema; no se publican credenciales.");
+        Environment.ExitCode = 1;
+    }
+    return;
+}
+
 // La API escucha en el 8072 también DENTRO del contenedor, para que el Dockerfile,
 // el docker-compose y los contratos digan todos el mismo número (3_plan.md §5.2).
-builder.WebHost.UseUrls("http://0.0.0.0:8072");
+var puerto = Environment.GetEnvironmentVariable("PORT") ?? "8072";
+if (!int.TryParse(puerto, out var numeroPuerto) || numeroPuerto is < 1 or > 65535)
+    throw new InvalidOperationException("PORT debe ser un puerto válido.");
+builder.WebHost.UseUrls($"http://0.0.0.0:{puerto}");
 
 // ============================================================
 // EL ENSAMBLADOR (Artículo 3, enmienda 1.1.0)
@@ -20,8 +44,14 @@ builder.Services.AgregarBloquePuentes();        // v2 — David Epia
 builder.Services.AgregarSeguridad(builder.Configuration);   // v3 — JWT, roles, usuarios
 builder.Services.AgregarMaestroDetalle();         // v3 — maestro-detalle (registro calificado y programa)
 builder.Services.AgregarReportes();              // v4 — 10 consultas multitabla y dashboard
+builder.Services.AgregarProveedorDatos(builder.Configuration);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(o => o.Filters.Add<ErroresProduccion>());
+var origenes = builder.Configuration.GetSection("Cors:Origenes").Get<string[]>() ?? [];
+builder.Services.AddCors(o => o.AddDefaultPolicy(p =>
+{
+    if (origenes.Length > 0) p.WithOrigins(origenes).AllowAnyHeader().AllowAnyMethod();
+}));
 
 // ============================================================
 // EL 422 DEL CONTRATO (3_plan.md §4.9)
@@ -98,6 +128,30 @@ builder.Services.AddSwaggerGen(swagger =>
 });
 
 var app = builder.Build();
+app.UseCors();
+
+app.MapGet("/health", async (IConfiguration configuracion, CancellationToken cancelacion) =>
+{
+    try
+    {
+        var proveedor = configuracion["BaseDatos:Proveedor"] ?? "SqlServer";
+        await using System.Data.Common.DbConnection conexion = proveedor.Equals("Postgres", StringComparison.OrdinalIgnoreCase)
+            ? new NpgsqlConnection(new ConfiguracionPostgres(configuracion).CadenaConexion)
+            : new SqlConnection(configuracion.GetConnectionString("SqlServer"));
+        await conexion.OpenAsync(cancelacion);
+        await using var comando = conexion.CreateCommand();
+        var esPostgres = proveedor.Equals("Postgres", StringComparison.OrdinalIgnoreCase);
+        comando.CommandText = esPostgres
+            ? "SELECT COUNT(*) FROM public.astra_migraciones WHERE version IN ('001_esquema.sql','002_operaciones_atomicas.sql','003_maestro_detalle.sql')"
+            : "SELECT COUNT(*) FROM rol WHERE activo = 1";
+        comando.CommandTimeout = 5;
+        var comprobacion = await comando.ExecuteScalarAsync(cancelacion);
+        if (esPostgres && Convert.ToInt64(comprobacion) != 3)
+            return Results.Json(new { estado = "no disponible", baseDatos = "migraciones pendientes" }, statusCode: 503);
+        return Results.Ok(new { estado = "saludable", baseDatos = "conectada" });
+    }
+    catch { return Results.Json(new { estado = "no disponible", baseDatos = "sin verificar" }, statusCode: 503); }
+});
 
 app.UseSwagger();
 app.UseSwaggerUI();

@@ -7,6 +7,13 @@ System.Globalization.CultureInfo.DefaultThreadCurrentCulture = cultura;
 System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = cultura;
 
 var builder = WebApplication.CreateBuilder(args);
+var puertoRender = Environment.GetEnvironmentVariable("PORT");
+if (puertoRender != null)
+{
+    if (!int.TryParse(puertoRender, out var numeroPuerto) || numeroPuerto is < 1 or > 65535)
+        throw new InvalidOperationException("PORT debe ser un puerto válido.");
+    builder.WebHost.UseUrls($"http://0.0.0.0:{puertoRender}");
+}
 
 // Blazor Server: el componente se renderiza en el servidor y el navegador
 // recibe el HTML ya armado, manteniendo una conexión para los eventos.
@@ -17,6 +24,9 @@ builder.Services.AddRazorComponents()
 // DE DÓNDE SALEN LOS DATOS: de la API, por HTTP (Ensamblador/).
 // ============================================================
 var urlApi = builder.Configuration["UrlApi"] ?? "http://localhost:8072";
+if (Environment.GetEnvironmentVariable("RENDER") == "true" &&
+    (!Uri.TryCreate(urlApi, UriKind.Absolute, out var direccionApi) || direccionApi.IsLoopback || direccionApi.Scheme != "https"))
+    throw new InvalidOperationException("Render requiere UrlApi HTTPS pública explícita.");
 
 // Fuera de Docker vale lo de appsettings.json; dentro, el compose la
 // sobreescribe con el NOMBRE del servicio —`api-innovacion`—, porque
@@ -44,5 +54,6 @@ app.UseAntiforgery();
 app.MapStaticAssets();
 app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 app.MapearSesion();                               // /sesion/salir y /sesion/expirada
+app.MapGet("/health", () => Results.Ok(new { estado = "saludable", componente = "front" }));
 
 app.Run();

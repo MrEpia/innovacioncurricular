@@ -36,14 +36,17 @@ public static class MigradorPostgres
             foreach (var archivo in ordenados)
             {
                 var version = Path.GetFileName(archivo);
-                var sql = await File.ReadAllTextAsync(archivo, Encoding.UTF8);
+                // Git conserva SQL en LF; Windows puede construir imágenes desde CRLF.
+                // El contenido lógico tiene el mismo checksum en ambos entornos.
+                var sql = (await File.ReadAllTextAsync(archivo, Encoding.UTF8)).Replace("\r\n", "\n").Replace("\r", "\n");
                 var checksum = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(sql)));
+                var checksumWindows = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(sql.Replace("\n", "\r\n"))));
                 await using var consultar = new NpgsqlCommand("SELECT checksum FROM public.astra_migraciones WHERE version=@version", conexion);
                 consultar.Parameters.AddWithValue("version", version);
                 var guardado = await consultar.ExecuteScalarAsync();
                 if (guardado is string anterior)
                 {
-                    if (anterior != checksum) throw new InvalidOperationException($"La migración {version} ya aplicada cambió. Cree otra migración; no sobrescriba el historial.");
+                    if (anterior != checksum && anterior != checksumWindows) throw new InvalidOperationException($"La migración {version} ya aplicada cambió. Cree otra migración; no sobrescriba el historial.");
                     Console.WriteLine($"Omitida (ya aplicada): {version}");
                     continue;
                 }

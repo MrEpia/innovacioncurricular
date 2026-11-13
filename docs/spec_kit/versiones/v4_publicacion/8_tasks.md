@@ -26,10 +26,12 @@
 - [x] `publicar.py bd` (25 tablas, 29 procedimientos, datos) · `api` · `front`, y los zips subidos
 - [x] Comprobado desde fuera: API v4, Swagger, páginas públicas, PWA, y front ↔ API ↔ base (ingreso con usuario inventado → «incorrectos»)
 - [ ] Ticket a soporte: activar HTTPS en los dos subdominios, y volver a publicar el front con `https://`
-- [ ] **Los dos:** recorrido con el administrador y con los otros roles sobre el sitio publicado
+- [x] Recorrido con el administrador sobre el sitio publicado: ingreso, dashboard y reportes (2026-11-12)
+- [ ] David: recorrido con los roles editor y consulta sobre el sitio publicado
 
 ## 3. Cierre (Calvo)
 
 - [x] Las URL publicadas en el README
 - [ ] Todas las ramas integradas en `main` (ninguna con commits fuera de `main`)
-- [ ] `9_checklist.md` firmado · `git tag v4` · `git push origin v4`
+- [ ] `9_checklist.md` firmado
+- [x] `git tag v4` · `git push origin v4`

@@ -19,7 +19,7 @@
 - [x] 9. Reportes y dashboard en el navegador; dashboard y menú a 375 px.
 - [x] 10. `publicar.py`: base, API y front publicados arrancan en Production (prueba local).
 - [x] 11. Regresión: `verificar_todo.py --limpio` en verde.
-- [ ] Sitio publicado en MonsterASP y URL en el README.
+- [x] Sitio publicado en MonsterASP y URL en el README (por HTTP; HTTPS pedido a soporte).
 
 ## C. Arquitectura y secretos
 

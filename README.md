@@ -24,9 +24,12 @@ curso).
 
 | | URL |
 |---|---|
-| Sitio (front) | *pendiente: se publica siguiendo [v4_publicacion/7_quickstart.md](docs/spec_kit/versiones/v4_publicacion/7_quickstart.md) §2* |
-| API y documentación | *pendiente* (`…/swagger`) |
+| Sitio (front) | <http://innovacion-umv.runasp.net> |
+| API y documentación | <http://innovacion-api.runasp.net> · <http://innovacion-api.runasp.net/swagger> |
 | Repositorio | <https://github.com/MrEpia/innovacioncurricular> |
+
+Publicado en MonsterASP.NET (plan gratuito). HTTPS está pedido a soporte: en el
+plan gratuito se activa a mano. Cómo se publicó: [7_quickstart.md §2](docs/spec_kit/versiones/v4_publicacion/7_quickstart.md).
 
 Las reglas que rigen todo están en la [constitución](docs/spec_kit/1_constitution.md)
 y la ruta completa en el [mapa de versiones](docs/spec_kit/versiones/0_mapa_versiones.md).

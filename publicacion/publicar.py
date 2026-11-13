@@ -65,9 +65,13 @@ def docker(*argumentos, entrada=None):
 # ------------------------------------------------------------------ base de datos
 def sqlcmd(env, carpeta, archivo=None, consulta=None):
     """Corre sqlcmd contra la base del hosting desde un contenedor desechable."""
+    # Desde el PC se entra por el nombre PÚBLICO de la base (acceso remoto);
+    # la API publicada usa el nombre interno (SQL_SERVIDOR), que solo resuelve
+    # dentro del datacenter del hosting.
+    servidor = env.get("SQL_SERVIDOR_REMOTO") or env["SQL_SERVIDOR"]
     argumentos = ["run", "--rm", "-v", f"{carpeta}:/scripts:ro", "--entrypoint",
                   "/opt/mssql-tools18/bin/sqlcmd", IMAGEN_SQL,
-                  "-S", env["SQL_SERVIDOR"], "-d", env["SQL_BASE"], "-U", env["SQL_USUARIO"],
+                  "-S", servidor, "-d", env["SQL_BASE"], "-U", env["SQL_USUARIO"],
                   "-P", env["SQL_CLAVE"], "-C", "-b", "-h", "-1", "-W"]
     argumentos += ["-i", f"/scripts/{archivo}"] if archivo else ["-Q", consulta]
     return docker(*argumentos)

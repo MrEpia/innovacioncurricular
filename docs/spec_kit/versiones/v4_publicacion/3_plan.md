@@ -68,9 +68,9 @@ flowchart LR
     P -->|bd| BD[("MSSQL del hosting:<br/>25 tablas + migraciones")]
     P -->|api| ZA["salida/api.zip<br/>Release + web.config con variables"]
     P -->|front| ZF["salida/front.zip<br/>Release + UrlApi"]
-    ZA --> SA["Sitio 1 (cuenta de Calvo):<br/>la API"]
-    ZF --> SF["Sitio 2 (cuenta de Epia):<br/>el front"]
-    SF -->|HTTPS + Bearer| SA
+    ZA --> SA["innovacion-api.runasp.net<br/>la API"]
+    ZF --> SF["innovacion-umv.runasp.net<br/>el front"]
+    SF -->|HTTP por ahora + Bearer| SA
     SA --> BD
 ```
 

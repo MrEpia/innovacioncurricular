@@ -69,10 +69,14 @@ vigente:
 | El campo «Usuario» se veía angosto en el celular: el componente no pone `type="text"` | Supervisor | El estilo también cubre `input:not([type])` |
 | La página `Servicios.razor` se llamaba igual que el espacio de nombres `FrontInnovacion.Servicios` | Supervisor | Renombrada a `PaginaServicios.razor` |
 | La API publicada no respondía en el puerto de prueba: `Program.cs` fija `UseUrls(8072)` | Supervisor | En IIS el puerto lo pone el servidor y ese `UseUrls` se ignora. En la prueba local bastó exponer el 8072 |
-| El plan gratuito de MonsterASP permite **un** sitio y el sistema tiene dos aplicaciones | **Spec** (C5) y research (D-v4-7) | Dos cuentas: la API y la base con Calvo, el front con Epia |
+| La IA leyó en una reseña que el plan gratuito permite **un** sitio y planeó dos cuentas | **Spec** (C5) y research (D-v4-7) | El panel real mostraba 5 sitios y 5 bases: todo quedó en la cuenta de Calvo. Lección: el dato del panel manda sobre las reseñas |
+| `publicar.py` usaba un solo nombre de servidor para la base, pero el hosting da dos (interno y público) | Supervisor | `SQL_SERVIDOR` (la API) y `SQL_SERVIDOR_REMOTO` (desde el PC) |
+| `https://` daba `ERR_CONNECTION_RESET` | Research (D-v4-7) | El plan gratuito activa HTTPS por ticket; mientras tanto, el front llama a la API por `http://` |
 
 ## 4. Lo que la IA NO puede hacer y queda para el equipo
 
-Crear las cuentas en el hosting y subir los `.zip`: exige registrarse con
-datos personales y aceptar términos. Los pasos exactos están en
+Crear la cuenta, iniciar sesión (la verificación de Cloudflare no pasa en el
+navegador integrado), escribir las contraseñas y subir los `.zip`. Lo hizo el
+estudiante en su navegador, paso a paso, mientras la IA corría `publicar.py`
+y comprobaba el sitio publicado desde fuera. Los pasos exactos están en
 [7_quickstart.md](7_quickstart.md) §2.

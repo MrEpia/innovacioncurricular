@@ -72,36 +72,47 @@ carga, la pila de `marca.css` cae a Georgia o a la fuente del sistema.
 puede mostrar datos sin red. Prometer más sería falso. El enunciado dice
 «si es posible»: lo posible es instalable y con una página sin conexión.
 
-## D-v4-7 — Publicación en MonsterASP.NET, en dos cuentas
+## D-v4-7 — Publicación en MonsterASP.NET, todo en una cuenta
 
 **Contexto.** El enunciado sugiere MonsterASP, SmarterASP.NET, Azure App
 Service o Somee para ASP.NET Core. El sistema necesita SQL Server.
 
-**Decisión.** MonsterASP.NET, por estas razones:
-- **Plan gratuito sin tarjeta:** incluye una base MSSQL de 1 GB.
+**Decisión.** MonsterASP.NET:
+- **Plan gratuito sin tarjeta:** incluye bases MSSQL de 1 GB.
 - **Corre .NET 10.**
-- **Subdominio con HTTPS:** `*.runasp.net`.
+- **Una cuenta alcanza:** el panel de la cuenta muestra **5 sitios y 5 bases de datos gratuitos**, así que la API, el front y la base van en la cuenta de Sebastián Calvo.
 
-El plan gratuito permite **un sitio por cuenta**, así que:
-- la **API y la base** van en la cuenta de Sebastián Calvo;
-- el **front** va en la de David Epia.
+| Pieza | Dónde |
+|---|---|
+| API | `innovacion-api.runasp.net` (site107258) |
+| Front | `innovacion-umv.runasp.net` (site107260) |
+| Base | MSSQL `db79553` (EU) |
 
-El front llama a la API por su URL pública, con HTTPS y Bearer, desde el
-servidor (Blazor Server). Por eso no hace falta CORS.
+**Dos nombres para la misma base:**
+- `db79553.databaseasp.net` es **interno**: solo resuelve dentro del datacenter, y es el que usa la API publicada (`SQL_SERVIDOR`).
+- `db79553.public.databaseasp.net` es **público**: hay que activar «Remote access», y lo usa `publicar.py bd` desde el PC (`SQL_SERVIDOR_REMOTO`).
 
 **Cómo llegan los secretos.** `publicar.py` compila en Release y escribe las
-variables de entorno en el `web.config` que genera `dotnet publish`: IIS se
+variables de entorno en el `web.config` que genera `dotnet publish`; IIS se
 las entrega a la aplicación. El `.env.produccion` y la carpeta `salida/` no
 se versionan (Artículo 7).
 
+**HTTPS.** En el plan gratuito, HTTPS no viene activado: el servidor corta las
+conexiones `https://` (`ERR_CONNECTION_RESET`), y la página del plan indica
+pedir la activación manual a soporte por ticket. Mientras llega, el front se
+publicó llamando a la API por `http://` (`URL_API`). Cuando soporte active
+HTTPS, se cambia `URL_API` a `https://`, se corre `publicar.py front` y se
+vuelve a subir.
+
 **Alternativas descartadas.**
-- **Azure App Service:** la capa gratuita exige tarjeta de crédito.
+- **Azure App Service:** se exploró la cuenta de estudiante, pero el equipo prefirió MonsterASP.
 - **Somee:** pone publicidad en el sitio gratuito.
 - **SmarterASP.NET:** es una prueba de 60 días, no un plan gratuito.
 
 **Precio, documentado.**
-- 256 MB de RAM: si la aplicación los supera, IIS la reinicia y las sesiones abiertas se pierden (la sesión vive en memoria, D-v3-7). Hay que volver a ingresar.
+- 256 MB de RAM: si la aplicación los supera, IIS la reinicia y las sesiones abiertas se pierden (la sesión vive en memoria, D-v3-7).
 - El servidor está en Europa.
+- Sin HTTPS, la contraseña viaja sin cifrar hasta que soporte lo active.
 
 ## D-v4-8 — Datos de demostración como migración
 

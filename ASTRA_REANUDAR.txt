@@ -1,9 +1,11 @@
-CONTINUAR la misión del repositorio privado MrEpia/innovacioncurricular.
-1. Leer ASTRA_ESTADO_TRABAJO.md en work/innovacioncurricular y la misión adjunta de este chat.
-2. Ejecutar git status --short, git branch --show-current, git log -5 --oneline y git fetch origin; revisar diferencias sin reset, clean, force push ni checkout de cambios ajenos.
-3. Mantener deploy/neon-render-spec-kit-v2. Si ya existe, reutilizarla después de inspeccionarla.
-4. Comprobar recursos existentes y despliegues en Neon y Render con sesiones disponibles; no duplicar ni tocar producción MonsterASP.
-5. Ejecutar la próxima acción exacta del estado; continuar tareas pendientes sin repetir las verificadas.
-6. Preservar SQL Server, secretos fuera de Git, migraciones no destructivas, commits por fase y PR sin fusionar.
-7. Actualizar ambos puntos de control al terminar cada fase. No declarar finalización sin comprobar todos los entregables.
-No hay reactivación de cuota confirmada. Basta escribir CONTINUAR en el mismo chat cuando la sesión esté disponible.
+CONTINUAR — misión MrEpia/innovacioncurricular (INCOMPLETA).
+Repositorio local: C:/Users/USER/Documents/Codex/2026-11-13/14-continuidad-autom-tica-por-l/work/innovacioncurricular
+1. Leer primero ASTRA_ESTADO_TRABAJO.md y la misión adjunta del chat.
+2. Ejecutar git status --short --branch; git branch --show-current; git log -5 --oneline; git fetch origin. Revisar diferencias; nunca reset/clean/force push ni sobrescribir trabajo ajeno. Mantener deploy/neon-render-spec-kit-v2 y el PR sin fusionar.
+3. Comprobar el último commit real y si ya están finalizados mapa/PR/checkpoint. Si faltan, completarlos antes de los pasos externos; no duplicar un PR.
+4. Revalidar Neon: el conector devolvió Unknown tool y desapareció. Si ya está conectado, listar proyectos/ramas/bases antes de crear uno nuevo. Solo capacidad gratuita confirmada y base separada; no tocar datos originales.
+5. Revalidar Render: workspace tea-cvbgt23qf0us73d8uuug. No tocar inventario (srv-cvbh02rtq21c73dv7330). El intento de blueprint no devolvió ID y falló HTTP 400 de acceso a repo/branch/file; comprobar recursos/blueprints y resolver acceso del repo privado antes de reintentar. GitHub sí tiene render.yaml en la rama. No cambiar privacidad ni insertar tokens en URLs.
+6. Seguir DESPLIEGUE_NEON_RENDER.md: migrar Neon con TLS VerifyFull y verificar tablas/FK/historial; crear/desplegar los dos Web Services nuevos con secretos fuera de Git; verificar URLs públicas, login, CRUD, roles, maestro-detalle, reportes, dashboard y Blazor.
+7. Pruebas locales YA APROBADAS: 194 de capas, 364 de humo, migraciones/rollback/concurrencia/runtime. Laboratorio propio astra-neon-v2 en 18072/18073; preservar contenedores históricos. Archivo privado local ../pruebas-local.env; no imprimirlo.
+8. Actualizar estado tras cada fase, registrar commit/archivos/pruebas/Neon/Render y próxima acción exacta. Regenerar mapa con líneas reales y ref que contenga los archivos; no inventar resultados públicos.
+No hay reinicio automático de cuota confirmado. CONTINUAR retoma desde este checkpoint cuando la sesión/accesos estén disponibles, sin repetir operaciones verificadas.

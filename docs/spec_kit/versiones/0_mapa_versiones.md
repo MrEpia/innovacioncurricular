@@ -66,3 +66,7 @@ especificación sin pasar por sus compuertas.
 3. **Regresión obligatoria**: al cerrar la vN, los criterios de todas las
    versiones anteriores deben seguir pasando.
 4. El repositorio siempre muestra la **versión en curso, funcionando**.
+
+## Revisión documental V2 — Neon y Render (en curso)
+
+La [revisión V2 Neon/Render](v2_neon_render/2_spec.md) está basada en el código V4. Conserva las entregas históricas, en particular v2_entrega2; añade auditoría, soporte PostgreSQL paralelo y documentación de despliegue. El estado externo se informa en DESPLIEGUE_NEON_RENDER.md y el punto de control ASTRA_ESTADO_TRABAJO.md, en la raíz del repositorio. No hay nuevo tag de versión ni cierre de misión hasta verificar los proveedores.

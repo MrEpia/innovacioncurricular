@@ -1,0 +1,7033 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "API Innovación Curricular — Universidad Monte Verde",
+    "description": "CRUD de las 25 tablas del módulo, login con JWT, maestro-detalle, 10 consultas multitabla (/api/reportes) y datos del dashboard (/api/dashboard). Para probar: POST /api/login, copie el token y use el botón Authorize.",
+    "version": "v4"
+  },
+  "paths": {
+    "/api/aa_rc": {
+      "get": {
+        "tags": [
+          "AaRc"
+        ],
+        "summary": "RF1 — Listar registros activos.",
+        "parameters": [
+          {
+            "name": "limite",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1000
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "AaRc"
+        ],
+        "summary": "RF3 — Crear un registro. 201 con la llave creada.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AaRcCrear"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AaRcCrear"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AaRcCrear"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/aa_rc/{activAcademicasIdcurso}/{registroCalificadoCodigo}": {
+      "get": {
+        "tags": [
+          "AaRc"
+        ],
+        "summary": "RF2 — Obtener un registro por su llave.",
+        "parameters": [
+          {
+            "name": "activAcademicasIdcurso",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "registroCalificadoCodigo",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "AaRc"
+        ],
+        "summary": "RF4 — Reemplazar completamente un registro.",
+        "parameters": [
+          {
+            "name": "activAcademicasIdcurso",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "registroCalificadoCodigo",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AaRcReemplazo"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AaRcReemplazo"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AaRcReemplazo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "AaRc"
+        ],
+        "summary": "RF5 — Actualizar parcialmente un registro.",
+        "parameters": [
+          {
+            "name": "activAcademicasIdcurso",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "registroCalificadoCodigo",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AaRcActualizar"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AaRcActualizar"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AaRcActualizar"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "AaRc"
+        ],
+        "summary": "RF6 — Borrado lógico.",
+        "parameters": [
+          {
+            "name": "activAcademicasIdcurso",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "registroCalificadoCodigo",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/acreditacion": {
+      "get": {
+        "tags": [
+          "Acreditacion"
+        ],
+        "summary": "RF1 — Listar registros activos.",
+        "parameters": [
+          {
+            "name": "limite",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1000
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Acreditacion"
+        ],
+        "summary": "RF3 — Crear un registro. 201 con la llave creada.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcreditacionCrear"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcreditacionCrear"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcreditacionCrear"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/acreditacion/{resolucion}": {
+      "get": {
+        "tags": [
+          "Acreditacion"
+        ],
+        "summary": "RF2 — Obtener un registro por su llave.",
+        "parameters": [
+          {
+            "name": "resolucion",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Acreditacion"
+        ],
+        "summary": "RF4 — Reemplazar completamente un registro.",
+        "parameters": [
+          {
+            "name": "resolucion",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcreditacionReemplazo"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcreditacionReemplazo"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcreditacionReemplazo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Acreditacion"
+        ],
+        "summary": "RF5 — Actualizar parcialmente un registro.",
+        "parameters": [
+          {
+            "name": "resolucion",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcreditacionActualizar"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcreditacionActualizar"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcreditacionActualizar"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Acreditacion"
+        ],
+        "summary": "RF6 — Borrado lógico.",
+        "parameters": [
+          {
+            "name": "resolucion",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/activ_academica": {
+      "get": {
+        "tags": [
+          "ActivAcademica"
+        ],
+        "summary": "RF1 — Listar registros activos.",
+        "parameters": [
+          {
+            "name": "limite",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1000
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "ActivAcademica"
+        ],
+        "summary": "RF3 — Crear un registro. 201 con la llave creada.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ActivAcademicaCrear"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ActivAcademicaCrear"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ActivAcademicaCrear"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/activ_academica/{id}": {
+      "get": {
+        "tags": [
+          "ActivAcademica"
+        ],
+        "summary": "RF2 — Obtener un registro por su llave.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "ActivAcademica"
+        ],
+        "summary": "RF4 — Reemplazar completamente un registro.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ActivAcademicaReemplazo"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ActivAcademicaReemplazo"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ActivAcademicaReemplazo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "ActivAcademica"
+        ],
+        "summary": "RF5 — Actualizar parcialmente un registro.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ActivAcademicaActualizar"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ActivAcademicaActualizar"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ActivAcademicaActualizar"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "ActivAcademica"
+        ],
+        "summary": "RF6 — Borrado lógico.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/aliado": {
+      "get": {
+        "tags": [
+          "Aliado"
+        ],
+        "summary": "RF1 — Listar aliados activos.",
+        "parameters": [
+          {
+            "name": "limite",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1000
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Aliado"
+        ],
+        "summary": "RF3 — Crear un aliado.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AliadoCrear"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AliadoCrear"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AliadoCrear"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/aliado/{nit}": {
+      "get": {
+        "tags": [
+          "Aliado"
+        ],
+        "summary": "RF2 — Obtener un aliado por su NIT.",
+        "parameters": [
+          {
+            "name": "nit",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Aliado"
+        ],
+        "summary": "RF4 — Reemplazar completamente un aliado.",
+        "parameters": [
+          {
+            "name": "nit",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AliadoReemplazo"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AliadoReemplazo"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AliadoReemplazo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Aliado"
+        ],
+        "summary": "RF5 — Actualizar parcialmente un aliado.",
+        "parameters": [
+          {
+            "name": "nit",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AliadoActualizar"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AliadoActualizar"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AliadoActualizar"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Aliado"
+        ],
+        "summary": "RF6 — Borrado lógico.",
+        "parameters": [
+          {
+            "name": "nit",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/alianza": {
+      "get": {
+        "tags": [
+          "Alianza"
+        ],
+        "summary": "RF1 — Listar registros activos.",
+        "parameters": [
+          {
+            "name": "limite",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1000
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Alianza"
+        ],
+        "summary": "RF3 — Crear un registro. 201 con la llave creada.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AlianzaCrear"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AlianzaCrear"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AlianzaCrear"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/alianza/{aliado}/{departamento}": {
+      "get": {
+        "tags": [
+          "Alianza"
+        ],
+        "summary": "RF2 — Obtener un registro por su llave.",
+        "parameters": [
+          {
+            "name": "aliado",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "departamento",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Alianza"
+        ],
+        "summary": "RF4 — Reemplazar completamente un registro.",
+        "parameters": [
+          {
+            "name": "aliado",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "departamento",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AlianzaReemplazo"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AlianzaReemplazo"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AlianzaReemplazo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Alianza"
+        ],
+        "summary": "RF5 — Actualizar parcialmente un registro.",
+        "parameters": [
+          {
+            "name": "aliado",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "departamento",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AlianzaActualizar"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AlianzaActualizar"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AlianzaActualizar"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Alianza"
+        ],
+        "summary": "RF6 — Borrado lógico.",
+        "parameters": [
+          {
+            "name": "aliado",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "departamento",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/an_programa": {
+      "get": {
+        "tags": [
+          "AnPrograma"
+        ],
+        "summary": "RF1 — Listar registros activos.",
+        "parameters": [
+          {
+            "name": "limite",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1000
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "AnPrograma"
+        ],
+        "summary": "RF3 — Crear un registro. 201 con la llave creada.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnProgramaCrear"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnProgramaCrear"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnProgramaCrear"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/an_programa/{aspectoNormativo}/{programa}": {
+      "get": {
+        "tags": [
+          "AnPrograma"
+        ],
+        "summary": "RF2 — Obtener un registro por su llave.",
+        "parameters": [
+          {
+            "name": "aspectoNormativo",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "programa",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "AnPrograma"
+        ],
+        "summary": "RF6 — Borrado lógico.",
+        "parameters": [
+          {
+            "name": "aspectoNormativo",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "programa",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "tags": [
+          "ApiInnovacion"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/": {
+      "get": {
+        "tags": [
+          "ApiInnovacion"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/area_conocimiento": {
+      "get": {
+        "tags": [
+          "AreaConocimiento"
+        ],
+        "summary": "RF1 — Listar registros activos.",
+        "parameters": [
+          {
+            "name": "limite",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1000
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "AreaConocimiento"
+        ],
+        "summary": "RF3 — Crear un registro.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AreaConocimientoCrear"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AreaConocimientoCrear"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AreaConocimientoCrear"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/area_conocimiento/{id}": {
+      "get": {
+        "tags": [
+          "AreaConocimiento"
+        ],
+        "summary": "RF2 — Obtener un registro por su llave.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "AreaConocimiento"
+        ],
+        "summary": "RF4 — Reemplazar completamente un registro.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AreaConocimientoReemplazo"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AreaConocimientoReemplazo"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AreaConocimientoReemplazo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "AreaConocimiento"
+        ],
+        "summary": "RF5 — Actualizar parcialmente un registro.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AreaConocimientoActualizar"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AreaConocimientoActualizar"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AreaConocimientoActualizar"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "AreaConocimiento"
+        ],
+        "summary": "RF6 — Borrado lógico.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/aspecto_normativo": {
+      "get": {
+        "tags": [
+          "AspectoNormativo"
+        ],
+        "summary": "RF1 — Listar registros activos.",
+        "parameters": [
+          {
+            "name": "limite",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1000
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "AspectoNormativo"
+        ],
+        "summary": "RF3 — Crear un registro.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AspectoNormativoCrear"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AspectoNormativoCrear"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AspectoNormativoCrear"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/aspecto_normativo/{id}": {
+      "get": {
+        "tags": [
+          "AspectoNormativo"
+        ],
+        "summary": "RF2 — Obtener un registro por su llave.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "AspectoNormativo"
+        ],
+        "summary": "RF4 — Reemplazar completamente un registro.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AspectoNormativoReemplazo"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AspectoNormativoReemplazo"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AspectoNormativoReemplazo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "AspectoNormativo"
+        ],
+        "summary": "RF5 — Actualizar parcialmente un registro.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AspectoNormativoActualizar"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AspectoNormativoActualizar"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AspectoNormativoActualizar"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "AspectoNormativo"
+        ],
+        "summary": "RF6 — Borrado lógico.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/car_innovacion": {
+      "get": {
+        "tags": [
+          "CarInnovacion"
+        ],
+        "summary": "RF1 — Listar registros activos.",
+        "parameters": [
+          {
+            "name": "limite",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1000
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "CarInnovacion"
+        ],
+        "summary": "RF3 — Crear un registro.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CarInnovacionCrear"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CarInnovacionCrear"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CarInnovacionCrear"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/car_innovacion/{id}": {
+      "get": {
+        "tags": [
+          "CarInnovacion"
+        ],
+        "summary": "RF2 — Obtener un registro por su llave.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "CarInnovacion"
+        ],
+        "summary": "RF4 — Reemplazar completamente un registro.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CarInnovacionReemplazo"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CarInnovacionReemplazo"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CarInnovacionReemplazo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "CarInnovacion"
+        ],
+        "summary": "RF5 — Actualizar parcialmente un registro.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CarInnovacionActualizar"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CarInnovacionActualizar"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CarInnovacionActualizar"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "CarInnovacion"
+        ],
+        "summary": "RF6 — Borrado lógico.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/dashboard/resumen": {
+      "get": {
+        "tags": [
+          "Dashboard"
+        ],
+        "summary": "Las cifras de las tarjetas: facultades, programas, docentes, graduados…",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/dashboard/programas-por-nivel": {
+      "get": {
+        "tags": [
+          "Dashboard"
+        ],
+        "summary": "Programas activos por nivel (profesional, maestría…).",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/dashboard/programas-por-sede": {
+      "get": {
+        "tags": [
+          "Dashboard"
+        ],
+        "summary": "Programas activos por ciudad de la sede.",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/dashboard/acreditaciones-por-calificacion": {
+      "get": {
+        "tags": [
+          "Dashboard"
+        ],
+        "summary": "Acreditaciones activas por calificación.",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/dashboard/registros-por-metodologia": {
+      "get": {
+        "tags": [
+          "Dashboard"
+        ],
+        "summary": "Registros calificados activos por metodología.",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/dashboard/docentes-por-dedicacion": {
+      "get": {
+        "tags": [
+          "Dashboard"
+        ],
+        "summary": "Vinculaciones docentes activas por dedicación.",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/dashboard/graduados-por-facultad": {
+      "get": {
+        "tags": [
+          "Dashboard"
+        ],
+        "summary": "Graduados por facultad: las «maximo» principales y el resto en «Otras».",
+        "parameters": [
+          {
+            "name": "maximo",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 6
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/docente_departamento": {
+      "get": {
+        "tags": [
+          "DocenteDepartamento"
+        ],
+        "summary": "RF1 — Listar registros activos.",
+        "parameters": [
+          {
+            "name": "limite",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1000
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "DocenteDepartamento"
+        ],
+        "summary": "RF3 — Crear un registro. 201 con la llave creada.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DocenteDepartamentoCrear"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DocenteDepartamentoCrear"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/DocenteDepartamentoCrear"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/docente_departamento/{docente}/{departamento}": {
+      "get": {
+        "tags": [
+          "DocenteDepartamento"
+        ],
+        "summary": "RF2 — Obtener un registro por su llave.",
+        "parameters": [
+          {
+            "name": "docente",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "departamento",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "DocenteDepartamento"
+        ],
+        "summary": "RF4 — Reemplazar completamente un registro.",
+        "parameters": [
+          {
+            "name": "docente",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "departamento",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DocenteDepartamentoReemplazo"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DocenteDepartamentoReemplazo"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/DocenteDepartamentoReemplazo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "DocenteDepartamento"
+        ],
+        "summary": "RF5 — Actualizar parcialmente un registro.",
+        "parameters": [
+          {
+            "name": "docente",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "departamento",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DocenteDepartamentoActualizar"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DocenteDepartamentoActualizar"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/DocenteDepartamentoActualizar"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "DocenteDepartamento"
+        ],
+        "summary": "RF6 — Borrado lógico.",
+        "parameters": [
+          {
+            "name": "docente",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "departamento",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/enfoque": {
+      "get": {
+        "tags": [
+          "Enfoque"
+        ],
+        "summary": "RF1 — Listar registros activos.",
+        "parameters": [
+          {
+            "name": "limite",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1000
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Enfoque"
+        ],
+        "summary": "RF3 — Crear un registro.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnfoqueCrear"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnfoqueCrear"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnfoqueCrear"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/enfoque/{id}": {
+      "get": {
+        "tags": [
+          "Enfoque"
+        ],
+        "summary": "RF2 — Obtener un registro por su llave.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Enfoque"
+        ],
+        "summary": "RF4 — Reemplazar completamente un registro.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnfoqueReemplazo"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnfoqueReemplazo"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnfoqueReemplazo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Enfoque"
+        ],
+        "summary": "RF5 — Actualizar parcialmente un registro.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnfoqueActualizar"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnfoqueActualizar"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnfoqueActualizar"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Enfoque"
+        ],
+        "summary": "RF6 — Borrado lógico.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/enfoque_rc": {
+      "get": {
+        "tags": [
+          "EnfoqueRc"
+        ],
+        "summary": "RF1 — Listar registros activos.",
+        "parameters": [
+          {
+            "name": "limite",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1000
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "EnfoqueRc"
+        ],
+        "summary": "RF3 — Crear un registro. 201 con la llave creada.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnfoqueRcCrear"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnfoqueRcCrear"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnfoqueRcCrear"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/enfoque_rc/{enfoque}/{registroCalificado}": {
+      "get": {
+        "tags": [
+          "EnfoqueRc"
+        ],
+        "summary": "RF2 — Obtener un registro por su llave.",
+        "parameters": [
+          {
+            "name": "enfoque",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "registroCalificado",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "EnfoqueRc"
+        ],
+        "summary": "RF6 — Borrado lógico.",
+        "parameters": [
+          {
+            "name": "enfoque",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "registroCalificado",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/facultad": {
+      "get": {
+        "tags": [
+          "Facultad"
+        ],
+        "summary": "RF1 — Listar registros activos.",
+        "parameters": [
+          {
+            "name": "limite",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1000
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Facultad"
+        ],
+        "summary": "RF3 — Crear un registro. 201 con la llave creada.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FacultadCrear"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FacultadCrear"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/FacultadCrear"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/facultad/{id}": {
+      "get": {
+        "tags": [
+          "Facultad"
+        ],
+        "summary": "RF2 — Obtener un registro por su llave.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Facultad"
+        ],
+        "summary": "RF4 — Reemplazar completamente un registro.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FacultadReemplazo"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FacultadReemplazo"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/FacultadReemplazo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Facultad"
+        ],
+        "summary": "RF5 — Actualizar parcialmente un registro.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FacultadActualizar"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FacultadActualizar"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/FacultadActualizar"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Facultad"
+        ],
+        "summary": "RF6 — Borrado lógico.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/login": {
+      "post": {
+        "tags": [
+          "Login"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginPeticion"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginPeticion"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginPeticion"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/pasantia": {
+      "get": {
+        "tags": [
+          "Pasantia"
+        ],
+        "summary": "RF1 — Listar registros activos.",
+        "parameters": [
+          {
+            "name": "limite",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1000
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Pasantia"
+        ],
+        "summary": "RF3 — Crear un registro. 201 con la llave creada.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasantiaCrear"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasantiaCrear"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasantiaCrear"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/pasantia/{id}": {
+      "get": {
+        "tags": [
+          "Pasantia"
+        ],
+        "summary": "RF2 — Obtener un registro por su llave.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Pasantia"
+        ],
+        "summary": "RF4 — Reemplazar completamente un registro.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasantiaReemplazo"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasantiaReemplazo"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasantiaReemplazo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Pasantia"
+        ],
+        "summary": "RF5 — Actualizar parcialmente un registro.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasantiaActualizar"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasantiaActualizar"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasantiaActualizar"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Pasantia"
+        ],
+        "summary": "RF6 — Borrado lógico.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/practica_estrategia": {
+      "get": {
+        "tags": [
+          "PracticaEstrategia"
+        ],
+        "summary": "RF1 — Listar registros activos.",
+        "parameters": [
+          {
+            "name": "limite",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1000
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "PracticaEstrategia"
+        ],
+        "summary": "RF3 — Crear un registro.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PracticaEstrategiaCrear"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PracticaEstrategiaCrear"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PracticaEstrategiaCrear"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/practica_estrategia/{id}": {
+      "get": {
+        "tags": [
+          "PracticaEstrategia"
+        ],
+        "summary": "RF2 — Obtener un registro por su llave.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "PracticaEstrategia"
+        ],
+        "summary": "RF4 — Reemplazar completamente un registro.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PracticaEstrategiaReemplazo"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PracticaEstrategiaReemplazo"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PracticaEstrategiaReemplazo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "PracticaEstrategia"
+        ],
+        "summary": "RF5 — Actualizar parcialmente un registro.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PracticaEstrategiaActualizar"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PracticaEstrategiaActualizar"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PracticaEstrategiaActualizar"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "PracticaEstrategia"
+        ],
+        "summary": "RF6 — Borrado lógico.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/premio": {
+      "get": {
+        "tags": [
+          "Premio"
+        ],
+        "summary": "RF1 — Listar registros activos.",
+        "parameters": [
+          {
+            "name": "limite",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1000
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Premio"
+        ],
+        "summary": "RF3 — Crear un registro. 201 con la llave creada.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PremioCrear"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PremioCrear"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PremioCrear"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/premio/{id}": {
+      "get": {
+        "tags": [
+          "Premio"
+        ],
+        "summary": "RF2 — Obtener un registro por su llave.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Premio"
+        ],
+        "summary": "RF4 — Reemplazar completamente un registro.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PremioReemplazo"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PremioReemplazo"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PremioReemplazo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Premio"
+        ],
+        "summary": "RF5 — Actualizar parcialmente un registro.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PremioActualizar"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PremioActualizar"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PremioActualizar"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Premio"
+        ],
+        "summary": "RF6 — Borrado lógico.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/programa": {
+      "get": {
+        "tags": [
+          "Programa"
+        ],
+        "summary": "RF1 — Listar registros activos.",
+        "parameters": [
+          {
+            "name": "limite",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1000
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Programa"
+        ],
+        "summary": "RF3 — Crear un registro. 201 con la llave creada.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProgramaCrear"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProgramaCrear"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProgramaCrear"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/programa/{id}": {
+      "get": {
+        "tags": [
+          "Programa"
+        ],
+        "summary": "RF2 — Obtener un registro por su llave.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Programa"
+        ],
+        "summary": "RF4 — Reemplazar completamente un registro.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProgramaReemplazo"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProgramaReemplazo"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProgramaReemplazo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Programa"
+        ],
+        "summary": "RF5 — Actualizar parcialmente un registro.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProgramaActualizar"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProgramaActualizar"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProgramaActualizar"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Programa"
+        ],
+        "summary": "RF6 — Borrado lógico.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/programa_ac": {
+      "get": {
+        "tags": [
+          "ProgramaAc"
+        ],
+        "summary": "RF1 — Listar registros activos.",
+        "parameters": [
+          {
+            "name": "limite",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1000
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "ProgramaAc"
+        ],
+        "summary": "RF3 — Crear un registro. 201 con la llave creada.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProgramaAcCrear"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProgramaAcCrear"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProgramaAcCrear"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/programa_ac/{programa}/{areaConocimiento}": {
+      "get": {
+        "tags": [
+          "ProgramaAc"
+        ],
+        "summary": "RF2 — Obtener un registro por su llave.",
+        "parameters": [
+          {
+            "name": "programa",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "areaConocimiento",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "ProgramaAc"
+        ],
+        "summary": "RF6 — Borrado lógico.",
+        "parameters": [
+          {
+            "name": "programa",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "areaConocimiento",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/programa_ci": {
+      "get": {
+        "tags": [
+          "ProgramaCi"
+        ],
+        "summary": "RF1 — Listar registros activos.",
+        "parameters": [
+          {
+            "name": "limite",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1000
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "ProgramaCi"
+        ],
+        "summary": "RF3 — Crear un registro. 201 con la llave creada.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProgramaCiCrear"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProgramaCiCrear"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProgramaCiCrear"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/programa_ci/{programa}/{carInnovacion}": {
+      "get": {
+        "tags": [
+          "ProgramaCi"
+        ],
+        "summary": "RF2 — Obtener un registro por su llave.",
+        "parameters": [
+          {
+            "name": "programa",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "carInnovacion",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "ProgramaCi"
+        ],
+        "summary": "RF6 — Borrado lógico.",
+        "parameters": [
+          {
+            "name": "programa",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "carInnovacion",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/programa/completo": {
+      "post": {
+        "tags": [
+          "ProgramaCompleto"
+        ],
+        "summary": "MD3 — Crear el programa con todo su detalle. Todo o nada.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProgramaCompletoCrear"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProgramaCompletoCrear"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProgramaCompletoCrear"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/programa/{id}/completo": {
+      "get": {
+        "tags": [
+          "ProgramaCompleto"
+        ],
+        "summary": "MD4 — El programa con su detalle activo.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/programa_pe": {
+      "get": {
+        "tags": [
+          "ProgramaPe"
+        ],
+        "summary": "RF1 — Listar registros activos.",
+        "parameters": [
+          {
+            "name": "limite",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1000
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "ProgramaPe"
+        ],
+        "summary": "RF3 — Crear un registro. 201 con la llave creada.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProgramaPeCrear"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProgramaPeCrear"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProgramaPeCrear"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/programa_pe/{programa}/{practicaEstrategia}": {
+      "get": {
+        "tags": [
+          "ProgramaPe"
+        ],
+        "summary": "RF2 — Obtener un registro por su llave.",
+        "parameters": [
+          {
+            "name": "programa",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "practicaEstrategia",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "ProgramaPe"
+        ],
+        "summary": "RF6 — Borrado lógico.",
+        "parameters": [
+          {
+            "name": "programa",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "practicaEstrategia",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/registro_calificado": {
+      "get": {
+        "tags": [
+          "RegistroCalificado"
+        ],
+        "summary": "RF1 — Listar registros activos.",
+        "parameters": [
+          {
+            "name": "limite",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1000
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "RegistroCalificado"
+        ],
+        "summary": "RF3 — Crear un registro. 201 con la llave creada.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegistroCalificadoCrear"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegistroCalificadoCrear"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegistroCalificadoCrear"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/registro_calificado/{codigo}": {
+      "get": {
+        "tags": [
+          "RegistroCalificado"
+        ],
+        "summary": "RF2 — Obtener un registro por su llave.",
+        "parameters": [
+          {
+            "name": "codigo",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "RegistroCalificado"
+        ],
+        "summary": "RF4 — Reemplazar completamente un registro.",
+        "parameters": [
+          {
+            "name": "codigo",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegistroCalificadoReemplazo"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegistroCalificadoReemplazo"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegistroCalificadoReemplazo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "RegistroCalificado"
+        ],
+        "summary": "RF5 — Actualizar parcialmente un registro.",
+        "parameters": [
+          {
+            "name": "codigo",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegistroCalificadoActualizar"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegistroCalificadoActualizar"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegistroCalificadoActualizar"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "RegistroCalificado"
+        ],
+        "summary": "RF6 — Borrado lógico.",
+        "parameters": [
+          {
+            "name": "codigo",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/registro_calificado/completo": {
+      "post": {
+        "tags": [
+          "RegistroCalificadoCompleto"
+        ],
+        "summary": "MD1 — Crear el registro con todo su detalle. Todo o nada.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegistroCalificadoCompletoCrear"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegistroCalificadoCompletoCrear"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegistroCalificadoCompletoCrear"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/registro_calificado/{codigo}/completo": {
+      "get": {
+        "tags": [
+          "RegistroCalificadoCompleto"
+        ],
+        "summary": "MD2 — El registro con su detalle activo.",
+        "parameters": [
+          {
+            "name": "codigo",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/reportes": {
+      "get": {
+        "tags": [
+          "Reportes"
+        ],
+        "summary": "El catálogo: los 10 reportes con su ruta, título, descripción y tablas.",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/reportes/programas-acreditados": {
+      "get": {
+        "tags": [
+          "Reportes"
+        ],
+        "summary": "R1 — Programas acreditados (acreditacion, programa, facultad, universidad).",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/reportes/registros-con-enfoques": {
+      "get": {
+        "tags": [
+          "Reportes"
+        ],
+        "summary": "R2 — Registros calificados con sus enfoques (5 tablas).",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/reportes/plan-de-estudios": {
+      "get": {
+        "tags": [
+          "Reportes"
+        ],
+        "summary": "R3 — Plan de estudios por registro calificado (4 tablas).",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/reportes/areas-por-facultad": {
+      "get": {
+        "tags": [
+          "Reportes"
+        ],
+        "summary": "R4 — Áreas de conocimiento por facultad (4 tablas).",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/reportes/innovacion-por-programa": {
+      "get": {
+        "tags": [
+          "Reportes"
+        ],
+        "summary": "R5 — Innovación por programa (6 tablas).",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/reportes/alianzas-vigentes": {
+      "get": {
+        "tags": [
+          "Reportes"
+        ],
+        "summary": "R6 — Alianzas vigentes (5 tablas).",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/reportes/normatividad-por-programa": {
+      "get": {
+        "tags": [
+          "Reportes"
+        ],
+        "summary": "R7 — Normatividad por programa (4 tablas).",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/reportes/internacionalizacion": {
+      "get": {
+        "tags": [
+          "Reportes"
+        ],
+        "summary": "R8 — Internacionalización y reconocimientos (4 tablas).",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/reportes/docentes-por-sede": {
+      "get": {
+        "tags": [
+          "Reportes"
+        ],
+        "summary": "R9 — Docentes por sede y dedicación (4 tablas).",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/reportes/cursos-espejo": {
+      "get": {
+        "tags": [
+          "Reportes"
+        ],
+        "summary": "R10 — Cursos espejo internacionales (4 tablas).",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/rol": {
+      "get": {
+        "tags": [
+          "Rol"
+        ],
+        "parameters": [
+          {
+            "name": "limite",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1000
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Rol"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RolCrear"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RolCrear"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RolCrear"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/rol/{id}": {
+      "get": {
+        "tags": [
+          "Rol"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Rol"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RolReemplazo"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RolReemplazo"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RolReemplazo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Rol"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RolActualizar"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RolActualizar"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RolActualizar"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Rol"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/rol_usuario": {
+      "get": {
+        "tags": [
+          "RolUsuario"
+        ],
+        "parameters": [
+          {
+            "name": "limite",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1000
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "RolUsuario"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RolUsuarioCrear"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RolUsuarioCrear"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RolUsuarioCrear"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/rol_usuario/{usuarioId}/{rolId}": {
+      "get": {
+        "tags": [
+          "RolUsuario"
+        ],
+        "parameters": [
+          {
+            "name": "usuarioId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "rolId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "RolUsuario"
+        ],
+        "parameters": [
+          {
+            "name": "usuarioId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "rolId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/universidad": {
+      "get": {
+        "tags": [
+          "Universidad"
+        ],
+        "summary": "RF1 — Listar registros activos.",
+        "parameters": [
+          {
+            "name": "limite",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1000
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Universidad"
+        ],
+        "summary": "RF3 — Crear un registro.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UniversidadCrear"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UniversidadCrear"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UniversidadCrear"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/universidad/{id}": {
+      "get": {
+        "tags": [
+          "Universidad"
+        ],
+        "summary": "RF2 — Obtener un registro por su llave.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Universidad"
+        ],
+        "summary": "RF4 — Reemplazar completamente un registro.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UniversidadReemplazo"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UniversidadReemplazo"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UniversidadReemplazo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Universidad"
+        ],
+        "summary": "RF5 — Actualizar parcialmente un registro.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UniversidadActualizar"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UniversidadActualizar"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UniversidadActualizar"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Universidad"
+        ],
+        "summary": "RF6 — Borrado lógico.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/usuario": {
+      "get": {
+        "tags": [
+          "Usuario"
+        ],
+        "parameters": [
+          {
+            "name": "limite",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1000
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Usuario"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UsuarioCrear"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UsuarioCrear"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UsuarioCrear"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/usuario/{id}": {
+      "get": {
+        "tags": [
+          "Usuario"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Usuario"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UsuarioReemplazo"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UsuarioReemplazo"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UsuarioReemplazo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Usuario"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UsuarioActualizar"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UsuarioActualizar"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UsuarioActualizar"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Usuario"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AaRcActualizar": {
+        "type": "object",
+        "properties": {
+          "componente": {
+            "maxLength": 45,
+            "type": "string",
+            "nullable": true
+          },
+          "semestre": {
+            "maxLength": 45,
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del PATCH para aa_rc: todo opcional, y solo se escribe lo que llegue. El MISMO cuerpo incompleto responde 422 en PUT y 200 aquí: lo decide el tipo, no un if.\r\n            \r\nLos tipos son anulables a propósito: si no lo fueran, un número ausente\r\nllegaría como 0 y el [Required] no se enteraría."
+      },
+      "AaRcCrear": {
+        "required": [
+          "activAcademicasIdcurso",
+          "componente",
+          "registroCalificadoCodigo",
+          "semestre"
+        ],
+        "type": "object",
+        "properties": {
+          "activAcademicasIdcurso": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "registroCalificadoCodigo": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "componente": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "semestre": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del POST para aa_rc. Lleva la llave, porque en esta tabla la llave no la genera la base: la escribe quien registra. Si falta un campo obligatorio, el framework responde 422 antes de que el negocio se entere.\r\n            \r\nLos tipos son anulables a propósito: si no lo fueran, un número ausente\r\nllegaría como 0 y el [Required] no se enteraría."
+      },
+      "AaRcReemplazo": {
+        "required": [
+          "componente",
+          "semestre"
+        ],
+        "type": "object",
+        "properties": {
+          "componente": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "semestre": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del PUT para aa_rc: reemplazar es poner TODO de nuevo, así que los campos obligatorios lo son también aquí. La llave no va: identifica la fila y viaja en la ruta. Un campo opcional que no llegue queda en NULL.\r\n            \r\nLos tipos son anulables a propósito: si no lo fueran, un número ausente\r\nllegaría como 0 y el [Required] no se enteraría."
+      },
+      "AcreditacionActualizar": {
+        "type": "object",
+        "properties": {
+          "tipo": {
+            "maxLength": 45,
+            "type": "string",
+            "nullable": true
+          },
+          "calificacion": {
+            "maxLength": 45,
+            "type": "string",
+            "nullable": true
+          },
+          "fechaInicio": {
+            "maxLength": 45,
+            "type": "string",
+            "nullable": true
+          },
+          "fechaFin": {
+            "maxLength": 45,
+            "type": "string",
+            "nullable": true
+          },
+          "programa": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del PATCH para acreditacion: todo opcional, y solo se escribe lo que llegue. El MISMO cuerpo incompleto responde 422 en PUT y 200 aquí: lo decide el tipo, no un if.\r\n            \r\nLos tipos son anulables a propósito: si no lo fueran, un número ausente\r\nllegaría como 0 y el [Required] no se enteraría."
+      },
+      "AcreditacionCrear": {
+        "required": [
+          "calificacion",
+          "fechaFin",
+          "fechaInicio",
+          "programa",
+          "resolucion",
+          "tipo"
+        ],
+        "type": "object",
+        "properties": {
+          "resolucion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "tipo": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "calificacion": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "fechaInicio": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "fechaFin": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "programa": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del POST para acreditacion. Lleva la llave, porque en esta tabla la llave no la genera la base: la escribe quien registra. Si falta un campo obligatorio, el framework responde 422 antes de que el negocio se entere.\r\n            \r\nLos tipos son anulables a propósito: si no lo fueran, un número ausente\r\nllegaría como 0 y el [Required] no se enteraría."
+      },
+      "AcreditacionReemplazo": {
+        "required": [
+          "calificacion",
+          "fechaFin",
+          "fechaInicio",
+          "programa",
+          "tipo"
+        ],
+        "type": "object",
+        "properties": {
+          "tipo": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "calificacion": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "fechaInicio": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "fechaFin": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "programa": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del PUT para acreditacion: reemplazar es poner TODO de nuevo, así que los campos obligatorios lo son también aquí. La llave no va: identifica la fila y viaja en la ruta. Un campo opcional que no llegue queda en NULL.\r\n            \r\nLos tipos son anulables a propósito: si no lo fueran, un número ausente\r\nllegaría como 0 y el [Required] no se enteraría."
+      },
+      "ActivAcademicaActualizar": {
+        "type": "object",
+        "properties": {
+          "nombre": {
+            "maxLength": 45,
+            "type": "string",
+            "nullable": true
+          },
+          "numCreditos": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "tipo": {
+            "maxLength": 20,
+            "type": "string",
+            "nullable": true
+          },
+          "areaFormacion": {
+            "maxLength": 45,
+            "type": "string",
+            "nullable": true
+          },
+          "hAcom": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "hIndep": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idioma": {
+            "maxLength": 45,
+            "type": "string",
+            "nullable": true
+          },
+          "espejo": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "entidadEspejo": {
+            "maxLength": 45,
+            "type": "string",
+            "nullable": true
+          },
+          "paisEspejo": {
+            "maxLength": 45,
+            "type": "string",
+            "nullable": true
+          },
+          "disenio": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del PATCH para activ_academica: todo opcional, y solo se escribe lo que llegue. El MISMO cuerpo incompleto responde 422 en PUT y 200 aquí: lo decide el tipo, no un if.\r\n            \r\nLos tipos son anulables a propósito: si no lo fueran, un número ausente\r\nllegaría como 0 y el [Required] no se enteraría."
+      },
+      "ActivAcademicaCrear": {
+        "required": [
+          "areaFormacion",
+          "entidadEspejo",
+          "espejo",
+          "hAcom",
+          "hIndep",
+          "id",
+          "idioma",
+          "nombre",
+          "numCreditos",
+          "paisEspejo",
+          "tipo"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nombre": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "numCreditos": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "tipo": {
+            "maxLength": 20,
+            "minLength": 1,
+            "type": "string"
+          },
+          "areaFormacion": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "hAcom": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "hIndep": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idioma": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "espejo": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "entidadEspejo": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "paisEspejo": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "disenio": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del POST para activ_academica. Lleva la llave, porque en esta tabla la llave no la genera la base: la escribe quien registra. Si falta un campo obligatorio, el framework responde 422 antes de que el negocio se entere.\r\n            \r\nLos tipos son anulables a propósito: si no lo fueran, un número ausente\r\nllegaría como 0 y el [Required] no se enteraría."
+      },
+      "ActivAcademicaReemplazo": {
+        "required": [
+          "areaFormacion",
+          "entidadEspejo",
+          "espejo",
+          "hAcom",
+          "hIndep",
+          "idioma",
+          "nombre",
+          "numCreditos",
+          "paisEspejo",
+          "tipo"
+        ],
+        "type": "object",
+        "properties": {
+          "nombre": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "numCreditos": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "tipo": {
+            "maxLength": 20,
+            "minLength": 1,
+            "type": "string"
+          },
+          "areaFormacion": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "hAcom": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "hIndep": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idioma": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "espejo": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "entidadEspejo": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "paisEspejo": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "disenio": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del PUT para activ_academica: reemplazar es poner TODO de nuevo, así que los campos obligatorios lo son también aquí. La llave no va: identifica la fila y viaja en la ruta. Un campo opcional que no llegue queda en NULL.\r\n            \r\nLos tipos son anulables a propósito: si no lo fueran, un número ausente\r\nllegaría como 0 y el [Required] no se enteraría."
+      },
+      "ActividadDelRegistroCrear": {
+        "required": [
+          "activAcademicasIdcurso",
+          "componente",
+          "semestre"
+        ],
+        "type": "object",
+        "properties": {
+          "activAcademicasIdcurso": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "componente": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "semestre": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AliadoActualizar": {
+        "type": "object",
+        "properties": {
+          "razonSocial": {
+            "type": "string",
+            "nullable": true
+          },
+          "nombreContacto": {
+            "type": "string",
+            "nullable": true
+          },
+          "correo": {
+            "type": "string",
+            "nullable": true
+          },
+          "telefono": {
+            "type": "string",
+            "nullable": true
+          },
+          "ciudad": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del PATCH: los cinco campos son OPCIONALES, y solo se escriben los\r\nque lleguen.\r\n            \r\nLa diferencia con AliadoReemplazo es toda la lección del contrato: el MISMO\r\ncuerpo responde 422 en PUT y 200 en PATCH, y no lo decide un if en el\r\nservicio — lo decide el tipo."
+      },
+      "AliadoCrear": {
+        "required": [
+          "ciudad",
+          "correo",
+          "nit",
+          "nombreContacto",
+          "razonSocial",
+          "telefono"
+        ],
+        "type": "object",
+        "properties": {
+          "nit": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "razonSocial": {
+            "maxLength": 60,
+            "minLength": 1,
+            "type": "string"
+          },
+          "nombreContacto": {
+            "maxLength": 60,
+            "minLength": 1,
+            "type": "string"
+          },
+          "correo": {
+            "maxLength": 70,
+            "minLength": 1,
+            "type": "string"
+          },
+          "telefono": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "ciudad": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del POST. Los SEIS campos son obligatorios: crear un aliado a medias\r\nno tiene sentido. Si falta uno, el framework responde 422 antes de que el\r\nnegocio se entere (3_plan.md §4.1)."
+      },
+      "AliadoReemplazo": {
+        "required": [
+          "ciudad",
+          "correo",
+          "nombreContacto",
+          "razonSocial",
+          "telefono"
+        ],
+        "type": "object",
+        "properties": {
+          "razonSocial": {
+            "maxLength": 60,
+            "minLength": 1,
+            "type": "string"
+          },
+          "nombreContacto": {
+            "maxLength": 60,
+            "minLength": 1,
+            "type": "string"
+          },
+          "correo": {
+            "maxLength": 70,
+            "minLength": 1,
+            "type": "string"
+          },
+          "telefono": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "ciudad": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del PUT. Reemplazar es poner TODO de nuevo, así que los cinco campos\r\nson obligatorios. El nit no va aquí: identifica la fila y viaja en la ruta\r\n(D-v1-5 del modelo de datos)."
+      },
+      "AlianzaActualizar": {
+        "type": "object",
+        "properties": {
+          "fechaInicio": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "fechaFin": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "docente": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del PATCH para alianza: todo opcional, y solo se escribe lo que llegue. El MISMO cuerpo incompleto responde 422 en PUT y 200 aquí: lo decide el tipo, no un if.\r\n            \r\nLos tipos son anulables a propósito: si no lo fueran, un número ausente\r\nllegaría como 0 y el [Required] no se enteraría."
+      },
+      "AlianzaCrear": {
+        "required": [
+          "aliado",
+          "departamento",
+          "fechaInicio"
+        ],
+        "type": "object",
+        "properties": {
+          "aliado": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "departamento": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "fechaInicio": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "fechaFin": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "docente": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del POST para alianza. Lleva la llave, porque en esta tabla la llave no la genera la base: la escribe quien registra. Si falta un campo obligatorio, el framework responde 422 antes de que el negocio se entere.\r\n            \r\nLos tipos son anulables a propósito: si no lo fueran, un número ausente\r\nllegaría como 0 y el [Required] no se enteraría."
+      },
+      "AlianzaReemplazo": {
+        "required": [
+          "fechaInicio"
+        ],
+        "type": "object",
+        "properties": {
+          "fechaInicio": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "fechaFin": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "docente": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del PUT para alianza: reemplazar es poner TODO de nuevo, así que los campos obligatorios lo son también aquí. La llave no va: identifica la fila y viaja en la ruta. Un campo opcional que no llegue queda en NULL.\r\n            \r\nLos tipos son anulables a propósito: si no lo fueran, un número ausente\r\nllegaría como 0 y el [Required] no se enteraría."
+      },
+      "AnProgramaCrear": {
+        "required": [
+          "aspectoNormativo",
+          "programa"
+        ],
+        "type": "object",
+        "properties": {
+          "aspectoNormativo": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "programa": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del POST para an_programa. Lleva la llave, porque en esta tabla la llave no la genera la base: la escribe quien registra. Si falta un campo obligatorio, el framework responde 422 antes de que el negocio se entere.\r\n            \r\nLos tipos son anulables a propósito: si no lo fueran, un número ausente\r\nllegaría como 0 y el [Required] no se enteraría."
+      },
+      "AreaConocimientoActualizar": {
+        "type": "object",
+        "properties": {
+          "granArea": {
+            "type": "string",
+            "nullable": true
+          },
+          "area": {
+            "type": "string",
+            "nullable": true
+          },
+          "disciplina": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del PATCH para area_conocimiento: los campos son OPCIONALES, y solo se\r\nescriben los que lleguen.\r\n            \r\nLa diferencia con AreaConocimientoReemplazo es toda la lección del contrato: el MISMO\r\ncuerpo responde 422 en PUT y 200 en PATCH, y no lo decide un if en el\r\nservicio — lo decide el tipo."
+      },
+      "AreaConocimientoCrear": {
+        "required": [
+          "area",
+          "disciplina",
+          "granArea",
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "maxLength": 6,
+            "minLength": 1,
+            "type": "string"
+          },
+          "granArea": {
+            "maxLength": 60,
+            "minLength": 1,
+            "type": "string"
+          },
+          "area": {
+            "maxLength": 60,
+            "minLength": 1,
+            "type": "string"
+          },
+          "disciplina": {
+            "maxLength": 150,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del POST para area_conocimiento. Todos los campos son obligatorios: crear un\r\nregistro a medias no tiene sentido. Si falta uno, el framework responde 422\r\nantes de que el negocio se entere."
+      },
+      "AreaConocimientoReemplazo": {
+        "required": [
+          "area",
+          "disciplina",
+          "granArea"
+        ],
+        "type": "object",
+        "properties": {
+          "granArea": {
+            "maxLength": 60,
+            "minLength": 1,
+            "type": "string"
+          },
+          "area": {
+            "maxLength": 60,
+            "minLength": 1,
+            "type": "string"
+          },
+          "disciplina": {
+            "maxLength": 150,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del PUT para area_conocimiento. Reemplazar es poner TODO de nuevo, así que\r\ntodos los campos son obligatorios. El id no va aquí: identifica la\r\nfila y viaja en la ruta."
+      },
+      "AspectoNormativoActualizar": {
+        "type": "object",
+        "properties": {
+          "tipo": {
+            "type": "string",
+            "nullable": true
+          },
+          "descripcion": {
+            "type": "string",
+            "nullable": true
+          },
+          "fuente": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del PATCH para aspecto_normativo: los campos son OPCIONALES, y solo se\r\nescriben los que lleguen.\r\n            \r\nLa diferencia con AspectoNormativoReemplazo es toda la lección del contrato: el MISMO\r\ncuerpo responde 422 en PUT y 200 en PATCH, y no lo decide un if en el\r\nservicio — lo decide el tipo."
+      },
+      "AspectoNormativoCrear": {
+        "required": [
+          "descripcion",
+          "fuente",
+          "id",
+          "tipo"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "tipo": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "descripcion": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "fuente": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del POST para aspecto_normativo. Todos los campos son obligatorios: crear un\r\nregistro a medias no tiene sentido. Si falta uno, el framework responde 422\r\nantes de que el negocio se entere."
+      },
+      "AspectoNormativoReemplazo": {
+        "required": [
+          "descripcion",
+          "fuente",
+          "tipo"
+        ],
+        "type": "object",
+        "properties": {
+          "tipo": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "descripcion": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "fuente": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del PUT para aspecto_normativo. Reemplazar es poner TODO de nuevo, así que\r\ntodos los campos son obligatorios. El id no va aquí: identifica la\r\nfila y viaja en la ruta."
+      },
+      "CarInnovacionActualizar": {
+        "type": "object",
+        "properties": {
+          "nombre": {
+            "type": "string",
+            "nullable": true
+          },
+          "descripcion": {
+            "type": "string",
+            "nullable": true
+          },
+          "tipo": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del PATCH para car_innovacion: los campos son OPCIONALES, y solo se\r\nescriben los que lleguen.\r\n            \r\nLa diferencia con CarInnovacionReemplazo es toda la lección del contrato: el MISMO\r\ncuerpo responde 422 en PUT y 200 en PATCH, y no lo decide un if en el\r\nservicio — lo decide el tipo."
+      },
+      "CarInnovacionCrear": {
+        "required": [
+          "descripcion",
+          "id",
+          "nombre",
+          "tipo"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nombre": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "descripcion": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "tipo": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del POST para car_innovacion. Todos los campos son obligatorios: crear un\r\nregistro a medias no tiene sentido. Si falta uno, el framework responde 422\r\nantes de que el negocio se entere."
+      },
+      "CarInnovacionReemplazo": {
+        "required": [
+          "descripcion",
+          "nombre",
+          "tipo"
+        ],
+        "type": "object",
+        "properties": {
+          "nombre": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "descripcion": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "tipo": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del PUT para car_innovacion. Reemplazar es poner TODO de nuevo, así que\r\ntodos los campos son obligatorios. El id no va aquí: identifica la\r\nfila y viaja en la ruta."
+      },
+      "DocenteDepartamentoActualizar": {
+        "type": "object",
+        "properties": {
+          "dedicacion": {
+            "maxLength": 15,
+            "type": "string",
+            "nullable": true
+          },
+          "modalidad": {
+            "maxLength": 45,
+            "type": "string",
+            "nullable": true
+          },
+          "fechaIngreso": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "fechaSalida": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del PATCH para docente_departamento: todo opcional, y solo se escribe lo que llegue. El MISMO cuerpo incompleto responde 422 en PUT y 200 aquí: lo decide el tipo, no un if.\r\n            \r\nLos tipos son anulables a propósito: si no lo fueran, un número ausente\r\nllegaría como 0 y el [Required] no se enteraría."
+      },
+      "DocenteDepartamentoCrear": {
+        "required": [
+          "dedicacion",
+          "departamento",
+          "docente",
+          "fechaIngreso",
+          "modalidad"
+        ],
+        "type": "object",
+        "properties": {
+          "docente": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "departamento": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "dedicacion": {
+            "maxLength": 15,
+            "minLength": 1,
+            "type": "string"
+          },
+          "modalidad": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "fechaIngreso": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "fechaSalida": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del POST para docente_departamento. Lleva la llave, porque en esta tabla la llave no la genera la base: la escribe quien registra. Si falta un campo obligatorio, el framework responde 422 antes de que el negocio se entere.\r\n            \r\nLos tipos son anulables a propósito: si no lo fueran, un número ausente\r\nllegaría como 0 y el [Required] no se enteraría."
+      },
+      "DocenteDepartamentoReemplazo": {
+        "required": [
+          "dedicacion",
+          "fechaIngreso",
+          "modalidad"
+        ],
+        "type": "object",
+        "properties": {
+          "dedicacion": {
+            "maxLength": 15,
+            "minLength": 1,
+            "type": "string"
+          },
+          "modalidad": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "fechaIngreso": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "fechaSalida": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del PUT para docente_departamento: reemplazar es poner TODO de nuevo, así que los campos obligatorios lo son también aquí. La llave no va: identifica la fila y viaja en la ruta. Un campo opcional que no llegue queda en NULL.\r\n            \r\nLos tipos son anulables a propósito: si no lo fueran, un número ausente\r\nllegaría como 0 y el [Required] no se enteraría."
+      },
+      "EnfoqueActualizar": {
+        "type": "object",
+        "properties": {
+          "nombre": {
+            "type": "string",
+            "nullable": true
+          },
+          "descripcion": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del PATCH para enfoque: los campos son OPCIONALES, y solo se\r\nescriben los que lleguen.\r\n            \r\nLa diferencia con EnfoqueReemplazo es toda la lección del contrato: el MISMO\r\ncuerpo responde 422 en PUT y 200 en PATCH, y no lo decide un if en el\r\nservicio — lo decide el tipo."
+      },
+      "EnfoqueCrear": {
+        "required": [
+          "descripcion",
+          "id",
+          "nombre"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nombre": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "descripcion": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del POST para enfoque. Todos los campos son obligatorios: crear un\r\nregistro a medias no tiene sentido. Si falta uno, el framework responde 422\r\nantes de que el negocio se entere."
+      },
+      "EnfoqueRcCrear": {
+        "required": [
+          "enfoque",
+          "registroCalificado"
+        ],
+        "type": "object",
+        "properties": {
+          "enfoque": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "registroCalificado": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del POST para enfoque_rc. Lleva la llave, porque en esta tabla la llave no la genera la base: la escribe quien registra. Si falta un campo obligatorio, el framework responde 422 antes de que el negocio se entere.\r\n            \r\nLos tipos son anulables a propósito: si no lo fueran, un número ausente\r\nllegaría como 0 y el [Required] no se enteraría."
+      },
+      "EnfoqueReemplazo": {
+        "required": [
+          "descripcion",
+          "nombre"
+        ],
+        "type": "object",
+        "properties": {
+          "nombre": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "descripcion": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del PUT para enfoque. Reemplazar es poner TODO de nuevo, así que\r\ntodos los campos son obligatorios. El id no va aquí: identifica la\r\nfila y viaja en la ruta."
+      },
+      "FacultadActualizar": {
+        "type": "object",
+        "properties": {
+          "nombre": {
+            "maxLength": 60,
+            "type": "string",
+            "nullable": true
+          },
+          "tipo": {
+            "maxLength": 45,
+            "type": "string",
+            "nullable": true
+          },
+          "fechaFun": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "universidad": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del PATCH para facultad: todo opcional, y solo se escribe lo que llegue. El MISMO cuerpo incompleto responde 422 en PUT y 200 aquí: lo decide el tipo, no un if.\r\n            \r\nLos tipos son anulables a propósito: si no lo fueran, un número ausente\r\nllegaría como 0 y el [Required] no se enteraría."
+      },
+      "FacultadCrear": {
+        "required": [
+          "fechaFun",
+          "id",
+          "nombre",
+          "tipo",
+          "universidad"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nombre": {
+            "maxLength": 60,
+            "minLength": 1,
+            "type": "string"
+          },
+          "tipo": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "fechaFun": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "universidad": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del POST para facultad. Lleva la llave, porque en esta tabla la llave no la genera la base: la escribe quien registra. Si falta un campo obligatorio, el framework responde 422 antes de que el negocio se entere.\r\n            \r\nLos tipos son anulables a propósito: si no lo fueran, un número ausente\r\nllegaría como 0 y el [Required] no se enteraría."
+      },
+      "FacultadReemplazo": {
+        "required": [
+          "fechaFun",
+          "nombre",
+          "tipo",
+          "universidad"
+        ],
+        "type": "object",
+        "properties": {
+          "nombre": {
+            "maxLength": 60,
+            "minLength": 1,
+            "type": "string"
+          },
+          "tipo": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "fechaFun": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "universidad": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del PUT para facultad: reemplazar es poner TODO de nuevo, así que los campos obligatorios lo son también aquí. La llave no va: identifica la fila y viaja en la ruta. Un campo opcional que no llegue queda en NULL.\r\n            \r\nLos tipos son anulables a propósito: si no lo fueran, un número ausente\r\nllegaría como 0 y el [Required] no se enteraría."
+      },
+      "LoginPeticion": {
+        "required": [
+          "clave",
+          "usuario"
+        ],
+        "type": "object",
+        "properties": {
+          "usuario": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "clave": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo de POST /api/login."
+      },
+      "PasantiaActualizar": {
+        "type": "object",
+        "properties": {
+          "nombre": {
+            "maxLength": 45,
+            "type": "string",
+            "nullable": true
+          },
+          "pais": {
+            "maxLength": 45,
+            "type": "string",
+            "nullable": true
+          },
+          "empresa": {
+            "maxLength": 45,
+            "type": "string",
+            "nullable": true
+          },
+          "descripcion": {
+            "maxLength": 45,
+            "type": "string",
+            "nullable": true
+          },
+          "programa": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del PATCH para pasantia: todo opcional, y solo se escribe lo que llegue. El MISMO cuerpo incompleto responde 422 en PUT y 200 aquí: lo decide el tipo, no un if.\r\n            \r\nLos tipos son anulables a propósito: si no lo fueran, un número ausente\r\nllegaría como 0 y el [Required] no se enteraría."
+      },
+      "PasantiaCrear": {
+        "required": [
+          "descripcion",
+          "empresa",
+          "id",
+          "nombre",
+          "pais",
+          "programa"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nombre": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "pais": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "empresa": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "descripcion": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "programa": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del POST para pasantia. Lleva la llave, porque en esta tabla la llave no la genera la base: la escribe quien registra. Si falta un campo obligatorio, el framework responde 422 antes de que el negocio se entere.\r\n            \r\nLos tipos son anulables a propósito: si no lo fueran, un número ausente\r\nllegaría como 0 y el [Required] no se enteraría."
+      },
+      "PasantiaReemplazo": {
+        "required": [
+          "descripcion",
+          "empresa",
+          "nombre",
+          "pais",
+          "programa"
+        ],
+        "type": "object",
+        "properties": {
+          "nombre": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "pais": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "empresa": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "descripcion": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "programa": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del PUT para pasantia: reemplazar es poner TODO de nuevo, así que los campos obligatorios lo son también aquí. La llave no va: identifica la fila y viaja en la ruta. Un campo opcional que no llegue queda en NULL.\r\n            \r\nLos tipos son anulables a propósito: si no lo fueran, un número ausente\r\nllegaría como 0 y el [Required] no se enteraría."
+      },
+      "PracticaEstrategiaActualizar": {
+        "type": "object",
+        "properties": {
+          "tipo": {
+            "type": "string",
+            "nullable": true
+          },
+          "nombre": {
+            "type": "string",
+            "nullable": true
+          },
+          "descripcion": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del PATCH para practica_estrategia: los campos son OPCIONALES, y solo se\r\nescriben los que lleguen.\r\n            \r\nLa diferencia con PracticaEstrategiaReemplazo es toda la lección del contrato: el MISMO\r\ncuerpo responde 422 en PUT y 200 en PATCH, y no lo decide un if en el\r\nservicio — lo decide el tipo."
+      },
+      "PracticaEstrategiaCrear": {
+        "required": [
+          "descripcion",
+          "id",
+          "nombre",
+          "tipo"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "tipo": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "nombre": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "descripcion": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del POST para practica_estrategia. Todos los campos son obligatorios: crear un\r\nregistro a medias no tiene sentido. Si falta uno, el framework responde 422\r\nantes de que el negocio se entere."
+      },
+      "PracticaEstrategiaReemplazo": {
+        "required": [
+          "descripcion",
+          "nombre",
+          "tipo"
+        ],
+        "type": "object",
+        "properties": {
+          "tipo": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "nombre": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "descripcion": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del PUT para practica_estrategia. Reemplazar es poner TODO de nuevo, así que\r\ntodos los campos son obligatorios. El id no va aquí: identifica la\r\nfila y viaja en la ruta."
+      },
+      "PremioActualizar": {
+        "type": "object",
+        "properties": {
+          "nombre": {
+            "maxLength": 45,
+            "type": "string",
+            "nullable": true
+          },
+          "descripcion": {
+            "maxLength": 45,
+            "type": "string",
+            "nullable": true
+          },
+          "fecha": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "entidadOtorgante": {
+            "maxLength": 45,
+            "type": "string",
+            "nullable": true
+          },
+          "pais": {
+            "maxLength": 45,
+            "type": "string",
+            "nullable": true
+          },
+          "programa": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del PATCH para premio: todo opcional, y solo se escribe lo que llegue. El MISMO cuerpo incompleto responde 422 en PUT y 200 aquí: lo decide el tipo, no un if.\r\n            \r\nLos tipos son anulables a propósito: si no lo fueran, un número ausente\r\nllegaría como 0 y el [Required] no se enteraría."
+      },
+      "PremioCrear": {
+        "required": [
+          "descripcion",
+          "entidadOtorgante",
+          "fecha",
+          "id",
+          "nombre",
+          "pais",
+          "programa"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nombre": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "descripcion": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "fecha": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "entidadOtorgante": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "pais": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "programa": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del POST para premio. Lleva la llave, porque en esta tabla la llave no la genera la base: la escribe quien registra. Si falta un campo obligatorio, el framework responde 422 antes de que el negocio se entere.\r\n            \r\nLos tipos son anulables a propósito: si no lo fueran, un número ausente\r\nllegaría como 0 y el [Required] no se enteraría."
+      },
+      "PremioReemplazo": {
+        "required": [
+          "descripcion",
+          "entidadOtorgante",
+          "fecha",
+          "nombre",
+          "pais",
+          "programa"
+        ],
+        "type": "object",
+        "properties": {
+          "nombre": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "descripcion": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "fecha": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "entidadOtorgante": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "pais": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "programa": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del PUT para premio: reemplazar es poner TODO de nuevo, así que los campos obligatorios lo son también aquí. La llave no va: identifica la fila y viaja en la ruta. Un campo opcional que no llegue queda en NULL.\r\n            \r\nLos tipos son anulables a propósito: si no lo fueran, un número ausente\r\nllegaría como 0 y el [Required] no se enteraría."
+      },
+      "ProgramaAcCrear": {
+        "required": [
+          "areaConocimiento",
+          "programa"
+        ],
+        "type": "object",
+        "properties": {
+          "programa": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "areaConocimiento": {
+            "maxLength": 6,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del POST para programa_ac. Lleva la llave, porque en esta tabla la llave no la genera la base: la escribe quien registra. Si falta un campo obligatorio, el framework responde 422 antes de que el negocio se entere.\r\n            \r\nLos tipos son anulables a propósito: si no lo fueran, un número ausente\r\nllegaría como 0 y el [Required] no se enteraría."
+      },
+      "ProgramaActualizar": {
+        "type": "object",
+        "properties": {
+          "nombre": {
+            "maxLength": 150,
+            "type": "string",
+            "nullable": true
+          },
+          "tipo": {
+            "maxLength": 45,
+            "type": "string",
+            "nullable": true
+          },
+          "nivel": {
+            "maxLength": 45,
+            "type": "string",
+            "nullable": true
+          },
+          "fechaCreacion": {
+            "maxLength": 45,
+            "type": "string",
+            "nullable": true
+          },
+          "fechaCierre": {
+            "maxLength": 45,
+            "type": "string",
+            "nullable": true
+          },
+          "numeroCohortes": {
+            "maxLength": 45,
+            "type": "string",
+            "nullable": true
+          },
+          "cantGraduados": {
+            "maxLength": 45,
+            "type": "string",
+            "nullable": true
+          },
+          "fechaActualizacion": {
+            "maxLength": 45,
+            "type": "string",
+            "nullable": true
+          },
+          "ciudad": {
+            "maxLength": 45,
+            "type": "string",
+            "nullable": true
+          },
+          "facultad": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del PATCH para programa: todo opcional, y solo se escribe lo que llegue. El MISMO cuerpo incompleto responde 422 en PUT y 200 aquí: lo decide el tipo, no un if.\r\n            \r\nLos tipos son anulables a propósito: si no lo fueran, un número ausente\r\nllegaría como 0 y el [Required] no se enteraría."
+      },
+      "ProgramaCiCrear": {
+        "required": [
+          "carInnovacion",
+          "programa"
+        ],
+        "type": "object",
+        "properties": {
+          "programa": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "carInnovacion": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del POST para programa_ci. Lleva la llave, porque en esta tabla la llave no la genera la base: la escribe quien registra. Si falta un campo obligatorio, el framework responde 422 antes de que el negocio se entere.\r\n            \r\nLos tipos son anulables a propósito: si no lo fueran, un número ausente\r\nllegaría como 0 y el [Required] no se enteraría."
+      },
+      "ProgramaCompletoCrear": {
+        "required": [
+          "cantGraduados",
+          "ciudad",
+          "facultad",
+          "fechaActualizacion",
+          "fechaCreacion",
+          "id",
+          "nivel",
+          "nombre",
+          "numeroCohortes",
+          "tipo"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nombre": {
+            "maxLength": 150,
+            "minLength": 1,
+            "type": "string"
+          },
+          "tipo": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "nivel": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "fechaCreacion": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "fechaCierre": {
+            "maxLength": 45,
+            "type": "string",
+            "nullable": true
+          },
+          "numeroCohortes": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "cantGraduados": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "fechaActualizacion": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "ciudad": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "facultad": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "areasConocimiento": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Ids de area_conocimiento (texto de hasta 6). Filas de programa_ac.",
+            "nullable": true
+          },
+          "practicasEstrategias": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "description": "Ids de practica_estrategia. Filas de programa_pe.",
+            "nullable": true
+          },
+          "caracteristicasInnovacion": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "description": "Ids de car_innovacion. Filas de programa_ci.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo de POST /api/programa/completo: los campos de ProgramaCrear\r\n(heredados, con sus mismas validaciones) más el detalle, como listas de\r\nllaves de los catálogos."
+      },
+      "ProgramaCrear": {
+        "required": [
+          "cantGraduados",
+          "ciudad",
+          "facultad",
+          "fechaActualizacion",
+          "fechaCreacion",
+          "id",
+          "nivel",
+          "nombre",
+          "numeroCohortes",
+          "tipo"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nombre": {
+            "maxLength": 150,
+            "minLength": 1,
+            "type": "string"
+          },
+          "tipo": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "nivel": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "fechaCreacion": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "fechaCierre": {
+            "maxLength": 45,
+            "type": "string",
+            "nullable": true
+          },
+          "numeroCohortes": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "cantGraduados": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "fechaActualizacion": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "ciudad": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "facultad": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del POST para programa. Lleva la llave, porque en esta tabla la llave no la genera la base: la escribe quien registra. Si falta un campo obligatorio, el framework responde 422 antes de que el negocio se entere.\r\n            \r\nLos tipos son anulables a propósito: si no lo fueran, un número ausente\r\nllegaría como 0 y el [Required] no se enteraría."
+      },
+      "ProgramaPeCrear": {
+        "required": [
+          "practicaEstrategia",
+          "programa"
+        ],
+        "type": "object",
+        "properties": {
+          "programa": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "practicaEstrategia": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del POST para programa_pe. Lleva la llave, porque en esta tabla la llave no la genera la base: la escribe quien registra. Si falta un campo obligatorio, el framework responde 422 antes de que el negocio se entere.\r\n            \r\nLos tipos son anulables a propósito: si no lo fueran, un número ausente\r\nllegaría como 0 y el [Required] no se enteraría."
+      },
+      "ProgramaReemplazo": {
+        "required": [
+          "cantGraduados",
+          "ciudad",
+          "facultad",
+          "fechaActualizacion",
+          "fechaCreacion",
+          "nivel",
+          "nombre",
+          "numeroCohortes",
+          "tipo"
+        ],
+        "type": "object",
+        "properties": {
+          "nombre": {
+            "maxLength": 150,
+            "minLength": 1,
+            "type": "string"
+          },
+          "tipo": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "nivel": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "fechaCreacion": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "fechaCierre": {
+            "maxLength": 45,
+            "type": "string",
+            "nullable": true
+          },
+          "numeroCohortes": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "cantGraduados": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "fechaActualizacion": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "ciudad": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "facultad": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del PUT para programa: reemplazar es poner TODO de nuevo, así que los campos obligatorios lo son también aquí. La llave no va: identifica la fila y viaja en la ruta. Un campo opcional que no llegue queda en NULL.\r\n            \r\nLos tipos son anulables a propósito: si no lo fueran, un número ausente\r\nllegaría como 0 y el [Required] no se enteraría."
+      },
+      "RegistroCalificadoActualizar": {
+        "type": "object",
+        "properties": {
+          "cantCreditos": {
+            "maxLength": 45,
+            "type": "string",
+            "nullable": true
+          },
+          "horaAcom": {
+            "maxLength": 45,
+            "type": "string",
+            "nullable": true
+          },
+          "horaInd": {
+            "maxLength": 45,
+            "type": "string",
+            "nullable": true
+          },
+          "metodologia": {
+            "maxLength": 45,
+            "type": "string",
+            "nullable": true
+          },
+          "fechaInicio": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "fechaFin": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "duracionAnios": {
+            "maxLength": 45,
+            "type": "string",
+            "nullable": true
+          },
+          "duracionSemestres": {
+            "maxLength": 45,
+            "type": "string",
+            "nullable": true
+          },
+          "tipoTitulacion": {
+            "maxLength": 45,
+            "type": "string",
+            "nullable": true
+          },
+          "programa": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del PATCH para registro_calificado: todo opcional, y solo se escribe lo que llegue. El MISMO cuerpo incompleto responde 422 en PUT y 200 aquí: lo decide el tipo, no un if.\r\n            \r\nLos tipos son anulables a propósito: si no lo fueran, un número ausente\r\nllegaría como 0 y el [Required] no se enteraría."
+      },
+      "RegistroCalificadoCompletoCrear": {
+        "required": [
+          "cantCreditos",
+          "codigo",
+          "duracionAnios",
+          "duracionSemestres",
+          "fechaFin",
+          "fechaInicio",
+          "horaAcom",
+          "horaInd",
+          "metodologia",
+          "programa",
+          "tipoTitulacion"
+        ],
+        "type": "object",
+        "properties": {
+          "codigo": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "cantCreditos": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "horaAcom": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "horaInd": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "metodologia": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "fechaInicio": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "fechaFin": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "duracionAnios": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "duracionSemestres": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "tipoTitulacion": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "programa": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "enfoques": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "description": "Ids de enfoque. Cada uno será una fila de enfoque_rc.",
+            "nullable": true
+          },
+          "actividades": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ActividadDelRegistroCrear"
+            },
+            "description": "Cada una será una fila de aa_rc.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo de POST /api/registro_calificado/completo: los campos de\r\nRegistroCalificadoCrear (heredados, con sus mismas validaciones) más el\r\ndetalle. [ApiController] valida también cada elemento de las listas:\r\nuna actividad sin componente es un 422, igual que en POST /api/aa_rc."
+      },
+      "RegistroCalificadoCrear": {
+        "required": [
+          "cantCreditos",
+          "codigo",
+          "duracionAnios",
+          "duracionSemestres",
+          "fechaFin",
+          "fechaInicio",
+          "horaAcom",
+          "horaInd",
+          "metodologia",
+          "programa",
+          "tipoTitulacion"
+        ],
+        "type": "object",
+        "properties": {
+          "codigo": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "cantCreditos": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "horaAcom": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "horaInd": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "metodologia": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "fechaInicio": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "fechaFin": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "duracionAnios": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "duracionSemestres": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "tipoTitulacion": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "programa": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del POST para registro_calificado. Lleva la llave, porque en esta tabla la llave no la genera la base: la escribe quien registra. Si falta un campo obligatorio, el framework responde 422 antes de que el negocio se entere.\r\n            \r\nLos tipos son anulables a propósito: si no lo fueran, un número ausente\r\nllegaría como 0 y el [Required] no se enteraría."
+      },
+      "RegistroCalificadoReemplazo": {
+        "required": [
+          "cantCreditos",
+          "duracionAnios",
+          "duracionSemestres",
+          "fechaFin",
+          "fechaInicio",
+          "horaAcom",
+          "horaInd",
+          "metodologia",
+          "programa",
+          "tipoTitulacion"
+        ],
+        "type": "object",
+        "properties": {
+          "cantCreditos": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "horaAcom": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "horaInd": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "metodologia": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "fechaInicio": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "fechaFin": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "duracionAnios": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "duracionSemestres": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "tipoTitulacion": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "programa": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del PUT para registro_calificado: reemplazar es poner TODO de nuevo, así que los campos obligatorios lo son también aquí. La llave no va: identifica la fila y viaja en la ruta. Un campo opcional que no llegue queda en NULL.\r\n            \r\nLos tipos son anulables a propósito: si no lo fueran, un número ausente\r\nllegaría como 0 y el [Required] no se enteraría."
+      },
+      "RolActualizar": {
+        "type": "object",
+        "properties": {
+          "nombre": {
+            "maxLength": 100,
+            "type": "string",
+            "nullable": true
+          },
+          "descripcion": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "PATCH /api/rol/{id}."
+      },
+      "RolCrear": {
+        "required": [
+          "nombre"
+        ],
+        "type": "object",
+        "properties": {
+          "nombre": {
+            "maxLength": 100,
+            "minLength": 1,
+            "type": "string"
+          },
+          "descripcion": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "POST /api/rol. El id lo genera la base."
+      },
+      "RolReemplazo": {
+        "required": [
+          "nombre"
+        ],
+        "type": "object",
+        "properties": {
+          "nombre": {
+            "maxLength": 100,
+            "minLength": 1,
+            "type": "string"
+          },
+          "descripcion": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "PUT /api/rol/{id}."
+      },
+      "RolUsuarioCrear": {
+        "required": [
+          "rolId",
+          "usuarioId"
+        ],
+        "type": "object",
+        "properties": {
+          "usuarioId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "rolId": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false,
+        "description": "POST /api/rol_usuario: asignar un rol a un usuario."
+      },
+      "UniversidadActualizar": {
+        "type": "object",
+        "properties": {
+          "nombre": {
+            "type": "string",
+            "nullable": true
+          },
+          "tipo": {
+            "type": "string",
+            "nullable": true
+          },
+          "ciudad": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del PATCH para universidad: los campos son OPCIONALES, y solo se\r\nescriben los que lleguen.\r\n            \r\nLa diferencia con UniversidadReemplazo es toda la lección del contrato: el MISMO\r\ncuerpo responde 422 en PUT y 200 en PATCH, y no lo decide un if en el\r\nservicio — lo decide el tipo."
+      },
+      "UniversidadCrear": {
+        "required": [
+          "ciudad",
+          "id",
+          "nombre",
+          "tipo"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nombre": {
+            "maxLength": 60,
+            "minLength": 1,
+            "type": "string"
+          },
+          "tipo": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "ciudad": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del POST para universidad. Todos los campos son obligatorios: crear un\r\nregistro a medias no tiene sentido. Si falta uno, el framework responde 422\r\nantes de que el negocio se entere."
+      },
+      "UniversidadReemplazo": {
+        "required": [
+          "ciudad",
+          "nombre",
+          "tipo"
+        ],
+        "type": "object",
+        "properties": {
+          "nombre": {
+            "maxLength": 60,
+            "minLength": 1,
+            "type": "string"
+          },
+          "tipo": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          },
+          "ciudad": {
+            "maxLength": 45,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "description": "El cuerpo del PUT para universidad. Reemplazar es poner TODO de nuevo, así que\r\ntodos los campos son obligatorios. El id no va aquí: identifica la\r\nfila y viaja en la ruta."
+      },
+      "UsuarioActualizar": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "maxLength": 100,
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "maxLength": 150,
+            "type": "string",
+            "format": "email",
+            "nullable": true
+          },
+          "nombreCompleto": {
+            "maxLength": 200,
+            "type": "string",
+            "nullable": true
+          },
+          "clave": {
+            "maxLength": 100,
+            "minLength": 8,
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "PATCH /api/usuario/{id}: todo opcional, incluida una clave nueva."
+      },
+      "UsuarioCrear": {
+        "required": [
+          "clave",
+          "email",
+          "username"
+        ],
+        "type": "object",
+        "properties": {
+          "username": {
+            "maxLength": 100,
+            "minLength": 1,
+            "type": "string"
+          },
+          "clave": {
+            "maxLength": 100,
+            "minLength": 8,
+            "type": "string"
+          },
+          "email": {
+            "maxLength": 150,
+            "minLength": 1,
+            "type": "string",
+            "format": "email"
+          },
+          "nombreCompleto": {
+            "maxLength": 200,
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "POST /api/usuario. La clave llega en claro por HTTPS y se guarda hasheada."
+      },
+      "UsuarioReemplazo": {
+        "required": [
+          "email",
+          "username"
+        ],
+        "type": "object",
+        "properties": {
+          "username": {
+            "maxLength": 100,
+            "minLength": 1,
+            "type": "string"
+          },
+          "email": {
+            "maxLength": 150,
+            "minLength": 1,
+            "type": "string",
+            "format": "email"
+          },
+          "nombreCompleto": {
+            "maxLength": 200,
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "PUT /api/usuario/{id}: los datos de la ficha. La contraseña NO va aquí: se cambia por PATCH."
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "description": "Pegue el token de POST /api/login (sin la palabra Bearer).",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "security": [
+    {
+      "Bearer": []
+    }
+  ]
+}

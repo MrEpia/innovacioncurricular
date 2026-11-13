@@ -137,3 +137,14 @@ de git (`git config user.name` / `user.email` **sin** `--global`, dentro de su
 carpeta) y sube su rama; el encargado del `main` integra y, al pasar los
 criterios, pone el tag de la versión. El reparto y el orden de cada entrega
 están en el `8_tasks.md` de su versión.
+
+## Revisión V2 de despliegue — Neon y Render (en preparación)
+
+La revisión [Spec Kit V2 Neon/Render](docs/spec_kit/versiones/v2_neon_render/2_spec.md) está basada en el código V4 y conserva la V2 histórica. Agrega un proveedor PostgreSQL paralelo y contenedores de producción, comprobados en un laboratorio aislado. **El despliegue público nuevo sigue pendiente de acceso a Neon y al repositorio privado desde Render.**
+
+- [Despliegue y migraciones](DESPLIEGUE_NEON_RENDER.md).
+- [Auditoría](docs/AUDITORIA_NEON_RENDER_V2.md) y [resultados locales](docs/VALIDACION_NEON_RENDER_V2.md).
+- [Mapa completo de archivos, funciones y endpoints](MAPA_COMPLETO_PROYECTO_V2.txt).
+- [Punto de control](ASTRA_ESTADO_TRABAJO.md) e [instrucción de reanudación](ASTRA_REANUDAR.txt).
+
+Los servicios y la documentación de las entregas anteriores se conservan. La revisión nueva se integra solo después de revisar su PR; no se fusiona automáticamente.

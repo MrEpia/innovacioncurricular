@@ -281,12 +281,13 @@ o se corrige el plan, o se enmienda esto.
 
 ---
 
-*Versión 1.5.0 · Ratificada el 2026-08-29 · Última enmienda: 2026-11-05*
+*Versión 1.6.0 (rama en revisión) · Ratificada el 2026-08-29 · Última enmienda: 2026-11-13*
 
 ### Registro de enmiendas
 
 | Versión | Fecha | Artículos | Qué cambió y por qué | Dónde se propuso |
 |---|---|---|---|---|
+| 1.6.0 | 2026-11-13 | 2, 5, 10 | Proveedor PostgreSQL paralelo para Neon, Npgsql y funciones PL/pgSQL invocadas con SELECT; migraciones separadas sin DROP; PORT en Render. SQL Server y versiones cerradas se conservan | [v2_neon_render/4_research.md](versiones/v2_neon_render/4_research.md), D-NR-1 a D-NR-5; misión explícita del propietario, sujeta a revisión por PR |
 | 1.5.0 | 2026-11-05 | 10 | Rutas de los 10 reportes y del dashboard, una por reporte y por gráfico · páginas corporativas públicas y estáticas | [v4_publicacion/4_research.md](versiones/v4_publicacion/4_research.md), D-v4-1 y D-v4-4 |
 | 1.4.0 | 2026-10-23 | 2, 10 | El maestro-detalle (registro calificado y programa con sus hijos) se guarda en un procedimiento, todo o nada, con el detalle como parámetro JSON · rutas `/api/{tabla}/completo` y `/api/{tabla}/{llave}/completo` | [v3_maestro_detalle/4_research.md](versiones/v3_maestro_detalle/4_research.md), D-MD-1 |
 | 1.3.0 | 2026-10-23 | 2 | Se permiten procedimientos almacenados para las operaciones atómicas de comprobar y escribir (27, en la migración `v3_002`) | [v3_seguridad/4_research.md](versiones/v3_seguridad/4_research.md), D-v3-10 |
@@ -330,3 +331,7 @@ Universidad actualice su manual, se cambia un archivo y nada más.
 >
 > El porqué de todo esto, con la fórmula del contraste y las referencias,
 > está en [`CONCEPTOS_IDENTIDAD_VISUAL.md`](../CONCEPTOS_IDENTIDAD_VISUAL.md).
+
+## Artículo 13 — Extensión Neon/Render (enmienda 1.6.0, rama en revisión)
+
+La revisión [V2 Neon/Render](versiones/v2_neon_render/2_spec.md) amplía el stack con **Npgsql 10.0.0** y repositorios PostgreSQL concretos, manteniendo Dapper, SQL explícito y las interfaces. SQL Server continúa por defecto. En PostgreSQL, las operaciones atómicas viven en funciones PL/pgSQL y se invocan con SELECT parametrizado; no se les aplica CommandType.StoredProcedure de SqlClient. Los scripts PostgreSQL son independientes y se aplican mediante historial/checksums sobre una base nueva; no se ejecuta el script de limpieza SQL Server. El `activo BIT` histórico se representa como smallint restringido a 0/1. Render recibe PORT; los puertos locales históricos no cambian. Esta ampliación implementa la petición explícita del propietario y se entrega en PR sin fusión automática. No cierra la revisión hasta verificar Neon, Render y pruebas públicas.

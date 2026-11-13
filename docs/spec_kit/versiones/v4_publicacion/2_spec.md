@@ -151,7 +151,7 @@ horizontal. En el celular el menú se pliega tras «☰ Menú».
 | C2 | ¿«Productos/Servicios»? | En una universidad son los **servicios del sistema** para cada dependencia: página `/servicios` |
 | C3 | ¿El formulario de contacto guarda mensajes? | No: abre el correo de quien escribe (`mailto:`). El sistema no recoge datos personales de visitantes |
 | C4 | ¿Con qué datos se ven los reportes? | Con el escenario de demostración de `v4_001_datos_demo.sql`, que no pisa lo que ya exista |
-| C5 | ¿Dos servidores o uno? | El plan gratuito de MonsterASP permite un sitio por cuenta: API y front van en dos cuentas, una por integrante (D-v4-7) |
+| C5 | ¿Dos servidores o uno? | Dos sitios (API y front) y una base, todos en la cuenta gratuita de Sebastián Calvo, que admite 5 sitios (D-v4-7) |
 
 ## 6. Definición de TERMINADA
 
